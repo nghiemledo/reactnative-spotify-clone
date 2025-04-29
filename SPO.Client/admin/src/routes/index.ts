@@ -1,9 +1,11 @@
+import AnalyticsOverview from '@/pages/admin/analytics/overview';
+import AnalyticsRevenue from '@/pages/admin/analytics/revenue';
+import AnalyticsSongs from '@/pages/admin/analytics/songs';
+import AnalyticsUsers from '@/pages/admin/analytics/users';
 import ManageArtistPage from '@/pages/admin/artist';
-import ManageArtistCreatePage from '@/pages/admin/artist/create';
-import ManageArtistEditPage from '@/pages/admin/artist/edit';
+import ManageArtistAddPage from '@/pages/admin/artist/add';
 import AdminPage from '@/pages/admin/index';
-import ManageSongCreatePage from '@/pages/admin/song/create';
-import ManageSongEditPage from '@/pages/admin/song/edit';
+import ManageSongAddPage from '@/pages/admin/song/add';
 import ManageSongPage from '@/pages/admin/song/index';
 import LoginPage from '@/pages/auth/LoginPage';
 // import RegisterPage from '@/pages/auth/RegisterPage';
@@ -20,13 +22,17 @@ const authPaths = {
 const privatePrefix = '/admin';
 const privateRoutes = [
     { path: privatePrefix, component: AdminPage },
-    { path: `${privatePrefix}/song`, component: ManageSongPage },
-    { path: `${privatePrefix}/song/create`, component: ManageSongCreatePage },
-    { path: `${privatePrefix}/song/edit`, component: ManageSongEditPage },
+
+    { path: `${privatePrefix}/analytics/overview`, component: AnalyticsOverview },
+    { path: `${privatePrefix}/analytics/songs`, component: AnalyticsSongs },
+    { path: `${privatePrefix}/analytics/users`, component: AnalyticsUsers },
+    { path: `${privatePrefix}/analytics/revenue`, component: AnalyticsRevenue },
 
     { path: `${privatePrefix}/artists`, component: ManageArtistPage },
-    { path: `${privatePrefix}/artists/add`, component: ManageArtistCreatePage },
-    { path: `${privatePrefix}/artists/edit`, component: ManageArtistEditPage },
+    { path: `${privatePrefix}/artists/add`, component: ManageArtistAddPage },
+
+    { path: `${privatePrefix}/songs`, component: ManageSongPage },
+    { path: `${privatePrefix}/songs/add`, component: ManageSongAddPage },
 ];
 
 const privatePaths = {

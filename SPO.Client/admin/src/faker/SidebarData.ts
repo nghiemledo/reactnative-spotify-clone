@@ -17,10 +17,10 @@ export const SidebarData = {
     navMain: [
         {
             title: "Analytics",
-            url: "/admin/analytics",
+            url: "/admin/analytics/overview",
             icon: BarChart4,
             items: [
-                { title: "Overview", url: "/admin/analytics" },
+                { title: "Overview", url: "/admin/analytics/overview" },
                 { title: "Song Plays", url: "/admin/analytics/songs" },
                 { title: "User Growth", url: "/admin/analytics/users" },
                 { title: "Revenue", url: "/admin/analytics/revenue" },
