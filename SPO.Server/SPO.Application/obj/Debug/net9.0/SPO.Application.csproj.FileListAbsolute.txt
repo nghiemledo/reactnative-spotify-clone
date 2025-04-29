@@ -1,0 +1,15 @@
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\bin\Debug\net9.0\SPO.Application.deps.json
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\bin\Debug\net9.0\SPO.Application.dll
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\bin\Debug\net9.0\SPO.Application.pdb
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\bin\Debug\net9.0\SPO.Domain.dll
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\bin\Debug\net9.0\SPO.Domain.pdb
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\obj\Debug\net9.0\SPO.Application.csproj.AssemblyReference.cache
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\obj\Debug\net9.0\SPO.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\obj\Debug\net9.0\SPO.Application.AssemblyInfoInputs.cache
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\obj\Debug\net9.0\SPO.Application.AssemblyInfo.cs
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\obj\Debug\net9.0\SPO.Application.csproj.CoreCompileInputs.cache
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\obj\Debug\net9.0\SPO.Appl.94F33B0F.Up2Date
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\obj\Debug\net9.0\SPO.Application.dll
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\obj\Debug\net9.0\refint\SPO.Application.dll
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\obj\Debug\net9.0\SPO.Application.pdb
+D:\01. UDA\03. Junior\MobileDevelopment-02\spotify-clone\SPO.Application\obj\Debug\net9.0\ref\SPO.Application.dll

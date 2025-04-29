@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "lkCfvS3KLknc9APDREpnvObFalfhxGUovRtQRhvDJD4=",
+  "Source": "SPO.Server",
+  "BasePath": "_content/SPO.Server",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

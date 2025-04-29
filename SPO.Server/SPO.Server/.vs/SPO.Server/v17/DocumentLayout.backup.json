@@ -1,0 +1,402 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Server\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{AC44F40F-B083-4D63-A44D-895FA7347DC3}|SPO.Server.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.server\\spo.server.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{AC44F40F-B083-4D63-A44D-895FA7347DC3}|SPO.Server.csproj|solutionrelative:spo.server.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{95BF9CC3-640F-454F-BBC6-F9B08977DAC0}|..\\SPO.Infrastructure\\SPO.Infrastructure.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.infrastructure\\spo.infrastructure.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4CAA2DA4-9205-4EE9-88FE-49F5DEC101F7}|..\\SPO.Common\\SPO.Common.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.common\\constants\\staticvariable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4CAA2DA4-9205-4EE9-88FE-49F5DEC101F7}|..\\SPO.Common\\SPO.Common.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.common\\spo.common.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{84459386-BE0A-47A4-901A-85CA215491B4}|..\\SPO.Application\\SPO.Application.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.application\\base\\dapperbase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{84459386-BE0A-47A4-901A-85CA215491B4}|..\\SPO.Application\\SPO.Application.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.application\\base\\idapperbase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{84459386-BE0A-47A4-901A-85CA215491B4}|..\\SPO.Application\\SPO.Application.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.application\\datatransferobjects\\response\\responseobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E32473D9-5570-4CD9-8C48-092BE0DFF998}|..\\SPO.Domain\\SPO.Domain.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.domain\\wrappers\\result.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AC44F40F-B083-4D63-A44D-895FA7347DC3}|SPO.Server.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AC44F40F-B083-4D63-A44D-895FA7347DC3}|SPO.Server.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E32473D9-5570-4CD9-8C48-092BE0DFF998}|..\\SPO.Domain\\SPO.Domain.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.domain\\wrappers\\iresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4CAA2DA4-9205-4EE9-88FE-49F5DEC101F7}|..\\SPO.Common\\SPO.Common.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.common\\password\\passwordservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{84459386-BE0A-47A4-901A-85CA215491B4}|..\\SPO.Application\\SPO.Application.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.application\\mappings\\generalprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{84459386-BE0A-47A4-901A-85CA215491B4}|..\\SPO.Application\\SPO.Application.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.application\\spo.application.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{84459386-BE0A-47A4-901A-85CA215491B4}|..\\SPO.Application\\SPO.Application.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.application\\datatransferobjects\\request\\song\\updatesongrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{84459386-BE0A-47A4-901A-85CA215491B4}|..\\SPO.Application\\SPO.Application.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.application\\datatransferobjects\\request\\song\\createsongrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{95BF9CC3-640F-454F-BBC6-F9B08977DAC0}|..\\SPO.Infrastructure\\SPO.Infrastructure.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.infrastructure\\dappers\\storeprocedures\\song\\sp_spo_insertsong.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{95BF9CC3-640F-454F-BBC6-F9B08977DAC0}|..\\SPO.Infrastructure\\SPO.Infrastructure.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.infrastructure\\dappers\\storeprocedures\\song\\sp_spo_getallsongs.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{95BF9CC3-640F-454F-BBC6-F9B08977DAC0}|..\\SPO.Infrastructure\\SPO.Infrastructure.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.infrastructure\\entityframework\\dbcontexts\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E32473D9-5570-4CD9-8C48-092BE0DFF998}|..\\SPO.Domain\\SPO.Domain.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.domain\\entities\\song.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E32473D9-5570-4CD9-8C48-092BE0DFF998}|..\\SPO.Domain\\SPO.Domain.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.domain\\entities\\base\\nonauditableentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E32473D9-5570-4CD9-8C48-092BE0DFF998}|..\\SPO.Domain\\SPO.Domain.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.domain\\entities\\base\\inonauditableentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E32473D9-5570-4CD9-8C48-092BE0DFF998}|..\\SPO.Domain\\SPO.Domain.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.domain\\entities\\base\\auditableentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E32473D9-5570-4CD9-8C48-092BE0DFF998}|..\\SPO.Domain\\SPO.Domain.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.domain\\entities\\base\\iauditableentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{95BF9CC3-640F-454F-BBC6-F9B08977DAC0}|..\\SPO.Infrastructure\\SPO.Infrastructure.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.infrastructure\\dappers\\storeprocedures\\song\\sp_spo_getallsongs.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{95BF9CC3-640F-454F-BBC6-F9B08977DAC0}|..\\SPO.Infrastructure\\SPO.Infrastructure.csproj|d:\\01. uda\\03. junior\\mobiledevelopment-02\\spotify-clone\\spo.infrastructure\\dappers\\storeprocedures\\song\\sp_spo_insertsong.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "SPO.Server",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Server\\SPO.Server.csproj",
+              "RelativeDocumentMoniker": "SPO.Server.csproj",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Server\\SPO.Server.csproj",
+              "RelativeToolTip": "SPO.Server.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAABGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-04-29T01:13:35.579Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SPO.Infrastructure",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Infrastructure\\SPO.Infrastructure.csproj",
+              "RelativeDocumentMoniker": "..\\SPO.Infrastructure\\SPO.Infrastructure.csproj",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Infrastructure\\SPO.Infrastructure.csproj",
+              "RelativeToolTip": "..\\SPO.Infrastructure\\SPO.Infrastructure.csproj",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-04-29T01:10:36.927Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "StaticVariable.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Common\\Constants\\StaticVariable.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Common\\Constants\\StaticVariable.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Common\\Constants\\StaticVariable.cs",
+              "RelativeToolTip": "..\\SPO.Common\\Constants\\StaticVariable.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T01:08:27.774Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IDapperBase.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Application\\Base\\IDapperBase.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Application\\Base\\IDapperBase.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Application\\Base\\IDapperBase.cs",
+              "RelativeToolTip": "..\\SPO.Application\\Base\\IDapperBase.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:55:12.878Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "DapperBase.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Application\\Base\\DapperBase.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Application\\Base\\DapperBase.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Application\\Base\\DapperBase.cs",
+              "RelativeToolTip": "..\\SPO.Application\\Base\\DapperBase.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:54:36.554Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ResponseObject.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Application\\DataTransferObjects\\Response\\ResponseObject.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Application\\DataTransferObjects\\Response\\ResponseObject.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Application\\DataTransferObjects\\Response\\ResponseObject.cs",
+              "RelativeToolTip": "..\\SPO.Application\\DataTransferObjects\\Response\\ResponseObject.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:48:56.695Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Server\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Server\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:47:49.03Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Result.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Domain\\Wrappers\\Result.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Domain\\Wrappers\\Result.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Domain\\Wrappers\\Result.cs",
+              "RelativeToolTip": "..\\SPO.Domain\\Wrappers\\Result.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:45:07.714Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SPO.Common",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Common\\SPO.Common.csproj",
+              "RelativeDocumentMoniker": "..\\SPO.Common\\SPO.Common.csproj",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Common\\SPO.Common.csproj",
+              "RelativeToolTip": "..\\SPO.Common\\SPO.Common.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-04-29T00:44:13.779Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "IResult.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Domain\\Wrappers\\IResult.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Domain\\Wrappers\\IResult.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Domain\\Wrappers\\IResult.cs",
+              "RelativeToolTip": "..\\SPO.Domain\\Wrappers\\IResult.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:45:03.011Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "PasswordService.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Common\\Password\\PasswordService.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Common\\Password\\PasswordService.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Common\\Password\\PasswordService.cs",
+              "RelativeToolTip": "..\\SPO.Common\\Password\\PasswordService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:44:49.775Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "GeneralProfile.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Application\\Mappings\\GeneralProfile.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Application\\Mappings\\GeneralProfile.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Application\\Mappings\\GeneralProfile.cs",
+              "RelativeToolTip": "..\\SPO.Application\\Mappings\\GeneralProfile.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:38:38.065Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "UpdateSongRequest.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Application\\DataTransferObjects\\Request\\Song\\UpdateSongRequest.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Application\\DataTransferObjects\\Request\\Song\\UpdateSongRequest.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Application\\DataTransferObjects\\Request\\Song\\UpdateSongRequest.cs",
+              "RelativeToolTip": "..\\SPO.Application\\DataTransferObjects\\Request\\Song\\UpdateSongRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:37:03.615Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "CreateSongRequest.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Application\\DataTransferObjects\\Request\\Song\\CreateSongRequest.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Application\\DataTransferObjects\\Request\\Song\\CreateSongRequest.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Application\\DataTransferObjects\\Request\\Song\\CreateSongRequest.cs",
+              "RelativeToolTip": "..\\SPO.Application\\DataTransferObjects\\Request\\Song\\CreateSongRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:36:47.417Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "SPO.Application",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Application\\SPO.Application.csproj",
+              "RelativeDocumentMoniker": "..\\SPO.Application\\SPO.Application.csproj",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Application\\SPO.Application.csproj",
+              "RelativeToolTip": "..\\SPO.Application\\SPO.Application.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-04-29T00:33:43.989Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "SP_SPO_InsertSong.sql ",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Infrastructure\\Dappers\\StoreProcedures\\Song\\SP_SPO_InsertSong.sql",
+              "RelativeDocumentMoniker": "..\\SPO.Infrastructure\\Dappers\\StoreProcedures\\Song\\SP_SPO_InsertSong.sql",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Infrastructure\\Dappers\\StoreProcedures\\Song\\SP_SPO_InsertSong.sql",
+              "RelativeToolTip": "..\\SPO.Infrastructure\\Dappers\\StoreProcedures\\Song\\SP_SPO_InsertSong.sql",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-04-29T00:32:06.533Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "SP_SPO_GetAllSongs.sql ",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Infrastructure\\Dappers\\StoreProcedures\\Song\\SP_SPO_GetAllSongs.sql",
+              "RelativeDocumentMoniker": "..\\SPO.Infrastructure\\Dappers\\StoreProcedures\\Song\\SP_SPO_GetAllSongs.sql",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Infrastructure\\Dappers\\StoreProcedures\\Song\\SP_SPO_GetAllSongs.sql",
+              "RelativeToolTip": "..\\SPO.Infrastructure\\Dappers\\StoreProcedures\\Song\\SP_SPO_GetAllSongs.sql",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-04-29T00:31:14.93Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "Song.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Domain\\Entities\\Song.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Domain\\Entities\\Song.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Domain\\Entities\\Song.cs",
+              "RelativeToolTip": "..\\SPO.Domain\\Entities\\Song.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:29:08.3Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "NonAuditableEntity.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Domain\\Entities\\Base\\NonAuditableEntity.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Domain\\Entities\\Base\\NonAuditableEntity.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Domain\\Entities\\Base\\NonAuditableEntity.cs",
+              "RelativeToolTip": "..\\SPO.Domain\\Entities\\Base\\NonAuditableEntity.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:28:44.872Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "INonAuditableEntity.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Domain\\Entities\\Base\\INonAuditableEntity.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Domain\\Entities\\Base\\INonAuditableEntity.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Domain\\Entities\\Base\\INonAuditableEntity.cs",
+              "RelativeToolTip": "..\\SPO.Domain\\Entities\\Base\\INonAuditableEntity.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:28:30.371Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "IAuditableEntity.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Domain\\Entities\\Base\\IAuditableEntity.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Domain\\Entities\\Base\\IAuditableEntity.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Domain\\Entities\\Base\\IAuditableEntity.cs",
+              "RelativeToolTip": "..\\SPO.Domain\\Entities\\Base\\IAuditableEntity.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:27:29.726Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "AuditableEntity.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Domain\\Entities\\Base\\AuditableEntity.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Domain\\Entities\\Base\\AuditableEntity.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Domain\\Entities\\Base\\AuditableEntity.cs",
+              "RelativeToolTip": "..\\SPO.Domain\\Entities\\Base\\AuditableEntity.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:27:10.252Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Infrastructure\\EntityFramework\\DbContexts\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "..\\SPO.Infrastructure\\EntityFramework\\DbContexts\\ApplicationDbContext.cs",
+              "ToolTip": "D:\\01. UDA\\03. Junior\\MobileDevelopment-02\\spotify-clone\\SPO.Infrastructure\\EntityFramework\\DbContexts\\ApplicationDbContext.cs",
+              "RelativeToolTip": "..\\SPO.Infrastructure\\EntityFramework\\DbContexts\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T00:26:39.92Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\SPO.Server.props" />
+</Project>
