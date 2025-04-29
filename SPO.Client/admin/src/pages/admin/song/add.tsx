@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ManageSongAddPage: React.FC = () => {
+const ManageAddSong: React.FC = () => {
     return (
         <div>
             manage song create page
@@ -8,4 +8,4 @@ const ManageSongAddPage: React.FC = () => {
     );
 };
 
-export default ManageSongAddPage;
+export default ManageAddSong;
