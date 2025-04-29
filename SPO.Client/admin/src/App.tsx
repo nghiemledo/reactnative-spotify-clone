@@ -13,7 +13,7 @@ function App() {
 
   return (
     <>
-      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <Routes>
           {authRoutes.map(({ path, component: Component }, index) => (
             <Route key={index} path={path} element={
