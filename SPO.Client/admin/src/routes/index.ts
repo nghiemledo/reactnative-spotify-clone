@@ -24,9 +24,9 @@ const privateRoutes = [
     { path: `${privatePrefix}/song/create`, component: ManageSongCreatePage },
     { path: `${privatePrefix}/song/edit`, component: ManageSongEditPage },
 
-    { path: `${privatePrefix}/artist`, component: ManageArtistPage },
-    { path: `${privatePrefix}/artist/create`, component: ManageArtistCreatePage },
-    { path: `${privatePrefix}/artist/edit`, component: ManageArtistEditPage },
+    { path: `${privatePrefix}/artists`, component: ManageArtistPage },
+    { path: `${privatePrefix}/artists/add`, component: ManageArtistCreatePage },
+    { path: `${privatePrefix}/artists/edit`, component: ManageArtistEditPage },
 ];
 
 const privatePaths = {
