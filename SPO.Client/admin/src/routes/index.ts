@@ -1,22 +1,28 @@
+import ManageAlbums from '@/pages/admin/album';
+import ManageAddAlbum from '@/pages/admin/album/add';
 import AnalyticsOverview from '@/pages/admin/analytics/overview';
 import AnalyticsRevenue from '@/pages/admin/analytics/revenue';
 import AnalyticsSongs from '@/pages/admin/analytics/songs';
 import AnalyticsUsers from '@/pages/admin/analytics/users';
-import ManageArtistPage from '@/pages/admin/artist';
-import ManageArtistAddPage from '@/pages/admin/artist/add';
+import ManageArtist from '@/pages/admin/artist';
+import ManageAddArtist from '@/pages/admin/artist/add';
 import AdminPage from '@/pages/admin/index';
-import ManageSongAddPage from '@/pages/admin/song/add';
-import ManageSongPage from '@/pages/admin/song/index';
+import ManagePlaylist from '@/pages/admin/playlist';
+import ManageReportsPlaylist from '@/pages/admin/playlist/reports';
+import SettingGeneral from '@/pages/admin/setting/general';
+import SettingRoles from '@/pages/admin/setting/roles';
+import SettingStorage from '@/pages/admin/setting/storage';
+import ManageAddSong from '@/pages/admin/song/add';
+import ManageSong from '@/pages/admin/song/index';
+import ManageUser from '@/pages/admin/user';
+import ManageAddUser from '@/pages/admin/user/add';
 import LoginPage from '@/pages/auth/LoginPage';
-// import RegisterPage from '@/pages/auth/RegisterPage';
 
 const authRoutes = [
     { path: '/login', component: LoginPage },
-    // { path: '/register', component: RegisterPage }
 ];
 const authPaths = {
     login: '/login',
-    register: '/register'
 }
 
 const privatePrefix = '/admin';
@@ -28,11 +34,24 @@ const privateRoutes = [
     { path: `${privatePrefix}/analytics/users`, component: AnalyticsUsers },
     { path: `${privatePrefix}/analytics/revenue`, component: AnalyticsRevenue },
 
-    { path: `${privatePrefix}/artists`, component: ManageArtistPage },
-    { path: `${privatePrefix}/artists/add`, component: ManageArtistAddPage },
+    { path: `${privatePrefix}/artists`, component: ManageArtist },
+    { path: `${privatePrefix}/artists/add`, component: ManageAddArtist },
 
-    { path: `${privatePrefix}/songs`, component: ManageSongPage },
-    { path: `${privatePrefix}/songs/add`, component: ManageSongAddPage },
+    { path: `${privatePrefix}/albums`, component: ManageAlbums },
+    { path: `${privatePrefix}/albums/add`, component: ManageAddAlbum },
+
+    { path: `${privatePrefix}/songs`, component: ManageSong },
+    { path: `${privatePrefix}/songs/add`, component: ManageAddSong },
+
+    { path: `${privatePrefix}/playlists`, component: ManagePlaylist },
+    { path: `${privatePrefix}/playlists/reports`, component: ManageReportsPlaylist },
+
+    { path: `${privatePrefix}/users`, component: ManageUser },
+    { path: `${privatePrefix}/users/add`, component: ManageAddUser },
+
+    { path: `${privatePrefix}/settings/general`, component: SettingGeneral },
+    { path: `${privatePrefix}/settings/storage`, component: SettingStorage },
+    { path: `${privatePrefix}/settings/roles`, component: SettingRoles },
 ];
 
 const privatePaths = {

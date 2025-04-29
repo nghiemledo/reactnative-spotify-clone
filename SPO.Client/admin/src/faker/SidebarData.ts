@@ -69,12 +69,12 @@ export const SidebarData = {
             icon: Users,
             items: [
                 { title: "All Users", url: "/admin/users" },
-                { title: "Add Admin", url: "/admin/users/create-admin" },
+                { title: "Add User", url: "/admin/users/add" },
             ],
         },
         {
             title: "Settings",
-            url: "/admin/settings",
+            url: "/admin/settings/general",
             icon: Settings,
             items: [
                 { title: "General Settings", url: "/admin/settings/general" },
