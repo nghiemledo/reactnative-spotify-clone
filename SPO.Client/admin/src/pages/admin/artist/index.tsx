@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ManageArtistPage: React.FC = () => {
+const ManageArtist: React.FC = () => {
     return (
         <div>
             manage artist page
@@ -8,4 +8,4 @@ const ManageArtistPage: React.FC = () => {
     );
 };
 
-export default ManageArtistPage;
+export default ManageArtist;
