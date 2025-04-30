@@ -2,8 +2,11 @@ import { Song } from '@/types/Song';
 import React from 'react';
 import { ColumnDef } from "@tanstack/react-table";
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/data-table';
+import { EditIcon } from '@/components/edit-icon';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { EyeIcon } from '@/components/eye-icon';
+import { DeleteIcon } from '@/components/delete-icon';
 
 const songs: Song[] = [
     {
@@ -74,9 +77,45 @@ const columns: ColumnDef<Song>[] = [
         id: "actions",
         header: "Actions",
         cell: ({ row }) => (
-            <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => console.log(row.original.id)}>Edit</Button>
-                <Button variant="destructive" size="sm">Delete</Button>
+            <div className="relative flex items-center gap-3">
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <span className="text-lg cursor-pointer active:opacity-50"
+                            // onClick={handleView}
+                            >
+                                <EyeIcon />
+                            </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>View</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <span className="text-lg cursor-pointer active:opacity-50"
+                            //  onClick={() => setEditOpen(true)}
+                            >
+                                <EditIcon />
+                            </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Update</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <span className="text-lg text-red-400 cursor-pointer active:opacity-50"
+                            // onClick={() => setDeleteOpen(true)}
+                            >
+                                <DeleteIcon />
+                            </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Delete</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             </div>
         ),
     },
