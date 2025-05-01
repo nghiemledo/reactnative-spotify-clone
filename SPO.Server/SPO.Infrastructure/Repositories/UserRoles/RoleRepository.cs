@@ -12,7 +12,6 @@ namespace SPO.Infrastructure.Repositories.UserRoles
         Task<Role?> GetByIdAsync(string id);
         Task<IEnumerable<Role>> GetAllAsync();
         Task<Role?> GetByNameAsync(string firstname);
-
     }
 
     public class RoleRepository : IRoleRepository
@@ -24,7 +23,7 @@ namespace SPO.Infrastructure.Repositories.UserRoles
         {
             try
             {
-                await _db.SaveData("[SP_AILMS_InsertRole]", new
+                await _db.SaveData("[SP_SPO_InsertRole]", new
                 {
                     vm.Name
                 });
@@ -37,7 +36,7 @@ namespace SPO.Infrastructure.Repositories.UserRoles
         {
             try
             {
-                await _db.SaveData("[SP_AILMS_UpdateRole]", new
+                await _db.SaveData("[SP_SPO_UpdateRole]", new
                 {
                     vm.Id,
                     vm.Name
@@ -51,7 +50,7 @@ namespace SPO.Infrastructure.Repositories.UserRoles
         {
             try
             {
-                await _db.SaveData("SP_AILMS_DeleteRole", new { Id = id });
+                await _db.SaveData("SP_SPO_DeleteRole", new { Id = id });
                 return true;
             }
             catch (Exception) { return false; }
@@ -60,19 +59,19 @@ namespace SPO.Infrastructure.Repositories.UserRoles
 
         public async Task<Role?> GetByIdAsync(string id)
         {
-            IEnumerable<Role> result = await _db.GetData<Role, dynamic>("[SP_AILMS_GetRoleById]", new { Id = id });
+            IEnumerable<Role> result = await _db.GetData<Role, dynamic>("[SP_SPO_GetRoleById]", new { Id = id });
             return result.FirstOrDefault();
         }
 
         public async Task<IEnumerable<Role>> GetAllAsync()
         {
-            string query = "[SP_AILMS_GetAllRoles]";
+            string query = "[SP_SPO_GetAllRoles]";
             return await _db.GetData<Role, dynamic>(query, new { });
         }
 
         public async Task<Role> GetByNameAsync(string name)
         {
-            IEnumerable<Role> result = await _db.GetData<Role, dynamic>("[SP_AILMS_GetRoleByName]", new { Name = name });
+            IEnumerable<Role> result = await _db.GetData<Role, dynamic>("[SP_SPO_GetRoleByName]", new { Name = name });
             return result.FirstOrDefault();
         }
     }

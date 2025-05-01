@@ -18,7 +18,7 @@ namespace SPO.Infrastructure.Repositories.UserRoles
         {
             try
             {
-                await _db.SaveData("[SP_AILMS_InsertUserRole]", new
+                await _db.SaveData("[SP_SPO_InsertUserRole]", new
                 {
                     vm.UserId,
                     vm.RoleId,
@@ -31,7 +31,7 @@ namespace SPO.Infrastructure.Repositories.UserRoles
         }
         public async Task<string> GetRoleByUserId(string UserId)
         {
-            IEnumerable<string> result = await _db.GetData<string, dynamic>("[SP_AILMS_GetRoleByUserId]", new { UserId });
+            IEnumerable<string> result = await _db.GetData<string, dynamic>("[SP_SPO_GetRoleByUserId]", new { UserId });
             return result.FirstOrDefault()!;
         }
     }
