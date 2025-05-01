@@ -60,4 +60,98 @@
             return Task.FromResult(Success(message));
         }
     }
+
+    public class Result<T> : Result, IResult<T>
+    {
+        public Result()
+        {
+        }
+
+        public T Data { get; set; } = default!;
+
+        private new static Result<T> Fail()
+        {
+            return new Result<T> { Status = false };
+        }
+
+        private new static Result<T> Fail(string message)
+        {
+            return new Result<T> { Status = false, Messages = new List<string> { message } };
+        }
+
+        private new static Result<T> Fail(List<string> messages)
+        {
+            return new Result<T> { Status = false, Messages = messages };
+        }
+
+        private static Result<T> Fail(T data)
+        {
+            return new Result<T> { Data = data };
+        }
+
+        public new static Task<Result<T>> FailAsync()
+        {
+            return Task.FromResult(Fail());
+        }
+
+        public new static Task<Result<T>> FailAsync(string message)
+        {
+            return Task.FromResult(Fail(message));
+        }
+
+        public new static Task<Result<T>> FailAsync(List<string> messages)
+        {
+            return Task.FromResult(Fail(messages));
+        }
+
+        public static Task<Result<T>> FailAsync(T data)
+        {
+            return Task.FromResult(Fail(data));
+        }
+
+        public new static Result<T> Success()
+        {
+            return new Result<T> { Status = true };
+        }
+
+        public new static Result<T> Success(string message)
+        {
+            return new Result<T> { Status = true, Messages = new List<string> { message } };
+        }
+
+        public static Result<T> Success(T data)
+        {
+            return new Result<T> { Status = true, Data = data };
+        }
+
+        public static Result<T> Success(T data, string message)
+        {
+            return new Result<T> { Status = true, Data = data, Messages = new List<string> { message } };
+        }
+
+        public static Result<T> Success(T data, List<string> messages)
+        {
+            return new Result<T> { Status = true, Data = data, Messages = messages };
+        }
+
+        public new static Task<Result<T>> SuccessAsync()
+        {
+            return Task.FromResult(Success());
+        }
+
+        public new static Task<Result<T>> SuccessAsync(string message)
+        {
+            return Task.FromResult(Success(message));
+        }
+
+        public static Task<Result<T>> SuccessAsync(T data)
+        {
+            return Task.FromResult(Success(data));
+        }
+
+        public static Task<Result<T>> SuccessAsync(T data, string message)
+        {
+            return Task.FromResult(Success(data, message));
+        }
+    }
 }
