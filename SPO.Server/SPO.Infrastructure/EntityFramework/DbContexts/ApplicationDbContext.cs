@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SPO.Domain.Entities;
 using SPO.Domain.Entities.UserRoles;
+using SPO.Infrastructure.Extensions;
 
 namespace SPO.Infrastructure.EntityFramework.DbContexts
 {
@@ -23,7 +24,7 @@ namespace SPO.Infrastructure.EntityFramework.DbContexts
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            //builder.Seed();
+            builder.Seed();
         }
     }
 }
