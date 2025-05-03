@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // export const PRODUCTION_API = process.env.NEXT_PUBLIC_API_URL
-export const PRIVATE_API = "https://localhost:44273/api"
+export const PRIVATE_API = "https://localhost:44322/api"
 
 import axios from 'axios'
 
