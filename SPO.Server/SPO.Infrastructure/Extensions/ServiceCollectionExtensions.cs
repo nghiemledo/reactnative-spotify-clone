@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SPO.Infrastructure.Dappers.Base;
+using SPO.Infrastructure.Repositories;
 using SPO.Infrastructure.Repositories.UserRoles;
 
 namespace SPO.Infrastructure.Extensions
@@ -17,6 +18,7 @@ namespace SPO.Infrastructure.Extensions
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+            services.AddScoped<IUserTokenRepository, UserTokenRepository>();
             //services.AddScoped<IFunctionRepository, FunctionRepository>();
         }
     }
