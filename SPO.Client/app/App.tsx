@@ -23,6 +23,7 @@ export default function App() {
 
   const cf = createTamagui(config);
 
+
   return (
     <TamaguiProvider config={cf}>
       <Provider store={store}>
