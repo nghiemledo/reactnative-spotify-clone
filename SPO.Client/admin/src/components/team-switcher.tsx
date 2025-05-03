@@ -9,9 +9,10 @@ export function TeamSwitcher() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <div className="h-13 w-full">
-          <img src={AppLogo} alt="Spotify Logo" className="w-full h-full object-contain" />
+        <div className="h-14 py-1 items-center justify-center flex">
+          <img src={AppLogo} alt="Spotify Logo" className="object-contain w-full h-full" />
         </div>
+        <hr className="border-spacing-x-0.5 w-full" />
       </SidebarMenuItem>
     </SidebarMenu>
   )
