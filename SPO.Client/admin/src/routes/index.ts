@@ -13,7 +13,9 @@ import SettingGeneral from '@/pages/admin/setting/general';
 import SettingRoles from '@/pages/admin/setting/roles';
 import SettingStorage from '@/pages/admin/setting/storage';
 import ManageAddSong from '@/pages/admin/song/add';
+import ManageEditSong from '@/pages/admin/song/edit';
 import ManageSong from '@/pages/admin/song/index';
+import ManageViewSong from '@/pages/admin/song/view';
 import ManageUser from '@/pages/admin/user';
 import ManageAddUser from '@/pages/admin/user/add';
 import LoginPage from '@/pages/auth/LoginPage';
@@ -41,7 +43,9 @@ const privateRoutes = [
     { path: `${privatePrefix}/albums/add`, component: ManageAddAlbum },
 
     { path: `${privatePrefix}/songs`, component: ManageSong },
+    { path: `${privatePrefix}/songs/:slug`, component: ManageViewSong },
     { path: `${privatePrefix}/songs/add`, component: ManageAddSong },
+    { path: `${privatePrefix}/songs/:slug/edit`, component: ManageEditSong },
 
     { path: `${privatePrefix}/playlists`, component: ManagePlaylist },
     { path: `${privatePrefix}/playlists/reports`, component: ManageReportsPlaylist },
