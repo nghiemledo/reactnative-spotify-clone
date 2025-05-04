@@ -9,7 +9,6 @@ namespace SPO.Infrastructure.Extensions
     {
         public static void AddRepositories(this IServiceCollection services)
         {
-            // Register custom repositories
             AddRepository(services);
         }
         public static void AddRepository(this IServiceCollection services)
@@ -20,6 +19,11 @@ namespace SPO.Infrastructure.Extensions
             services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             services.AddScoped<IUserTokenRepository, UserTokenRepository>();
             //services.AddScoped<IFunctionRepository, FunctionRepository>();
+            services.AddScoped<IArtistRepository, ArtistRepository>();
+            services.AddScoped<IGenreRepository, GenreRepository>();
+            services.AddScoped<IAlbumRepository, AlbumRepository>();
+            services.AddScoped<ISongRepository, SongRepository>();
+
         }
     }
 }
