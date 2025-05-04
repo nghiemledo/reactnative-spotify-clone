@@ -94,7 +94,7 @@ namespace SPO.Server.Controllers
             var user = _context.Users.Where(x => x.Email == request.Email).FirstOrDefault();
             if (user == null)
             {
-                return BadRequest(await Result<LoginUserRequest>.FailAsync("Email không tồn tại"));
+                return BadRequest(await Result<LoginUserRequest>.FailAsync("Email does not exist"));
             }
             else
             {
@@ -117,7 +117,7 @@ namespace SPO.Server.Controllers
                     return Ok(new { Token = token, RefreshToken = refreshToken, user = user, status = true, role = userRole });
                 }
                 else
-                    return BadRequest(await Result<LoginUserRequest>.FailAsync("Mật khẩu sai"));
+                    return BadRequest(await Result<LoginUserRequest>.FailAsync("Wrong password"));
             }
         }
 
