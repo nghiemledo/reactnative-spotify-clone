@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 type AuthContextType = {
     loginError: string | null;
     registerError: string | null;
-    user: { email: string; roles: string[] } | null;
+    user: { email: string; fullName?: string; urlAvatar?: string; roles: string[] } | null;
     login: (data: { email: string; password: string }) => Promise<boolean>;
     logout: () => void;
     onRegister: (data: { email: string; password: string }) => Promise<void>;
@@ -18,7 +18,7 @@ type AuthContextType = {
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const [user, setUser] = useState<{ email: string; roles: string[] } | null>(null);
+    const [user, setUser] = useState<{ email: string; fullName?: string; urlAvatar?: string; roles: string[] } | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loginError, setLoginError] = useState<string | null>(null);
     const [registerError, setRegisterError] = useState<string | null>(null);
