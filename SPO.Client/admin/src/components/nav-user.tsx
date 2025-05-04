@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useNavigate } from "react-router-dom"
 import { authPaths } from "@/routes"
+import { useAuth } from "@/contexts/AuthContext"
 
 export function NavUser({
   user,
@@ -43,7 +44,10 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
   const navigate = useNavigate()
+  const { logout } = useAuth()
+
   const handleLogout = () => {
+    logout();
     navigate(authPaths.login)
   }
 
