@@ -59,11 +59,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 navigate('/');
                 return true;
             } else {
-                setLoginError("Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu");
+                setLoginError("Login failed. Check your email and password again");
                 return false;
             }
         } catch (error: any) {
-            setLoginError(error?.response?.data?.message || "Lỗi server. Vui lòng thử lại sau");
+            if (error.response?.data?.messages?.length > 0) {
+                setLoginError(error.response.data.messages[0]);
+            } else {
+                setLoginError("Internal server error. Try again later");
+            }
             return false;
         }
     };
