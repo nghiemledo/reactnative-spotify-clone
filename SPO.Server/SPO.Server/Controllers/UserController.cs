@@ -117,7 +117,7 @@ namespace SPO.Server.Controllers
                     return Ok(new { Token = token, RefreshToken = refreshToken, user = user, status = true, role = userRole });
                 }
                 else
-                    return BadRequest(await Result<LoginUserRequest>.FailAsync("Wrong password"));
+                    return BadRequest(await Result<LoginUserRequest>.FailAsync("Password is not correct"));
             }
         }
 
@@ -148,7 +148,6 @@ namespace SPO.Server.Controllers
         [Route("register")]
         public async Task<IActionResult> Register([FromBody] CreateUserRequest request)
         {
-
             request.Password = SPO.Common.Password.BCryptPasswordService.HashPassword(request.Password);
             await _userRepository.AddAsync(request);
             var role = await _roleRepostitory.GetByNameAsync("user");
