@@ -2,6 +2,7 @@ import React from "react";
 import { FlatList, ScrollView, TouchableOpacity } from "react-native";
 import { YStack, XStack, Text, Image, H3, Button, Avatar } from "tamagui";
 import { Play } from "@tamagui/lucide-icons";
+import PlayingScreen from "./PlayingScreen";
 
 // Sample data for sections
 const radioItems = [
@@ -169,406 +170,407 @@ const podcastItems = [
 
 export default function HomeScreen() {
   return (
-    <YStack flex={1} backgroundColor="#121212" padding="$4">
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header with Avatar and Buttons */}
-        <XStack alignItems="center" space="$2" marginBottom="$4">
-          <Avatar circular size="$4">
-            <Avatar.Image
-              accessibilityLabel="User Avatar"
-              src="https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg"
-            />
-            <Avatar.Fallback backgroundColor="$blue10" />
-          </Avatar>
-          <Button
-            backgroundColor="#1DB954"
-            borderRadius="$2"
-            paddingHorizontal="$3"
-          >
-            <Text color="white" fontWeight="bold">
-              ALL
-            </Text>
-          </Button>
-          <Button
-            backgroundColor="#1E1E1E"
-            borderRadius="$2"
-            paddingHorizontal="$3"
-          >
-            <Text color="white">Music</Text>
-          </Button>
-          <Button
-            backgroundColor="#1E1E1E"
-            borderRadius="$2"
-            paddingHorizontal="$3"
-          >
-            <Text color="white">Podcasts</Text>
-          </Button>
-        </XStack>
+    // <YStack flex={1} backgroundColor="#121212" padding="$4">
+    //   <ScrollView showsVerticalScrollIndicator={false}>
+    //     {/* Header with Avatar and Buttons */}
+    //     <XStack alignItems="center" space="$2" marginBottom="$4">
+    //       <Avatar circular size="$4">
+    //         <Avatar.Image
+    //           accessibilityLabel="User Avatar"
+    //           src="https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg"
+    //         />
+    //         <Avatar.Fallback backgroundColor="$blue10" />
+    //       </Avatar>
+    //       <Button
+    //         backgroundColor="#1DB954"
+    //         borderRadius="$2"
+    //         paddingHorizontal="$3"
+    //       >
+    //         <Text color="white" fontWeight="bold">
+    //           ALL
+    //         </Text>
+    //       </Button>
+    //       <Button
+    //         backgroundColor="#1E1E1E"
+    //         borderRadius="$2"
+    //         paddingHorizontal="$3"
+    //       >
+    //         <Text color="white">Music</Text>
+    //       </Button>
+    //       <Button
+    //         backgroundColor="#1E1E1E"
+    //         borderRadius="$2"
+    //         paddingHorizontal="$3"
+    //       >
+    //         <Text color="white">Podcasts</Text>
+    //       </Button>
+    //     </XStack>
 
-        {/* Popular Radio Section */}
-        <H3 color="white" marginBottom="$3">
-          Popular radio
-        </H3>
-        <FlatList
-          data={radioItems}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity>
-              <YStack width={150} marginRight="$4">
-                <Image
-                  source={{ uri: item.image }}
-                  width={150}
-                  height={150}
-                  borderRadius="$2"
-                />
-                <Text color="white" fontWeight="bold" marginTop="$2">
-                  {item.title}
-                </Text>
-                <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                  {item.artists}
-                </Text>
-              </YStack>
-            </TouchableOpacity>
-          )}
-        />
+    //     {/* Popular Radio Section */}
+    //     <H3 color="white" marginBottom="$3">
+    //       Popular radio
+    //     </H3>
+    //     <FlatList
+    //       data={radioItems}
+    //       horizontal
+    //       showsHorizontalScrollIndicator={false}
+    //       keyExtractor={(item) => item.id}
+    //       renderItem={({ item }) => (
+    //         <TouchableOpacity>
+    //           <YStack width={150} marginRight="$4">
+    //             <Image
+    //               source={{ uri: item.image }}
+    //               width={150}
+    //               height={150}
+    //               borderRadius="$2"
+    //             />
+    //             <Text color="white" fontWeight="bold" marginTop="$2">
+    //               {item.title}
+    //             </Text>
+    //             <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+    //               {item.artists}
+    //             </Text>
+    //           </YStack>
+    //         </TouchableOpacity>
+    //       )}
+    //     />
 
-        {/* Charts Section */}
-        <H3 color="white" marginTop="$6" marginBottom="$3">
-          Charts
-        </H3>
-        <FlatList
-          data={chartItems}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity>
-              <YStack width={120} marginRight="$4">
-                <Image
-                  source={{ uri: item.image }}
-                  width={120}
-                  height={180}
-                  borderRadius="$2"
-                />
-                <Text color="white" fontWeight="bold" marginTop="$2">
-                  {item.title}
-                </Text>
-                <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                  {item.artists}
-                </Text>
-              </YStack>
-            </TouchableOpacity>
-          )}
-        />
+    //     {/* Charts Section */}
+    //     <H3 color="white" marginTop="$6" marginBottom="$3">
+    //       Charts
+    //     </H3>
+    //     <FlatList
+    //       data={chartItems}
+    //       horizontal
+    //       showsHorizontalScrollIndicator={false}
+    //       keyExtractor={(item) => item.id}
+    //       renderItem={({ item }) => (
+    //         <TouchableOpacity>
+    //           <YStack width={120} marginRight="$4">
+    //             <Image
+    //               source={{ uri: item.image }}
+    //               width={120}
+    //               height={180}
+    //               borderRadius="$2"
+    //             />
+    //             <Text color="white" fontWeight="bold" marginTop="$2">
+    //               {item.title}
+    //             </Text>
+    //             <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+    //               {item.artists}
+    //             </Text>
+    //           </YStack>
+    //         </TouchableOpacity>
+    //       )}
+    //     />
 
-        {/* Popular Albums Section */}
-        <H3 color="white" marginTop="$6" marginBottom="$3">
-          Popular albums
-        </H3>
-        <FlatList
-          data={albumItems}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity>
-              <YStack width={120} marginRight="$4">
-                <Image
-                  source={{ uri: item.image }}
-                  width={120}
-                  height={120}
-                  borderRadius="$2"
-                />
-                <Text color="white" fontWeight="bold" marginTop="$2">
-                  {item.title}
-                </Text>
-                <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                  {item.artists}
-                </Text>
-              </YStack>
-            </TouchableOpacity>
-          )}
-        />
+    //     {/* Popular Albums Section */}
+    //     <H3 color="white" marginTop="$6" marginBottom="$3">
+    //       Popular albums
+    //     </H3>
+    //     <FlatList
+    //       data={albumItems}
+    //       horizontal
+    //       showsHorizontalScrollIndicator={false}
+    //       keyExtractor={(item) => item.id}
+    //       renderItem={({ item }) => (
+    //         <TouchableOpacity>
+    //           <YStack width={120} marginRight="$4">
+    //             <Image
+    //               source={{ uri: item.image }}
+    //               width={120}
+    //               height={120}
+    //               borderRadius="$2"
+    //             />
+    //             <Text color="white" fontWeight="bold" marginTop="$2">
+    //               {item.title}
+    //             </Text>
+    //             <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+    //               {item.artists}
+    //             </Text>
+    //           </YStack>
+    //         </TouchableOpacity>
+    //       )}
+    //     />
 
-        {/* Popular Artists Section */}
-        <H3 color="white" marginTop="$6" marginBottom="$3">
-          Popular artists
-        </H3>
-        <FlatList
-          data={artistItems}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity>
-              <YStack width={100} marginRight="$4" alignItems="center">
-                <Image
-                  source={{ uri: item.image }}
-                  width={100}
-                  height={100}
-                  borderRadius={50}
-                />
-                <Text
-                  color="white"
-                  fontWeight="bold"
-                  marginTop="$2"
-                  textAlign="center"
-                >
-                  {item.title}
-                </Text>
-              </YStack>
-            </TouchableOpacity>
-          )}
-        />
+    //     {/* Popular Artists Section */}
+    //     <H3 color="white" marginTop="$6" marginBottom="$3">
+    //       Popular artists
+    //     </H3>
+    //     <FlatList
+    //       data={artistItems}
+    //       horizontal
+    //       showsHorizontalScrollIndicator={false}
+    //       keyExtractor={(item) => item.id}
+    //       renderItem={({ item }) => (
+    //         <TouchableOpacity>
+    //           <YStack width={100} marginRight="$4" alignItems="center">
+    //             <Image
+    //               source={{ uri: item.image }}
+    //               width={100}
+    //               height={100}
+    //               borderRadius={50}
+    //             />
+    //             <Text
+    //               color="white"
+    //               fontWeight="bold"
+    //               marginTop="$2"
+    //               textAlign="center"
+    //             >
+    //               {item.title}
+    //             </Text>
+    //           </YStack>
+    //         </TouchableOpacity>
+    //       )}
+    //     />
 
-        {/* Recent Rotation Section */}
-        <H3 color="white" marginTop="$6" marginBottom="$3">
-          Your recent rotation
-        </H3>
-        <FlatList
-          data={recentItems}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity>
-              <XStack alignItems="center" paddingVertical="$2">
-                <Image
-                  source={{ uri: item.image }}
-                  width={50}
-                  height={50}
-                  borderRadius="$2"
-                />
-                <YStack marginLeft="$3" flex={1}>
-                  <Text color="white" fontWeight="bold">
-                    {item.title}
-                  </Text>
-                  <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                    {item.artists}
-                  </Text>
-                </YStack>
-                <Button
-                  backgroundColor="#1DB954"
-                  borderRadius={100}
-                  width="$3"
-                  height="$3"
-                  padding={0}
-                  icon={<Play size="$1" color="black" fill="black" />}
-                />
-              </XStack>
-            </TouchableOpacity>
-          )}
-        />
+    //     {/* Recent Rotation Section */}
+    //     <H3 color="white" marginTop="$6" marginBottom="$3">
+    //       Your recent rotation
+    //     </H3>
+    //     <FlatList
+    //       data={recentItems}
+    //       keyExtractor={(item) => item.id}
+    //       renderItem={({ item }) => (
+    //         <TouchableOpacity>
+    //           <XStack alignItems="center" paddingVertical="$2">
+    //             <Image
+    //               source={{ uri: item.image }}
+    //               width={50}
+    //               height={50}
+    //               borderRadius="$2"
+    //             />
+    //             <YStack marginLeft="$3" flex={1}>
+    //               <Text color="white" fontWeight="bold">
+    //                 {item.title}
+    //               </Text>
+    //               <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+    //                 {item.artists}
+    //               </Text>
+    //             </YStack>
+    //             <Button
+    //               backgroundColor="#1DB954"
+    //               borderRadius={100}
+    //               width="$3"
+    //               height="$3"
+    //               padding={0}
+    //               icon={<Play size="$1" color="black" fill="black" />}
+    //             />
+    //           </XStack>
+    //         </TouchableOpacity>
+    //       )}
+    //     />
 
-        {/* Relaxation Section */}
-        <H3 color="white" marginTop="$6" marginBottom="$3">
-          Không báo thức + deadline, chỉ có nhạc và giường êm
-        </H3>
-        <FlatList
-          data={relaxationItems}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity>
-              <YStack width={120} marginRight="$4">
-                <Image
-                  source={{ uri: item.image }}
-                  width={120}
-                  height={180}
-                  borderRadius="$2"
-                />
-                <Text color="white" fontWeight="bold" marginTop="$2">
-                  {item.title}
-                </Text>
-                <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                  {item.artists}
-                </Text>
-              </YStack>
-            </TouchableOpacity>
-          )}
-        />
+    //     {/* Relaxation Section */}
+    //     <H3 color="white" marginTop="$6" marginBottom="$3">
+    //       Không báo thức + deadline, chỉ có nhạc và giường êm
+    //     </H3>
+    //     <FlatList
+    //       data={relaxationItems}
+    //       horizontal
+    //       showsHorizontalScrollIndicator={false}
+    //       keyExtractor={(item) => item.id}
+    //       renderItem={({ item }) => (
+    //         <TouchableOpacity>
+    //           <YStack width={120} marginRight="$4">
+    //             <Image
+    //               source={{ uri: item.image }}
+    //               width={120}
+    //               height={180}
+    //               borderRadius="$2"
+    //             />
+    //             <Text color="white" fontWeight="bold" marginTop="$2">
+    //               {item.title}
+    //             </Text>
+    //             <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+    //               {item.artists}
+    //             </Text>
+    //           </YStack>
+    //         </TouchableOpacity>
+    //       )}
+    //     />
 
-        {/* New Releases Section */}
-        <H3 color="white" marginTop="$6" marginBottom="$3">
-          New releases for you
-        </H3>
-        <FlatList
-          data={newReleasesItems}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity>
-              <YStack width={120} marginRight="$4">
-                <Image
-                  source={{ uri: item.image }}
-                  width={120}
-                  height={180}
-                  borderRadius="$2"
-                />
-                <Text color="white" fontWeight="bold" marginTop="$2">
-                  {item.title}
-                </Text>
-                <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                  {item.artists}
-                </Text>
-              </YStack>
-            </TouchableOpacity>
-          )}
-        />
+    //     {/* New Releases Section */}
+    //     <H3 color="white" marginTop="$6" marginBottom="$3">
+    //       New releases for you
+    //     </H3>
+    //     <FlatList
+    //       data={newReleasesItems}
+    //       horizontal
+    //       showsHorizontalScrollIndicator={false}
+    //       keyExtractor={(item) => item.id}
+    //       renderItem={({ item }) => (
+    //         <TouchableOpacity>
+    //           <YStack width={120} marginRight="$4">
+    //             <Image
+    //               source={{ uri: item.image }}
+    //               width={120}
+    //               height={180}
+    //               borderRadius="$2"
+    //             />
+    //             <Text color="white" fontWeight="bold" marginTop="$2">
+    //               {item.title}
+    //             </Text>
+    //             <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+    //               {item.artists}
+    //             </Text>
+    //           </YStack>
+    //         </TouchableOpacity>
+    //       )}
+    //     />
 
-        {/* Find Your Next Favorite Song Section */}
-        <H3 color="white" marginTop="$6" marginBottom="$3">
-          Find your next favorite song
-        </H3>
-        <FlatList
-          data={newReleasesItems.slice(0, 3)} // Reuse new releases for simplicity
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity>
-              <YStack width={120} marginRight="$4">
-                <Image
-                  source={{ uri: item.image }}
-                  width={120}
-                  height={180}
-                  borderRadius="$2"
-                />
-                <Text color="white" fontWeight="bold" marginTop="$2">
-                  Similar to {item.title}
-                </Text>
-                <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                  {item.artists}
-                </Text>
-              </YStack>
-            </TouchableOpacity>
-          )}
-        />
+    //     {/* Find Your Next Favorite Song Section */}
+    //     <H3 color="white" marginTop="$6" marginBottom="$3">
+    //       Find your next favorite song
+    //     </H3>
+    //     <FlatList
+    //       data={newReleasesItems.slice(0, 3)} // Reuse new releases for simplicity
+    //       horizontal
+    //       showsHorizontalScrollIndicator={false}
+    //       keyExtractor={(item) => item.id}
+    //       renderItem={({ item }) => (
+    //         <TouchableOpacity>
+    //           <YStack width={120} marginRight="$4">
+    //             <Image
+    //               source={{ uri: item.image }}
+    //               width={120}
+    //               height={180}
+    //               borderRadius="$2"
+    //             />
+    //             <Text color="white" fontWeight="bold" marginTop="$2">
+    //               Similar to {item.title}
+    //             </Text>
+    //             <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+    //               {item.artists}
+    //             </Text>
+    //           </YStack>
+    //         </TouchableOpacity>
+    //       )}
+    //     />
 
-        {/* Uniquely Yours Section */}
-        <H3 color="white" marginTop="$6" marginBottom="$3">
-          Uniquely yours
-        </H3>
-        <FlatList
-          data={uniquelyYoursItems}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity>
-              <YStack width={120} marginRight="$4">
-                <Image
-                  source={{ uri: item.image }}
-                  width={120}
-                  height={180}
-                  borderRadius="$2"
-                />
-                <Text color="white" fontWeight="bold" marginTop="$2">
-                  {item.title}
-                </Text>
-                <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                  {item.artists}
-                </Text>
-              </YStack>
-            </TouchableOpacity>
-          )}
-        />
-        {/* Podcast Section */}
-        <H3 color="white" marginTop="$6" marginBottom="$3">
-          Podcasts
-        </H3>
-        <FlatList
-          data={podcastItems}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity>
-              <YStack
-                backgroundColor="#1E1E1E"
-                padding="$4"
-                borderRadius="$4"
-                marginBottom="$5"
-                alignItems="center"
-              >
-                <Image
-                  source={{ uri: item.image }}
-                  width={180}
-                  height={180}
-                  borderRadius="$4"
-                />
+    //     {/* Uniquely Yours Section */}
+    //     <H3 color="white" marginTop="$6" marginBottom="$3">
+    //       Uniquely yours
+    //     </H3>
+    //     <FlatList
+    //       data={uniquelyYoursItems}
+    //       horizontal
+    //       showsHorizontalScrollIndicator={false}
+    //       keyExtractor={(item) => item.id}
+    //       renderItem={({ item }) => (
+    //         <TouchableOpacity>
+    //           <YStack width={120} marginRight="$4">
+    //             <Image
+    //               source={{ uri: item.image }}
+    //               width={120}
+    //               height={180}
+    //               borderRadius="$2"
+    //             />
+    //             <Text color="white" fontWeight="bold" marginTop="$2">
+    //               {item.title}
+    //             </Text>
+    //             <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+    //               {item.artists}
+    //             </Text>
+    //           </YStack>
+    //         </TouchableOpacity>
+    //       )}
+    //     />
+    //     {/* Podcast Section */}
+    //     <H3 color="white" marginTop="$6" marginBottom="$3">
+    //       Podcasts
+    //     </H3>
+    //     <FlatList
+    //       data={podcastItems}
+    //       keyExtractor={(item) => item.id}
+    //       renderItem={({ item }) => (
+    //         <TouchableOpacity>
+    //           <YStack
+    //             backgroundColor="#1E1E1E"
+    //             padding="$4"
+    //             borderRadius="$4"
+    //             marginBottom="$5"
+    //             alignItems="center"
+    //           >
+    //             <Image
+    //               source={{ uri: item.image }}
+    //               width={180}
+    //               height={180}
+    //               borderRadius="$4"
+    //             />
 
-                <Text
-                  color="white"
-                  fontSize="$5"
-                  fontWeight="bold"
-                  textAlign="center"
-                  marginTop="$3"
-                  numberOfLines={2}
-                >
-                  {item.title}
-                </Text>
+    //             <Text
+    //               color="white"
+    //               fontSize="$5"
+    //               fontWeight="bold"
+    //               textAlign="center"
+    //               marginTop="$3"
+    //               numberOfLines={2}
+    //             >
+    //               {item.title}
+    //             </Text>
 
-                <Text
-                  color="rgba(255,255,255,0.6)"
-                  fontSize="$3"
-                  marginTop="$1"
-                  textAlign="center"
-                >
-                  {item.artists}
-                </Text>
+    //             <Text
+    //               color="rgba(255,255,255,0.6)"
+    //               fontSize="$3"
+    //               marginTop="$1"
+    //               textAlign="center"
+    //             >
+    //               {item.artists}
+    //             </Text>
 
-                <Text
-                  color="rgba(255,255,255,0.6)"
-                  fontSize="$2"
-                  marginTop="$1"
-                  textAlign="center"
-                >
-                  {item.date}
-                </Text>
+    //             <Text
+    //               color="rgba(255,255,255,0.6)"
+    //               fontSize="$2"
+    //               marginTop="$1"
+    //               textAlign="center"
+    //             >
+    //               {item.date}
+    //             </Text>
 
-                <Text
-                  color="rgba(255,255,255,0.7)"
-                  fontSize="$2"
-                  marginTop="$3"
-                  numberOfLines={3}
-                  textAlign="center"
-                >
-                  {item.description}
-                </Text>
+    //             <Text
+    //               color="rgba(255,255,255,0.7)"
+    //               fontSize="$2"
+    //               marginTop="$3"
+    //               numberOfLines={3}
+    //               textAlign="center"
+    //             >
+    //               {item.description}
+    //             </Text>
 
-                <XStack
-                  marginTop="$4"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  width="100%"
-                >
-                  <Button
-                    backgroundColor="#333"
-                    borderRadius="$2"
-                    paddingHorizontal="$3"
-                  >
-                    <Text color="white" fontSize="$2">
-                      Preview episode
-                    </Text>
-                  </Button>
-                  <XStack alignItems="center" space="$2">
-                    <Text color="rgba(255,255,255,0.6)" fontSize="$2">
-                      0:00
-                    </Text>
-                    <Text color="rgba(255,255,255,0.6)" fontSize="$2">
-                      ──────
-                    </Text>
-                    <Text color="rgba(255,255,255,0.6)" fontSize="$2">
-                      {item.date.split("·")[1]?.trim()}
-                    </Text>
-                  </XStack>
-                </XStack>
-              </YStack>
-            </TouchableOpacity>
-          )}
-        />
-      </ScrollView>
-    </YStack>
+    //             <XStack
+    //               marginTop="$4"
+    //               justifyContent="space-between"
+    //               alignItems="center"
+    //               width="100%"
+    //             >
+    //               <Button
+    //                 backgroundColor="#333"
+    //                 borderRadius="$2"
+    //                 paddingHorizontal="$3"
+    //               >
+    //                 <Text color="white" fontSize="$2">
+    //                   Preview episode
+    //                 </Text>
+    //               </Button>
+    //               <XStack alignItems="center" space="$2">
+    //                 <Text color="rgba(255,255,255,0.6)" fontSize="$2">
+    //                   0:00
+    //                 </Text>
+    //                 <Text color="rgba(255,255,255,0.6)" fontSize="$2">
+    //                   ──────
+    //                 </Text>
+    //                 <Text color="rgba(255,255,255,0.6)" fontSize="$2">
+    //                   {item.date.split("·")[1]?.trim()}
+    //                 </Text>
+    //               </XStack>
+    //             </XStack>
+    //           </YStack>
+    //         </TouchableOpacity>
+    //       )}
+    //     />
+    //   </ScrollView>
+    // </YStack>
+    <PlayingScreen />
   );
 }

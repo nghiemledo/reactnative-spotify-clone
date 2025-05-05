@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from "react";
 import { View, Image, Text } from "react-native";
-import TrackPlayer, { Capability, State } from "react-native-track-player";
+import TrackPlayer, { State } from "react-native-track-player";
 import { Stack } from "tamagui";
 import { TrackInfo } from "../components/Player/TrackInfo";
 import { PlayerControls } from "../components/Player/PlayerControls";
@@ -10,14 +10,14 @@ const PlayingScreen: React.FC = () => {
   const setupPlayer = useCallback(async () => {
     try {
       await TrackPlayer.setupPlayer();
-      await TrackPlayer.updateOptions({
-        capabilities: [
-          Capability.Play,
-          Capability.Pause,
-          Capability.SkipToNext,
-          Capability.SkipToPrevious,
-        ],
-      });
+      // await TrackPlayer.updateOptions({
+      //   capabilities: [
+      //     Capability.Play,
+      //     Capability.Pause,
+      //     Capability.SkipToNext,
+      //     Capability.SkipToPrevious,
+      //   ],
+      // });
 
       // Thêm bài hát vào danh sách phát
       const track = {
