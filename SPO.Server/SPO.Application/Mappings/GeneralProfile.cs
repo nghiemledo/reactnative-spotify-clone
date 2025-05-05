@@ -3,6 +3,7 @@ using SPO.Application.DataTransferObjects.Request.Album;
 using SPO.Application.DataTransferObjects.Request.Artist;
 using SPO.Application.DataTransferObjects.Request.Genre;
 using SPO.Application.DataTransferObjects.Request.Playlist;
+using SPO.Application.DataTransferObjects.Request.PlaylistItem;
 using SPO.Application.DataTransferObjects.Request.PodcastCategory;
 using SPO.Application.DataTransferObjects.Request.PodcastEpisode;
 using SPO.Application.DataTransferObjects.Request.PodcastShow;
@@ -28,6 +29,7 @@ namespace SPO.Application.Mappings
             CreateMap<CreateSongRequest, Song>();
             CreateMap<CreateAlbumRequest, Album>();
             CreateMap<CreatePlaylistRequest, Playlist>();
+            CreateMap<CreatePlaylistItemRequest, PlaylistItem>();
             CreateMap<CreatePodcastCategoryRequest, PodcastCategory>();
             CreateMap<CreatePodcastShowRequest, PodcastShow>();
             CreateMap<CreatePodcastEpisodeRequest, PodcastEpisode>();
