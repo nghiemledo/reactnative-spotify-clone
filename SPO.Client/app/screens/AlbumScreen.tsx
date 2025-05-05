@@ -19,14 +19,9 @@ import {
   ArrowLeft,
   Globe,
   ArrowDownCircle,
-  UserPlus,
   EllipsisVertical,
   Play,
   Plus,
-  ChevronsUpDown,
-  Pen,
-  Share2,
-  Shuffle,
   Search,
 } from "@tamagui/lucide-icons";
 import { LinearGradient } from "@tamagui/linear-gradient";
@@ -36,75 +31,45 @@ const albumData = {
   id: "1",
   title: "Đánh Đổi",
   releaseDate: "10 Oct 2023",
-  coverImage:
-    "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  artistName: "Obito, Shiki", // Lấy từ Albums.ArtistId -> Artists.Name
+  coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+  artistName: "Obito, Shiki",
+  totalSongs: 20,
+  totalDuration: "56 min",
 };
 
 const songs = [
-  { id: "1", title: "Intro", artist: "Obito, Shiki", duration: "3:15" },
+  { id: "1", title: "Còn Nợ Ba Mẹ", artist: "Obito, Shiki", duration: "3:15" },
+  { id: "2", title: "Champion", artist: "Obito, Shiki", duration: "4:20" },
+  { id: "3", title: "Chưa Xong", artist: "Obito, Shiki", duration: "2:10" },
+  { id: "4", title: "Chúa Xong", artist: "Obito, Shiki", duration: "5:00" },
+  { id: "5", title: "Tự Sướng", artist: "Obito, Shiki", duration: "3:45" },
+  { id: "6", title: "Outro", artist: "Obito, Shiki", duration: "5:00" },
+  // Thêm các bài hát khác nếu cần để đạt 20 bài
+];
+
+const recommendedAlbums = [
   {
-    id: "2",
-    title: "Xuất Phát Diễm",
-    artist: "Obito, Shiki",
-    duration: "4:20",
+    id: "1",
+    title: "Hip-hop Việt",
+    artist: "HIEUTHUHAI, Dangrangto, Wxrdie, R...",
+    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    year: "2023",
+  },
+  {
+    id: 2,
+    title: "Best of Hip-hop Việt 2023",
+    artist: "HIEUTHUHAI, tlinh, RPT MCK, Andree Right Han...",
+    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    year: "2023",
   },
   {
     id: "3",
-    title: "CL5 (interlude)",
-    artist: "Obito, Shiki",
-    duration: "2:10",
-  },
-  {
-    id: "4",
-    title: "Đầu Đường Xó Chợ",
-    artist: "Obito, Shiki, Lăng LD",
-    duration: "5:00",
-  },
-  {
-    id: "5",
-    title: "Đầu Đường Xó Chợ",
-    artist: "Obito, Shiki, Lăng LD",
-    duration: "5:00",
-  },
-  {
-    id: "6",
-    title: "Đầu Đường Xó Chợ",
-    artist: "Obito, Shiki, Lăng LD",
-    duration: "5:00",
-  },
-  {
-    id: "7",
-    title: "Đầu Đường Xó Chợ",
-    artist: "Obito, Shiki, Lăng LD",
-    duration: "5:00",
-  },
-  {
-    id: "8",
-    title: "Đầu Đường Xó Chợ",
-    artist: "Obito, Shiki, Lăng LD",
-    duration: "5:00",
-  },
-  {
-    id: "9",
-    title: "Đầu Đường Xó Chợ",
-    artist: "Obito, Shiki, Lăng LD",
-    duration: "5:00",
-  },
-  {
-    id: "10",
-    title: "Đầu Đường Xó Chợ",
-    artist: "Obito, Shiki, Lăng LD",
-    duration: "5:00",
-  },
-  {
-    id: "11",
-    title: "Đầu Đường Xó Chợ",
-    artist: "Obito, Shiki, Lăng LD",
-    duration: "5:00",
+    title: "SOOI",
+    artist: "Vũ, DatKaa...",
+    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    year: "2023",
   },
 ];
-
 
 type AlbumScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -212,7 +177,7 @@ export default function AlbumScreen({
                 fontSize: 18,
                 fontWeight: "bold",
                 opacity: titleOpacity,
-                marginLeft: 20,
+                marginLeft: 8,
               }}
             >
               {albumData.title}
@@ -230,6 +195,41 @@ export default function AlbumScreen({
         )}
       >
         <YStack flex={1} marginTop="$6" padding="$4">
+          {/* Thanh tìm kiếm */}
+          <Animated.View style={{ opacity: searchOpacity }}>
+            <XStack marginTop="$6" marginBottom="$6">
+              <Input
+                size="$3.5"
+                borderWidth={0}
+                borderRadius="$2"
+                backgroundColor="rgba(255, 255, 255, 0.2)"
+                color="white"
+                placeholder="Tìm trong album này"
+                placeholderTextColor="rgba(255, 255, 255, 0.6)"
+                flex={1}
+                margin="auto"
+                style={{
+                  fontSize: 15,
+                  paddingLeft: 40,
+                  fontWeight: "bold",
+                }}
+                focusStyle={{
+                  borderWidth: 0,
+                  backgroundColor: "rgba(255, 255, 255, 0.3)",
+                }}
+              />
+              <XStack
+                position="absolute"
+                left="$3"
+                top="$2.5"
+                alignItems="center"
+                pointerEvents="none"
+              >
+                <Search size="$1" color="rgba(255, 255, 255, 0.6)" />
+              </XStack>
+            </XStack>
+          </Animated.View>
+
           {/* Hình ảnh album */}
           <XStack
             alignItems="center"
@@ -295,6 +295,11 @@ export default function AlbumScreen({
             </XStack>
           </YStack>
 
+          {/* Tổng số bài hát và thời lượng */}
+          <Text color="white" opacity={0.7} marginBottom="$4">
+            {albumData.totalSongs} songs • {albumData.totalDuration}
+          </Text>
+
           {/* Nút điều khiển */}
           <XStack space="$4" marginBottom="$4" justifyContent="space-between">
             <XStack gap="$4">
@@ -304,21 +309,8 @@ export default function AlbumScreen({
                 color="white"
                 margin={0}
                 padding={0}
-                icon={<Plus size="$2" color="white" strokeWidth={1} />}
-                hoverStyle={{ backgroundColor: "transparent" }}
-                pressStyle={{
-                  backgroundColor: "transparent",
-                  borderBlockColor: "transparent",
-                }}
-              />
-              <Button
-                disabled
-                backgroundColor="transparent"
-                color="white"
-                margin={0}
-                padding={0}
                 icon={
-                  <ArrowDownCircle size="$2" color="white" strokeWidth={1} />
+                  <Plus size="$2" color="white" strokeWidth={1} />
                 }
                 hoverStyle={{ backgroundColor: "transparent" }}
                 pressStyle={{
@@ -332,9 +324,20 @@ export default function AlbumScreen({
                 color="white"
                 margin={0}
                 padding={0}
-                icon={
-                  <EllipsisVertical size="$2" color="white" strokeWidth={1} />
-                }
+                icon={<ArrowDownCircle size="$2" color="white" strokeWidth={1} />}
+                hoverStyle={{ backgroundColor: "transparent" }}
+                pressStyle={{
+                  backgroundColor: "transparent",
+                  borderBlockColor: "transparent",
+                }}
+              />
+              <Button
+                disabled
+                backgroundColor="transparent"
+                color="white"
+                margin={0}
+                padding={0}
+                icon={<EllipsisVertical size="$2" color="white" strokeWidth={1} />}
                 hoverStyle={{ backgroundColor: "transparent" }}
                 pressStyle={{
                   backgroundColor: "transparent",
@@ -403,6 +406,36 @@ export default function AlbumScreen({
                 </XStack>
               </TouchableOpacity>
             )}
+          />
+
+          {/* Phần "You may also like" */}
+          <H3 marginTop="$6" marginBottom="$3" color="white">
+            You may also like
+          </H3>
+          <FlatList
+            data={recommendedAlbums}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity>
+                <YStack width={120} marginRight="$4">
+                  <Image
+                    source={{ uri: item.coverImage }}
+                    width={120}
+                    height={180}
+                    borderRadius="$2"
+                  />
+                  <Text color="white" fontWeight="bold" marginTop="$2">
+                    {item.title}
+                  </Text>
+                  <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+                    {item.artist} {item.year && `• ${item.year}`}
+                  </Text>
+                </YStack>
+              </TouchableOpacity>
+            )}
+            scrollEnabled={false}
           />
         </YStack>
       </ScrollView>
