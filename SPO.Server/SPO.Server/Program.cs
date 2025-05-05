@@ -54,7 +54,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ai-lms", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Spoc", Version = "v1" });
 
     // Cấu hình JWT cho Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
