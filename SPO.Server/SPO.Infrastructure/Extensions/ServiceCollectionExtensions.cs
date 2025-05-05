@@ -23,6 +23,10 @@ namespace SPO.Infrastructure.Extensions
             services.AddScoped<IGenreRepository, GenreRepository>();
             services.AddScoped<IAlbumRepository, AlbumRepository>();
             services.AddScoped<ISongRepository, SongRepository>();
+            services.AddScoped<IPlaylistRepository, PlaylistRepository>();
+            services.AddScoped<IPodcastCategoryRepository, PodcastCategoryRepository>();
+            services.AddScoped<IPodcastShowRepository, PodcastShowRepository>();
+            services.AddScoped<IPodcastEpisodeRepository, PodcastEpisodeRepository>();
 
         }
     }
