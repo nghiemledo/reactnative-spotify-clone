@@ -6,6 +6,7 @@ import AnalyticsSongs from '@/pages/admin/analytics/songs';
 import AnalyticsUsers from '@/pages/admin/analytics/users';
 import ManageArtist from '@/pages/admin/artist';
 import ManageAddArtist from '@/pages/admin/artist/add';
+import ManageGenre from '@/pages/admin/genre';
 import AdminPage from '@/pages/admin/index';
 import ManagePlaylist from '@/pages/admin/playlist';
 import ManageReportsPlaylist from '@/pages/admin/playlist/reports';
@@ -46,6 +47,8 @@ const privateRoutes = [
     { path: `${privatePrefix}/songs/:slug`, component: ManageViewSong },
     { path: `${privatePrefix}/songs/add`, component: ManageAddSong },
     { path: `${privatePrefix}/songs/:slug/edit`, component: ManageEditSong },
+
+    { path: `${privatePrefix}/genres`, component: ManageGenre },
 
     { path: `${privatePrefix}/playlists`, component: ManagePlaylist },
     { path: `${privatePrefix}/playlists/reports`, component: ManageReportsPlaylist },

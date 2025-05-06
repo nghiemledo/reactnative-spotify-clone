@@ -50,6 +50,15 @@ export const SidebarData = {
             ],
         },
         {
+            title: "Genre Management",
+            url: "/admin/genres",
+            icon: Music,
+            items: [
+                { title: "All Genres", url: "/admin/genres" },
+                { title: "Add Genre", url: "/admin/genres/add" },
+            ],
+        },
+        {
             title: "Playlist Management",
             url: "/admin/playlists",
             icon: ListMusic,
