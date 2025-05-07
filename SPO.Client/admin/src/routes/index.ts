@@ -6,7 +6,12 @@ import AnalyticsSongs from '@/pages/admin/analytics/songs';
 import AnalyticsUsers from '@/pages/admin/analytics/users';
 import ManageArtist from '@/pages/admin/artist';
 import ManageAddArtist from '@/pages/admin/artist/add';
+import ManageEditArtist from '@/pages/admin/artist/edit';
+import ManageViewArtist from '@/pages/admin/artist/view';
 import ManageGenre from '@/pages/admin/genre';
+import ManageAddGenre from '@/pages/admin/genre/add';
+import ManageEditGenre from '@/pages/admin/genre/edit';
+import ManageViewGenre from '@/pages/admin/genre/view';
 import AdminPage from '@/pages/admin/index';
 import ManagePlaylist from '@/pages/admin/playlist';
 import ManageReportsPlaylist from '@/pages/admin/playlist/reports';
@@ -38,7 +43,9 @@ const privateRoutes = [
     { path: `${privatePrefix}/analytics/revenue`, component: AnalyticsRevenue },
 
     { path: `${privatePrefix}/artists`, component: ManageArtist },
+    { path: `${privatePrefix}/artists/:id`, component: ManageViewArtist },
     { path: `${privatePrefix}/artists/add`, component: ManageAddArtist },
+    { path: `${privatePrefix}/artists/:id/edit`, component: ManageEditArtist },
 
     { path: `${privatePrefix}/albums`, component: ManageAlbums },
     { path: `${privatePrefix}/albums/add`, component: ManageAddAlbum },
@@ -49,6 +56,9 @@ const privateRoutes = [
     { path: `${privatePrefix}/songs/:slug/edit`, component: ManageEditSong },
 
     { path: `${privatePrefix}/genres`, component: ManageGenre },
+    { path: `${privatePrefix}/genres/:id`, component: ManageViewGenre },
+    { path: `${privatePrefix}/genres/add`, component: ManageAddGenre },
+    { path: `${privatePrefix}/genres/:id/edit`, component: ManageEditGenre },
 
     { path: `${privatePrefix}/playlists`, component: ManagePlaylist },
     { path: `${privatePrefix}/playlists/reports`, component: ManageReportsPlaylist },
