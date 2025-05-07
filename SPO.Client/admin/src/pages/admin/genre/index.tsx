@@ -1,9 +1,20 @@
+import { DataTable } from '@/components/data-table';
+import { columns } from '@/components/genre/columns';
+import Loading from '@/components/loading';
 import { Button } from '@/components/ui/button';
+import { getGenreData } from '@/store/genre/genre.actions';
+import { RootState, useAppDispatch, useAppSelector } from '@/store/store';
 import { PlusCircle } from 'lucide-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const ManageGenre: React.FC = () => {
+    const { genreData, loading } = useAppSelector((state: RootState) => state.genre);
+    const dispatch = useAppDispatch()
+    useEffect(() => {
+        dispatch(getGenreData());
+    }, [dispatch]);
+
     return (
         <div className="container mx-auto">
             <div className="mb-5 flex items-center justify-between space-y-2">
@@ -20,7 +31,12 @@ const ManageGenre: React.FC = () => {
                     </Button>
                 </div>
             </div>
-            
+            {loading ? (
+                <Loading />
+            ) : (
+                <DataTable columns={columns} data={genreData} />
+            )
+            }
         </div>
     );
 };

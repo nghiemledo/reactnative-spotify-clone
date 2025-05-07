@@ -16,7 +16,7 @@ const initialState: initialStateTypes = {
 }
 
 const genreSlice = createSlice({
-    name: 'song',
+    name: 'genre',
     initialState,
     reducers: {},
     extraReducers(builder) {
@@ -32,8 +32,11 @@ const genreSlice = createSlice({
                 state.loading = false;
                 state.genreDetail = action.payload;
                 const id = action.payload.id;
-                const index = state.genreData.findIndex((item) => item.id === id);
-                if (index !== -1) {
+                console.log('Id from index', id);
+                
+                const existingGenre = state.genreData.find((item) => item.id === id);
+                if (existingGenre) {
+                    const index = state.genreData.indexOf(existingGenre);
                     state.genreData[index] = action.payload;
                 }
             })
