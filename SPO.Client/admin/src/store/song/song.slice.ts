@@ -1,6 +1,6 @@
 import { Song } from "@/types/song.type";
 import { createSlice } from "@reduxjs/toolkit";
-import { deleteSongData, getSongBySlug, getSongData, postSongData, putSongData } from "./song.actions";
+import { deleteSongData, getSongById, getSongData, postSongData, putSongData } from "./song.actions";
 
 interface initialStateTypes {
     songData: Song[];
@@ -24,16 +24,17 @@ const songSlice = createSlice({
             .addCase(getSongData.fulfilled, (state, action) => {
                 state.songData = action.payload
             })
-            .addCase(getSongBySlug.pending, (state) => {
+            .addCase(getSongById.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(getSongBySlug.fulfilled, (state, action) => {
+            .addCase(getSongById.fulfilled, (state, action) => {
                 state.loading = false;
                 state.songDetail = action.payload;
-                const slug = action.payload.slug;
-                const index = state.songData.findIndex((item) => item.slug === slug);
-                if (index !== -1) {
+                const id = action.payload.id;
+                const existingGenre = state.songData.find((item) => item.id === id);
+                if (existingGenre) {
+                    const index = state.songData.indexOf(existingGenre);
                     state.songData[index] = action.payload;
                 }
             })
@@ -48,9 +49,9 @@ const songSlice = createSlice({
                 console.error('Post failed:', action.payload);
             })
             .addCase(putSongData.fulfilled, (state, action) => {
-                const slug = action.payload.slug;
+                const id = action.payload.id;
                 state.songData.some((item, index) => {
-                    if (item.id === slug) {
+                    if (item.id === id) {
                         state.songData[index] = action.payload;
                         return true;
                     }
