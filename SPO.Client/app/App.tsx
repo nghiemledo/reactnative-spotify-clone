@@ -1,26 +1,16 @@
-import { TamaguiProvider } from "@tamagui/core";
-import { StatusBar } from "expo-status-bar";
-import React from "react";
+import { TamaguiProvider } from "tamagui";
+import { config } from "./tamagui.config";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { StyleSheet, Text, View } from "react-native";
-import { config } from "tamagui.config";
+import { Text } from "react-native";
 import Navigation from "navigations";
-
 export default function App() {
+  // console.log(tamaguiConfig);
   return (
-    <TamaguiProvider config={config}>
+    <TamaguiProvider config={config} defaultTheme="light">
       <SafeAreaProvider>
         <Navigation />
+        {/* <Text>Welcome to Tamagui</Text> */}
       </SafeAreaProvider>
     </TamaguiProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

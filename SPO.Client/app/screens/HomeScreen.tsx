@@ -1,7 +1,8 @@
 import React from "react";
+import { Button } from "tamagui";
 
 const HomeScreen = () => {
-  return <div>Home</div>;
+  return <Button theme={"blue"}>Hello world</Button>;
 };
 
 export default HomeScreen;

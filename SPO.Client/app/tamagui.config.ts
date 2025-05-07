@@ -1,24 +1,11 @@
-import { createTamagui, getConfig } from "@tamagui/core";
+import { defaultConfig } from "@tamagui/config/v4";
+import { createTamagui } from "tamagui";
 
-export const config = createTamagui({
-  theme: {
-    light: {
-      background: "#fff",
-      text: "#000",
-    },
-    dark: {
-      background: "#000",
-      text: "#fff",
-    },
-  },
-  tokens: {
-    color: {
-      primary: "#007bff",
-    },
-    space: {
-      sm: 8,
-      md: 16,
-      lg: 24,
-    },
-  },
-});
+export const config = createTamagui(defaultConfig);
+
+type CustomConfig = typeof config;
+
+// ensure types work
+declare module "tamagui" {
+  interface TamaguiCustomConfig extends CustomConfig {}
+}
