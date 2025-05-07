@@ -8,7 +8,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import { EyeIcon } from "../eye-icon";
 import { EditIcon } from "../edit-icon";
 import { DeleteIcon } from "../delete-icon";
-import { cn } from "@/lib/utils";
 import DeleteModal from "../delete-modal";
 import { useAppDispatch } from "@/store/store";
 import { deleteSongData } from "@/store/song/song.actions";
@@ -25,41 +24,33 @@ export const columns: ColumnDef<Song>[] = [
         header: "Title",
     },
     {
-        accessorKey: "artist",
-        header: "Artist",
-    },
-    {
-        accessorKey: "album",
-        header: "Album",
-    },
-    {
         accessorKey: "duration",
         header: "Duration",
     },
     {
-        accessorKey: "releaseDate",
-        header: "Release Date",
-    },
-    {
-        accessorKey: "genre",
-        header: "Genre",
-    },
-    {
-        accessorKey: "status",
-        header: "Status",
+        accessorKey: "artistId",
+        header: "Artist",
         cell: ({ row }) => {
-            const status = row.getValue("status") as string;
-            return (
-                <span
-                    className={cn(
-                        "px-2 py-1 text-sm font-medium rounded",
-                        status === "Published" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                    )}
-                >
-                    {status}
-                </span>
-            );
-        },
+            return row.original.artistId
+        }
+    },
+    {
+        accessorKey: "genreId",
+        header: "Genre",
+        cell: ({ row }) => {
+            return row.original.genreId
+        }
+    },
+    {
+        accessorKey: "albumId",
+        header: "Album",
+        cell: ({ row }) => {
+            return row.original.albumId
+        }
+    },
+    {
+        accessorKey: "createdAt",
+        header: "Release Date",
     },
     {
         id: "actions",
@@ -71,11 +62,11 @@ export const columns: ColumnDef<Song>[] = [
             const [loading, setLoading] = useState(false);
 
             const handleView = () => {
-                navigate(`/admin/songs/${row.original.slug}`);
+                navigate(`/admin/songs/${row.original.id}`);
             };
 
             const handleEdit = () => {
-                navigate(`/admin/songs/${row.original.slug}/edit`);
+                navigate(`/admin/songs/${row.original.id}/edit`);
             }
 
             const handleDelete = async () => {
