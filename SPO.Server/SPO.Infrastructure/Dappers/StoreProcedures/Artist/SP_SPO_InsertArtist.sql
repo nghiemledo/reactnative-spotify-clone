@@ -12,7 +12,6 @@ GO
 create procedure [dbo].[SP_SPO_InsertArtist] (
     @Id varchar(max),
     @Name nvarchar(MAX),
-    @Slug nvarchar(MAX),
     @Bio NVARCHAR(MAX),
     @UrlAvatar nvarchar(MAX)
 )
