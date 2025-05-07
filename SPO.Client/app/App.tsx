@@ -4,15 +4,13 @@ import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StyleSheet, Text, View } from "react-native";
 import { config } from "tamagui.config";
+import Navigation from "navigations";
 
 export default function App() {
   return (
     <TamaguiProvider config={config}>
       <SafeAreaProvider>
-        <View style={styles.container}>
-          <Text>Open up App.tsx to start working on your app!</Text>
-          <StatusBar style="auto" />
-        </View>
+        <Navigation />
       </SafeAreaProvider>
     </TamaguiProvider>
   );
