@@ -2,11 +2,13 @@ import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux";
 import { songReducer } from "./song/song.slice";
 import { genreReducer } from "./genre/genre.slice";
+import { artistReducer } from "./artist/artist.slice";
 
 export const store = configureStore({
     reducer: {
         song: songReducer,
-        genre: genreReducer
+        genre: genreReducer,
+        artist: artistReducer
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({ serializableCheck: false }),
