@@ -20,7 +20,6 @@ type Props = {
 }
 
 const DeleteModal: React.FC<Props> = ({ deleteModalOpen, setDeleteModalOpen, row, loading, handleDelete }) => {
-    
     return (
         <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
             <DialogContent>
@@ -37,7 +36,7 @@ const DeleteModal: React.FC<Props> = ({ deleteModalOpen, setDeleteModalOpen, row
                         disabled={loading}
                         className='cursor-pointer'
                     >
-                        Hủy
+                        Cancel
                     </Button>
                     <Button
                         variant="destructive"
