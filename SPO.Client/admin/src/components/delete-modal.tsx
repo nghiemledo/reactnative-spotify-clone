@@ -27,7 +27,7 @@ const DeleteModal: React.FC<Props> = ({ deleteModalOpen, setDeleteModalOpen, row
                 <DialogHeader>
                     <DialogTitle>Delete data</DialogTitle>
                     <DialogDescription>
-                        Are you sure want to delete <strong>{row.original.name}</strong>? This action can not be undo.
+                        Are you sure want to delete data <strong>{row.original.name}</strong>? This action can not be undo.
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
