@@ -12,9 +12,10 @@ import {
 import { FlatList, ScrollView, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { playSong } from "../store/playerSlice";
-import { useEffect, useRef, useState } from "react";
+import { fetchSongs } from "../store/songSlice";
+import { useEffect, useRef } from "react";
 import {
   ArrowLeft,
   Globe,
@@ -30,58 +31,7 @@ import {
   Search,
 } from "@tamagui/lucide-icons";
 import { LinearGradient } from "@tamagui/linear-gradient";
-
-// Dữ liệu giả lập cho queue
-const queueItems = [
-  {
-    id: "1",
-    title: "Song breakdown: I WANT YOU",
-    description: "The Interstellar Tennis Podcast",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "Accepting the song that blew you up",
-    description: "RAW talk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "3",
-    title: "Song breakdown: I WANT YOU",
-    description: "The Interstellar Tennis Podcast",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "4",
-    title: "Accepting the song that blew you up",
-    description: "RAW talk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "5",
-    title: "Song breakdown: I WANT YOU",
-    description: "The Interstellar Tennis Podcast",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "6",
-    title: "Accepting the song that blew you up",
-    description: "RAW talk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "7",
-    title: "Song breakdown: I WANT YOU",
-    description: "The Interstellar Tennis Podcast",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "8",
-    title: "Accepting the song that blew you up",
-    description: "RAW talk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
+import { AppDispatch, RootState } from "../store";
 
 type QueueScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -93,7 +43,8 @@ export default function DetailPlaylistScreen({
 }: {
   navigation: QueueScreenNavigationProp;
 }) {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
+  const { songs, loading, error } = useSelector((state: RootState) => state.songs);
 
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -130,7 +81,27 @@ export default function DetailPlaylistScreen({
     navigation.setOptions({
       headerShown: false,
     });
-  }, [navigation]);
+    dispatch(fetchSongs());
+  }, [navigation, dispatch]);
+
+  // Log songs state for debugging
+  useEffect(() => {
+    console.log("Songs state:", {
+      songs,
+      loading,
+      error,
+      songCount: songs.length,
+      firstSong: songs[0] || "No songs",
+    });
+  }, [songs, loading, error]);
+
+  // Hàm kiểm tra URL ảnh hợp lệ
+  const getValidImageUrl = (url: string | undefined): string => {
+    if (url && url.startsWith("http") && /\.(jpg|jpeg|png|webp)$/i.test(url)) {
+      return url;
+    }
+    return "https://placehold.co/150x150";
+  };
 
   return (
     <LinearGradient
@@ -249,7 +220,9 @@ export default function DetailPlaylistScreen({
             padding={0}
           >
             <Animated.Image
-              source={{ uri: queueItems[0].image }}
+              source={{
+                uri: getValidImageUrl(songs[0]?.coverImage),
+              }}
               style={{
                 width: imageSize,
                 height: imageSize,
@@ -258,10 +231,9 @@ export default function DetailPlaylistScreen({
                 alignSelf: "center",
               }}
               resizeMode="stretch"
-              onError={(e) =>
-                console.log("Image load error:", e.nativeEvent.error)
-              }
-              defaultSource={{ uri: "https://via.placeholder.com/150" }}
+              onError={(e) => {
+                console.log("Main image load error:", e.nativeEvent.error, "URL:", songs[0]?.coverImage);
+              }}
             />
           </XStack>
 
@@ -274,7 +246,7 @@ export default function DetailPlaylistScreen({
               <Avatar circular size="$2">
                 <Avatar.Image
                   accessibilityLabel="Cam"
-                  src={queueItems[0].image}
+                  src={getValidImageUrl(songs[0]?.coverImage)}
                 />
                 <Avatar.Fallback backgroundColor="$blue10" />
               </Avatar>
@@ -298,7 +270,7 @@ export default function DetailPlaylistScreen({
                   color="white"
                   textAlign="center"
                 >
-                  47 ph
+                  {songs.length} bài hát
                 </Text>
               </YStack>
             </XStack>
@@ -437,59 +409,68 @@ export default function DetailPlaylistScreen({
             </Button>
           </XStack>
 
-          {/* Danh sách bài hát/podcast */}
-          <FlatList
-            data={queueItems}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  dispatch(playSong(item.title));
-                  navigation.navigate("PlayerModal");
-                }}
-              >
-                <XStack
-                  alignItems="center"
-                  justifyContent="space-between"
-                  paddingVertical="$2"
+          {/* Danh sách bài hát */}
+          {loading ? (
+            <Text color="white">Đang tải...</Text>
+          ) : error ? (
+            <Text color="red">Lỗi: {error}</Text>
+          ) : songs.length === 0 ? (
+            <Text color="white">Không có bài hát nào</Text>
+          ) : (
+            <FlatList
+              data={songs}
+              keyExtractor={(item) => item.id}
+              scrollEnabled={false}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    dispatch(playSong(item.title));
+                    // navigation.navigate("PlayerModal");
+                  }}
                 >
-                  <XStack alignItems="center" gap="$3" flex={1}>
-                    <Image
-                      source={{ uri: item.image }}
-                      width={50}
-                      height={50}
-                      borderRadius={8}
-                    />
-                    <YStack flex={1}>
-                      <Text fontSize={15} fontWeight="300" color="white">
-                        {item.title}
-                      </Text>
-                      <Text fontSize={13} color="white" opacity={0.7}>
-                        {item.description}
-                      </Text>
-                    </YStack>
-                  </XStack>
-                  <Button
-                    backgroundColor="transparent"
-                    
-                    padding={0}
-                    icon={
-                      <EllipsisVertical
-                        size="$2"
-                        color="white"
-                        strokeWidth={1}
+                  <XStack
+                    alignItems="center"
+                    justifyContent="space-between"
+                    paddingVertical="$2"
+                  >
+                    <XStack alignItems="center" gap="$3" flex={1}>
+                      <Image
+                        source={{
+                          uri: getValidImageUrl(item.coverImage),
+                        }}
+                        width={50}
+                        height={50}
+                        borderRadius={8}
+                        onError={(e) => {
+                          console.log("Song image load error:", e.nativeEvent.error, "URL:", item.coverImage);
+                        }}
                       />
-                    }
-                    pressStyle={{
-                      backgroundColor: "transparent",
-                      borderBlockColor: "transparent",
-                    }}
-                  />
-                </XStack>
-              </TouchableOpacity>
-            )}
-          />
+                      <YStack flex={1}>
+                        <Text fontSize={15} fontWeight="300" color="white">
+                          {item.title}
+                        </Text>
+                      </YStack>
+                    </XStack>
+                    <Button
+                      backgroundColor="transparent"
+                      padding={0}
+                      icon={
+                        <EllipsisVertical
+                          size="$2"
+                          color="white"
+                          strokeWidth={1}
+                        />
+                      }
+                      pressStyle={{
+                        backgroundColor: "transparent",
+                        borderBlockColor: "transparent",
+                      }}
+                    />
+                  </XStack>
+                </TouchableOpacity>
+              )}
+            />
+          )}
         </YStack>
       </ScrollView>
     </LinearGradient>
