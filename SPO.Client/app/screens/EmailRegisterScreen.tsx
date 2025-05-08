@@ -283,7 +283,7 @@ export default function EmailRegisterScreen({
           <GenderSelectionComponent
             onSelect={handleChange("gender")}
             initialGender={formData.gender}
-          />
+          /> 
         ) : currentConfig.component === "nameInput" ? (
           <YStack width="100%" space="$4">
             {currentConfig.fields!.map((field) => (

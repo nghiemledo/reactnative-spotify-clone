@@ -14,7 +14,7 @@ export const GenderSelectionComponent: React.FC<GenderSelectionComponentProps> =
 
   const genders = [
     { label: "Nữ", value: "female" },
-    { label: "Nam", value: "male" },
+    { label: "Nam", value: "male" }, 
     { label: "Phân nhị giới", value: "gay" },
     { label: "Khác", value: "other" },
     { label: "Không muốn nêu cụ thể", value: "none" },

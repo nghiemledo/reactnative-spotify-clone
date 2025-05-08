@@ -102,7 +102,7 @@ export const InputComponent: React.FC<InputComponentProps> = ({
             padding="$2"
             marginRight="$2"
             backgroundColor="transparent"
-            pressStyle={{ backgroundColor: "transparent" }}
+            pressStyle={{ backgroundColor: "transparent" }} 
           />
         )}
       </XStack>

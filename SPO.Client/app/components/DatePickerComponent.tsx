@@ -76,7 +76,7 @@ export const DatePickerComponent: React.FC<DatePickerComponentProps> = ({
         onCancel={hideDatePicker}
         date={new Date()}
         minimumDate={new Date("1900-01-01")}
-        maximumDate={new Date("2025-12-31")}
+        maximumDate={new Date("2025-12-31")} 
       />
     </>
   );

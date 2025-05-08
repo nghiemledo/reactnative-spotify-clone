@@ -47,7 +47,7 @@ export const TermsAndPreferencesComponent: React.FC<TermsAndPreferencesComponent
       <Text color="#fff" fontSize="$1" fontWeight={"bold"}>
         Bằng việc nhấn vào "Tạo tài khoản", bạn đồng ý với Điều khoản sử dụng
         và Chính sách quyền riêng tư của chúng tôi.
-      </Text>
+      </Text> 
       <TouchableOpacity onPress={openTerms}>
         <Text style={{ color: "#1DB954", fontSize: 12, fontWeight: "bold" }}>
           Điều khoản sử dụng
