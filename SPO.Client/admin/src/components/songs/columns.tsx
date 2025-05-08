@@ -1,9 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
 import { Song } from "@/types/song.type";
 import { ColumnDef } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { EyeIcon } from "../eye-icon";
@@ -13,10 +12,7 @@ import DeleteModal from "../delete-modal";
 import { RootState, useAppDispatch, useAppSelector } from "@/store/store";
 import { deleteSongData } from "@/store/song/song.actions";
 import { useNavigate } from "react-router-dom";
-import { getArtistById } from "@/store/artist/artist.actions";
-import { getGenreById } from "@/store/genre/genre.actions";
 import { formatDate } from "@/utils/formatDate";
-
 
 export const columns: ColumnDef<Song>[] = [
     {
@@ -33,7 +29,7 @@ export const columns: ColumnDef<Song>[] = [
         header: "Cover Image",
         cell: ({ row }) => {
             return (
-                <div className="w-20 h-20">
+                <div className="w-10 h-10">
                     <img className="w-full h-full object-cover rounded-xl" src={row.original.coverImage} alt={row.original.title} />
                 </div>
             )
@@ -47,38 +43,25 @@ export const columns: ColumnDef<Song>[] = [
         accessorKey: "artistId",
         header: "Artist",
         cell: ({ row }) => {
-            const dispatch = useAppDispatch();
-            const { artistDetail } = useAppSelector((state: RootState) => state.artist);
-            useEffect(() => {
-                dispatch(getArtistById(row.original.artistId));
-            }, [row.original.artistId]);
-            return (
-                <>
-                    {artistDetail?.name}
-                </>
-            )
-        }
+            const { artistData } = useAppSelector((state: RootState) => state.artist);
+            const artist = artistData.find((a) => a.id === row.original.artistId);
+            return <>{artist?.name || "Unknown Artist"}</>;
+        },
     },
     {
         accessorKey: "genreId",
         header: "Genre",
         cell: ({ row }) => {
-            const dispatch = useAppDispatch();
-            const { genreDetail } = useAppSelector((state: RootState) => state.genre);
-            useEffect(() => { dispatch(getGenreById(row.original.genreId)) }, [row.original.genreId]);
-            return (
-                <>
-                    {genreDetail?.name}
-                </>
-            )
-
-        }
+            const { genreData } = useAppSelector((state: RootState) => state.genre);
+            const genre = genreData.find((g) => g.id === row.original.genreId);
+            return <>{genre?.name || "Unknown Genre"}</>;
+        },
     },
     {
         accessorKey: "albumId",
         header: "Album",
         cell: ({ row }) => {
-            return row.original.albumId
+            return row.original.albumId || "N/A"
         }
     },
     {

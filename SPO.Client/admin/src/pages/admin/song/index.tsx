@@ -7,10 +7,13 @@ import { columns } from '@/components/songs/columns';
 import { getSongData } from '@/store/song/song.actions';
 import { RootState, useAppDispatch, useAppSelector } from '@/store/store';
 import Loading from '@/components/loading';
+import { useFetchSongData } from '@/hooks/use-fetch-song-data';
 
 const ManageSong: React.FC = () => {
     const { songData, loading } = useAppSelector((state: RootState) => state.song);
-    const dispatch = useAppDispatch()
+    const dispatch = useAppDispatch();
+
+    useFetchSongData();
     useEffect(() => {
         dispatch(getSongData());
     }, [dispatch]);
