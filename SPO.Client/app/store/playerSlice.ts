@@ -1,12 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 interface PlayerState {
-  currentSong: SongTrack;
+  currentSong: string;
   isPlaying: boolean;
 }
 
 const initialState: PlayerState = {
-  currentSong: {},
+  currentSong: "",
   isPlaying: false,
 };
 
