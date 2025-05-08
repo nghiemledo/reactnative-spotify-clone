@@ -25,6 +25,7 @@ namespace SPO.Infrastructure.Repositories
                 var parameters = new
                 {
                     vm.Title,
+                    vm.CoverImage,
                     vm.GenreId,
                     vm.Duration,
                     vm.ArtistId,
@@ -56,6 +57,7 @@ namespace SPO.Infrastructure.Repositories
                 {
                     vm.Id,
                     vm.Title,
+                    vm.CoverImage,
                     vm.GenreId,
                     vm.Duration,
                     vm.ArtistId,
