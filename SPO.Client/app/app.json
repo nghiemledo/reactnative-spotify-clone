@@ -12,6 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "plugins": ["expo-dev-client"],
     "ios": {
       "supportsTablet": true
     },
@@ -21,15 +22,9 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
+      "edgeToEdgeEnabled": true
       
-      "autolinking": {
-        "exclude": [
-          "react-native-track-player",
-          "@react-native-async-storage/async-storage",
-          "react-native-safe-area-context"
-        ]
-      }
+    
     },
     "web": {
       "favicon": "./assets/favicon.png"
