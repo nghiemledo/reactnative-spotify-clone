@@ -112,7 +112,7 @@ export const columns: ColumnDef<Song>[] = [
                 <div className="relative flex items-center gap-3">
                     <TooltipProvider>
                         <Tooltip>
-                            <TooltipTrigger asChild>
+                            <TooltipTrigger asChild disabled>
                                 <span className="text-lg cursor-pointer active:opacity-50"
                                     onClick={handleView}
                                 >
@@ -124,7 +124,7 @@ export const columns: ColumnDef<Song>[] = [
                             </TooltipContent>
                         </Tooltip>
                         <Tooltip>
-                            <TooltipTrigger asChild>
+                            <TooltipTrigger asChild disabled>
                                 <span className="text-lg cursor-pointer active:opacity-50"
                                     onClick={handleEdit}
                                 >
