@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // export const PRODUCTION_API = process.env.NEXT_PUBLIC_API_URL
-export const PRIVATE_API = "https://localhost:44322/api"
+// "https://localhost:44322/api"
+export const PRIVATE_API = "https://aivn.vn/api"
 
-import axios from 'axios'
+import axios from 'axios'   
 
 const axiosClient = axios.create({
     baseURL: PRIVATE_API,
