@@ -3,10 +3,10 @@ import { YStack, XStack, Text, Button, Input, AnimatePresence, View } from "tama
 import { TouchableOpacity } from "react-native";
 import { Eye, EyeOff } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../../types";
 import { useDispatch, useSelector } from "react-redux";
-import { login, setError } from "../store/authSlice";
-import { RootState, AppDispatch } from "../store";
+import { login, setError } from "../../store/authSlice";
+import { RootState, AppDispatch } from "../../store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type EmailLoginScreenNavigationProp = NativeStackNavigationProp<
