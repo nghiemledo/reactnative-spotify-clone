@@ -1,5 +1,7 @@
 import ManageAlbums from '@/pages/admin/album';
 import ManageAddAlbum from '@/pages/admin/album/add';
+import ManageEditAlbum from '@/pages/admin/album/edit';
+import ManageViewAlbum from '@/pages/admin/album/view';
 import AnalyticsOverview from '@/pages/admin/analytics/overview';
 import AnalyticsRevenue from '@/pages/admin/analytics/revenue';
 import AnalyticsSongs from '@/pages/admin/analytics/songs';
@@ -48,7 +50,9 @@ const privateRoutes = [
     { path: `${privatePrefix}/artists/:id/edit`, component: ManageEditArtist },
 
     { path: `${privatePrefix}/albums`, component: ManageAlbums },
+    { path: `${privatePrefix}/albums/:id`, component: ManageViewAlbum },
     { path: `${privatePrefix}/albums/add`, component: ManageAddAlbum },
+    { path: `${privatePrefix}/albums/:id/edit`, component: ManageEditAlbum },
 
     { path: `${privatePrefix}/songs`, component: ManageSong },
     { path: `${privatePrefix}/songs/:slug`, component: ManageViewSong },
