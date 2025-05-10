@@ -2,13 +2,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { getAlbumData } from '@/store/album/album.actions';
-import { getArtistData } from '@/store/artist/artist.actions';
-import { getGenreData } from '@/store/genre/genre.actions';
 import { postSongData } from '@/store/song/song.actions';
 import { RootState, useAppDispatch, useAppSelector } from '@/store/store';
 import { ArrowLeft, Save } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -69,12 +66,6 @@ const ManageAddSong: React.FC = () => {
             });
         }
     };
-
-    useEffect(() => {
-        dispatch(getGenreData());
-        dispatch(getArtistData());
-        dispatch(getAlbumData());
-    }, [dispatch]);
 
     return (
         <div className='container mx-auto'>
@@ -244,7 +235,7 @@ const ManageAddSong: React.FC = () => {
                                 <SelectContent>
                                     {albumData?.map((album) => (
                                         <SelectItem key={album.id} value={album.id?.toString() || ""}>
-                                            {album.name}
+                                            {album.title}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
