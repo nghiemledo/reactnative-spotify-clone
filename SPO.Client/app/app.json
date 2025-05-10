@@ -22,7 +22,26 @@
       },
       "edgeToEdgeEnabled": true,
       "versionCode": 1,
-      "package": "com.truong1510.app"
+      "package": "com.truong1510.app",
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ],
+      "jsEngine": "jsc",
+      "config": {
+        "usesCleartextTraffic": true,
+        "foregroundService": {
+          "type": "mediaPlayback"
+        }
+      },
+      "kotlinVersion": "1.9.22",
+      "splash": {
+        "backgroundColor": "#FFFFFF"
+      },
+      "gradleProps": {
+        "org.gradle.jvmargs": "-Xmx4g -XX:MaxMetaspaceSize=1g"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
