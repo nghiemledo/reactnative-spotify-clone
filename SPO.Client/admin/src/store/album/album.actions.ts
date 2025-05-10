@@ -35,7 +35,7 @@ export const getAlbumById = createAsyncThunk(
 
 export const postAlbumData = createAsyncThunk(
     POST_ALBUM,
-    async (body: Omit<Album, 'id' | 'createdAt' | 'updatedAt'>, { signal, rejectWithValue }) => {
+    async (body: Omit<Album, 'id' | 'releaseDate' | 'createdAt' | 'updatedAt'>, { signal, rejectWithValue }) => {
         try {
             const response = await axiosClient.post(`/album`, body, { signal });
             if (response.data.status === true) {

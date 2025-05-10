@@ -1,6 +1,7 @@
 export interface Album {
+    id?: string;
     title: string;
-    releaseDate: string;
+    releaseDate?: string;
     coverImage: string;
     genreId?: string;
     artistId?: string;

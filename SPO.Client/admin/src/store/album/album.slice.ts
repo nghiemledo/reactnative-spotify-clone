@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Artist } from "@/types/artist.type";
 import { deleteAlbumData, getAlbumById, getAlbumData, postAlbumData, putAlbumData } from "./album.actions";
+import { Album } from "@/types/album.type";
 
 interface initialStateTypes {
-    albumData: Artist[];
-    albumDetail: Artist | null;
+    albumData: Album[];
+    albumDetail: Album | null;
     loading: boolean;
     error: string | null;
 }
@@ -46,6 +46,7 @@ const albumSlice = createSlice({
                 state.albumData.push(action.payload)
             })
             .addCase(postAlbumData.rejected, (_, action) => {
+                console.log(action.payload);
                 console.error('Post failed:', action.payload);
             })
             .addCase(putAlbumData.fulfilled, (state, action) => {
