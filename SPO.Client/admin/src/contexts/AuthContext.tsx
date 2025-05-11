@@ -13,6 +13,7 @@ type AuthContextType = {
     logout: () => void;
     onRegister: (data: { email: string; password: string }) => Promise<void>;
     isAuthenticated: boolean;
+    isLoading: boolean;
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,6 +21,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<{ email: string; fullName?: string; urlAvatar?: string; roles: string[] } | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [loginError, setLoginError] = useState<string | null>(null);
     const [registerError, setRegisterError] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -32,6 +34,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setUser(JSON.parse(storedUser));
             setIsAuthenticated(true);
         }
+        setIsLoading(false);
     }, []);
 
     const login = async (data: { email: string; password: string }) => {
@@ -94,7 +97,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ loginError, registerError, user, login, logout, onRegister, isAuthenticated }}>
+        <AuthContext.Provider value={{ loginError, registerError, user, login, logout, onRegister, isAuthenticated, isLoading }}>
             {children}
         </AuthContext.Provider>
     );
