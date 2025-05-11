@@ -36,10 +36,6 @@ export const columns: ColumnDef<Song>[] = [
         }
     },
     {
-        accessorKey: "duration",
-        header: "Duration",
-    },
-    {
         accessorKey: "artistId",
         header: "Artist",
         cell: ({ row }) => {
@@ -61,7 +57,9 @@ export const columns: ColumnDef<Song>[] = [
         accessorKey: "albumId",
         header: "Album",
         cell: ({ row }) => {
-            return row.original.albumId || "N/A"
+            const { albumData } = useAppSelector((state: RootState) => state.album);
+            const album = albumData.find((g) => g.id === row.original.albumId);
+            return <>{album?.title || "Unknown Album"}</>;
         }
     },
     {

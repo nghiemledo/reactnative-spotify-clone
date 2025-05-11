@@ -1,277 +1,357 @@
-// import { getSongBySlug, putSongData } from '@/store/song/song.actions';
-// import { RootState, useAppDispatch, useAppSelector } from '@/store/store';
-// import { Song } from '@/types/song.type';
-// import React, { useEffect } from 'react';
-// import { useNavigate, useParams } from 'react-router-dom';
-// import { useForm, SubmitHandler } from 'react-hook-form';
-// import { SongStatus } from '@/enums/song-status.enum';
-// import { toast } from 'sonner';
-// import { Button } from '@/components/ui/button';
-// import { Input } from '@/components/ui/input';
-// import { Label } from '@/components/ui/label';
-// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-// import { Check } from 'lucide-react';
+import Loading from '@/components/loading';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getSongById, putSongData } from '@/store/song/song.actions';
+import { RootState, useAppDispatch, useAppSelector } from '@/store/store';
+import { ArrowLeft, Save } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
-// type SongFormData = Song;
+interface FormValues {
+    title: string;
+    coverImage: string;
+    genreId: string;
+    duration: number;
+    audioUrl: string;
+    artistId: string;
+    albumId: string;
+}
 
-// const ManageEditSong: React.FC = () => {
-//     const { slug } = useParams();
-//     const dispatch = useAppDispatch();
-//     const navigate = useNavigate();
-//     const { songDetail, loading, error } = useAppSelector((state: RootState) => state.song);
+const ManageEditSong: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const { songDetail, loading } = useAppSelector((state: RootState) => state.song);
+    const { albumData } = useAppSelector((state: RootState) => state.album);
+    const { genreData } = useAppSelector((state: RootState) => state.genre);
+    const { artistData } = useAppSelector((state: RootState) => state.artist);
+    const [imageError, setImageError] = useState(false);
 
-//     const form = useForm<SongFormData>({
-//         defaultValues: {
-//             id: '',
-//             title: '',
-//             slug: '',
-//             artist: '',
-//             album: '',
-//             duration: '',
-//             releaseDate: '',
-//             genre: '',
-//             status: SongStatus.Published,
-//         },
-//         mode: 'onChange',
-//     });
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+        setValue,
+        watch
+    } = useForm<FormValues>({
+        defaultValues: {
+            title: "",
+            genreId: "",
+            duration: 0,
+            audioUrl: "",
+            artistId: "",
+            albumId: ""
+        },
+    });
 
-//     useEffect(() => {
-//         if (slug) {
-//             dispatch(getSongBySlug(slug));
-//         }
-//     }, [dispatch, slug]);
+    const coverImage = watch("coverImage");
 
-//     useEffect(() => {
-//         if (songDetail) {
-//             form.reset({
-//                 id: songDetail.id,
-//                 slug: songDetail.slug,
-//                 title: songDetail.title,
-//                 artist: songDetail.artist,
-//                 album: songDetail.album,
-//                 duration: songDetail.duration,
-//                 releaseDate: songDetail.releaseDate,
-//                 genre: songDetail.genre,
-//                 status: songDetail.status,
-//                 createdAt: songDetail.createdAt,
-//                 updatedAt: songDetail.updatedAt,
-//             });
-//         }
-//     }, [songDetail, form]);
+    useEffect(() => {
+        if (id) {
+            dispatch(getSongById(id));
+        }
+    }, [dispatch, id]);
 
-//     const onSubmit: SubmitHandler<SongFormData> = async (data) => {
-//         try {
-//             await dispatch(putSongData(data)).unwrap();
-//             toast('Success', {
-//                 description: 'Updated song successfully!',
-//             });
-//             navigate('/admin/songs');
-//         } catch (err) {
-//             console.error('Submission error:', err);
-//             toast('Error', {
-//                 description: error || 'Could not update song. Please try again.',
-//             });
-//         }
-//     };
+    useEffect(() => {
+        if (songDetail) {
+            setValue('title', songDetail.title);
+            setValue('coverImage', songDetail.coverImage || '');
+            setValue('genreId', songDetail.genreId || '');
+            setValue('duration', songDetail.duration);
+            setValue('audioUrl', songDetail.audioUrl || '');
+            setValue('artistId', songDetail.artistId || '');
+            setValue('albumId', songDetail.albumId || '');
+        }
+    }, [songDetail, setValue]);
 
-//     const handleCancel = () => {
-//         navigate('/admin/songs');
-//     };
+    const onSubmit: SubmitHandler<FormValues> = async (data) => {
+        if (!id) return;
+        const payload = {
+            id,
+            title: data.title,
+            coverImage: data.coverImage,
+            genreId: data.genreId,
+            duration: data.duration,
+            audioUrl: data.audioUrl,
+            artistId: data.artistId,
+            albumId: data.albumId,
+            createdAt: songDetail?.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+        try {
+            await dispatch(putSongData(payload)).unwrap();
+            toast('Success!', {
+                description: 'Song has been updated successfully.',
+            });
+            navigate('/admin/songs');
+        } catch {
+            toast('Error', {
+                description: 'Failed to update song. Please try again.',
+            });
+        }
+    };
 
-//     return (
-//         <div className="flex flex-col gap-4 container mx-auto">
-//             <h1 className="text-2xl font-bold">Edit Song</h1>
-//             <Card>
-//                 <CardHeader>
-//                     <CardTitle>Song Information</CardTitle>
-//                 </CardHeader>
-//                 <CardContent>
-//                     {loading && <p>Loading...</p>}
-//                     {error && <p className="text-red-600">Error: {error}</p>}
-//                     {!loading && !error && (
-//                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-//                             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-//                                 {/* Title */}
-//                                 <div className="space-y-2">
-//                                     <Label htmlFor="title">Title</Label>
-//                                     <Input
-//                                         id="title"
-//                                         {...form.register('title', {
-//                                             required: 'Title is required',
-//                                             minLength: {
-//                                                 value: 2,
-//                                                 message: 'Title must be at least 2 characters',
-//                                             },
-//                                             maxLength: {
-//                                                 value: 100,
-//                                                 message: 'Title cannot exceed 100 characters',
-//                                             },
-//                                         })}
-//                                         disabled={loading}
-//                                         placeholder="Enter song title"
-//                                     />
-//                                     {form.formState.errors.title && (
-//                                         <p className="text-sm text-red-600">{form.formState.errors.title.message}</p>
-//                                     )}
-//                                 </div>
+    return (
+        <div className="container mx-auto">
+            <div className="mb-5 flex items-center justify-between space-y-2">
+                <h1 className="text-2xl font-bold tracking-tight">Edit Song</h1>
+                <div className="flex items-center space-x-2">
+                    <Button asChild variant={'outline'}>
+                        <Link to={'/admin/songs'}>
+                            <ArrowLeft className="h-4 w-4" />
+                            Back
+                        </Link>
+                    </Button>
+                </div>
+            </div>
+            <Card>
+                <CardContent className="pt-6">
+                    {loading ? (
+                        <Loading />
+                    ) : (
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label
+                                        htmlFor="title"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        Song Title <span className="text-red-500">*</span>
+                                    </label>
+                                    {errors.title && <p className="text-sm font-medium text-destructive">{errors.title.message}</p>}
+                                </div>
+                                <Input
+                                    id="title"
+                                    placeholder="Enter song title"
+                                    {...register("title", {
+                                        required: "Song title is required",
+                                        minLength: {
+                                            value: 2,
+                                            message: "Song title must be at least 2 characters",
+                                        },
+                                        maxLength: {
+                                            value: 50,
+                                            message: "Song title must not exceed 50 characters",
+                                        },
+                                    })}
+                                    className={errors.title ? "border-destructive" : ""}
+                                />
+                                <p className="text-sm text-muted-foreground">The title of the song that will be displayed to users.</p>
+                            </div>
 
-//                                 {/* Artist */}
-//                                 <div className="space-y-2">
-//                                     <Label htmlFor="artist">Artist</Label>
-//                                     <Input
-//                                         id="artist"
-//                                         {...form.register('artist', {
-//                                             required: 'Artist is required',
-//                                             minLength: {
-//                                                 value: 2,
-//                                                 message: 'Artist must be at least 2 characters',
-//                                             },
-//                                             maxLength: {
-//                                                 value: 100,
-//                                                 message: 'Artist cannot exceed 100 characters',
-//                                             },
-//                                         })}
-//                                         disabled={loading}
-//                                         placeholder="Enter artist name"
-//                                     />
-//                                     {form.formState.errors.artist && (
-//                                         <p className="text-sm text-red-600">{form.formState.errors.artist.message}</p>
-//                                     )}
-//                                 </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label
+                                        htmlFor="avatar"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        Song Image <span className="text-red-500">*</span>
+                                    </label>
+                                    {errors.coverImage && <p className="text-sm font-medium text-destructive">{errors.coverImage.message}</p>}
+                                </div>
+                                <Input
+                                    id="avatar"
+                                    placeholder="Enter song url image"
+                                    {...register("coverImage", {
+                                        required: "Song image is required",
+                                        minLength: {
+                                            value: 2,
+                                            message: "Song image must be at least 2 characters",
+                                        }
+                                    })}
+                                    className={errors.coverImage ? "border-destructive" : ""}
+                                />
+                                <p className="text-sm text-muted-foreground">The image of the song that will be displayed to users.</p>
+                                {coverImage && (
+                                    <div className="mt-2">
+                                        <p className="text-sm font-medium">Image Preview:</p>
+                                        {imageError ? (
+                                            <p className="text-sm text-destructive">
+                                                Unable to load image. Please check the URL.
+                                            </p>
+                                        ) : (
+                                            <img
+                                                src={coverImage}
+                                                alt="Artist avatar preview"
+                                                className="mt-2 h-32 w-32 object-cover rounded-md border"
+                                                onError={() => setImageError(true)}
+                                                onLoad={() => setImageError(false)}
+                                            />
+                                        )}
+                                    </div>
+                                )}
+                            </div>
 
-//                                 {/* Album */}
-//                                 <div className="space-y-2">
-//                                     <Label htmlFor="album">Album</Label>
-//                                     <Input
-//                                         id="album"
-//                                         {...form.register('album', {
-//                                             required: 'Album is required',
-//                                             minLength: {
-//                                                 value: 2,
-//                                                 message: 'Album must be at least 2 characters',
-//                                             },
-//                                             maxLength: {
-//                                                 value: 100,
-//                                                 message: 'Album cannot exceed 100 characters',
-//                                             },
-//                                         })}
-//                                         disabled={loading}
-//                                         placeholder="Enter album name"
-//                                     />
-//                                     {form.formState.errors.album && (
-//                                         <p className="text-sm text-red-600">{form.formState.errors.album.message}</p>
-//                                     )}
-//                                 </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label
+                                        htmlFor="genreId"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        Genre <span className="text-red-500">*</span>
+                                    </label>
+                                    {errors.genreId && <p className="text-sm font-medium text-destructive">{errors.genreId.message}</p>}
+                                </div>
+                                <Select
+                                    onValueChange={(value) => setValue("genreId", value)}
+                                    value={watch('genreId')}
+                                    {...register("genreId", {
+                                        required: "Genre is required",
+                                    })}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select genre" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {genreData?.map((genre) => (
+                                            <SelectItem key={genre.id} value={genre.id!.toString()}>
+                                                {genre.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <p className="text-sm text-muted-foreground">Select the genre of the song.</p>
+                            </div>
 
-//                                 {/* Duration */}
-//                                 <div className="space-y-2">
-//                                     <Label htmlFor="duration">Duration (MM:SS)</Label>
-//                                     <Input
-//                                         id="duration"
-//                                         {...form.register('duration', {
-//                                             required: 'Duration is required',
-//                                             pattern: {
-//                                                 value: /^(?:[0-5]?[0-9]):[0-5][0-9]$/,
-//                                                 message: 'Duration must be in MM:SS format (e.g., 3:45)',
-//                                             },
-//                                         })}
-//                                         disabled={loading}
-//                                         placeholder="e.g., 3:45"
-//                                     />
-//                                     {form.formState.errors.duration && (
-//                                         <p className="text-sm text-red-600">{form.formState.errors.duration.message}</p>
-//                                     )}
-//                                 </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label
+                                        htmlFor="artistId"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        Artist <span className="text-red-500">*</span>
+                                    </label>
+                                    {errors.artistId && <p className="text-sm font-medium text-destructive">{errors.artistId.message}</p>}
+                                </div>
+                                <Select
+                                    onValueChange={(value) => setValue("artistId", value)}
+                                    value={watch('artistId')}
+                                    {...register("artistId", {
+                                        required: "Artist is required",
+                                    })}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select artist" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {artistData?.map((artist) => (
+                                            <SelectItem key={artist.id} value={artist.id?.toString() || ''}>
+                                                {artist.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <p className="text-sm text-muted-foreground">Select the artist of the song.</p>
+                            </div>
 
-//                                 {/* Release Date */}
-//                                 <div className="space-y-2">
-//                                     <Label htmlFor="releaseDate">Release Date</Label>
-//                                     <Input
-//                                         id="releaseDate"
-//                                         type="date"
-//                                         {...form.register('releaseDate', {
-//                                             required: 'Release date is required',
-//                                             validate: (value) => {
-//                                                 const today = new Date();
-//                                                 today.setHours(0, 0, 0, 0);
-//                                                 const selectedDate = new Date(value);
-//                                                 return selectedDate <= today || 'Release date cannot be in the future';
-//                                             },
-//                                         })}
-//                                         disabled={loading}
-//                                     />
-//                                     {form.formState.errors.releaseDate && (
-//                                         <p className="text-sm text-red-600">{form.formState.errors.releaseDate.message}</p>
-//                                     )}
-//                                 </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label
+                                        htmlFor="albumId"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        Album <span className="text-red-500">*</span>
+                                    </label>
+                                    {errors.albumId && <p className="text-sm font-medium text-destructive">{errors.albumId.message}</p>}
+                                </div>
+                                <Select
+                                    onValueChange={(value) => setValue("albumId", value)}
+                                    value={watch('albumId')}
+                                    {...register("albumId")}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select album" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {albumData?.map((album) => (
+                                            <SelectItem key={album.id} value={album.id?.toString() || ""}>
+                                                {album.title}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <p className="text-sm text-muted-foreground">Select the album of the song.</p>
+                            </div>
 
-//                                 {/* Genre */}
-//                                 <div className="space-y-2">
-//                                     <Label htmlFor="genre">Genre</Label>
-//                                     <Input
-//                                         id="genre"
-//                                         {...form.register('genre', {
-//                                             required: 'Genre is required',
-//                                             minLength: {
-//                                                 value: 2,
-//                                                 message: 'Genre must be at least 2 characters',
-//                                             },
-//                                             maxLength: {
-//                                                 value: 50,
-//                                                 message: 'Genre cannot exceed 50 characters',
-//                                             },
-//                                         })}
-//                                         disabled={loading}
-//                                         placeholder="Enter genre"
-//                                     />
-//                                     {form.formState.errors.genre && (
-//                                         <p className="text-sm text-red-600">{form.formState.errors.genre.message}</p>
-//                                     )}
-//                                 </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label
+                                        htmlFor="duration"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        Duration (seconds) <span className="text-red-500">*</span>
+                                    </label>
+                                    {errors.duration && <p className="text-sm font-medium text-destructive">{errors.duration.message}</p>}
+                                </div>
+                                <Input
+                                    id="duration"
+                                    type="number"
+                                    placeholder="Enter duration in seconds"
+                                    {...register("duration", {
+                                        required: "Duration is required",
+                                        min: {
+                                            value: 1,
+                                            message: "Duration must be at least 1 second",
+                                        },
+                                    })}
+                                    className={errors.duration ? "border-destructive" : ""}
+                                />
+                                <p className="text-sm text-muted-foreground">The duration of the song in seconds.</p>
+                            </div>
 
-//                                 {/* Status */}
-//                                 <div className="space-y-2">
-//                                     <Label htmlFor="status">Status</Label>
-//                                     <Select
-//                                         onValueChange={(value) => form.setValue('status', value as SongStatus)}
-//                                         value={form.watch('status')}
-//                                         disabled={loading}
-//                                     >
-//                                         <SelectTrigger className="w-full rounded-2xl">
-//                                             <SelectValue placeholder="Select status" />
-//                                         </SelectTrigger>
-//                                         <SelectContent>
-//                                             <SelectItem value={SongStatus.Published}>{SongStatus.Published}</SelectItem>
-//                                             <SelectItem value={SongStatus.Draft}>{SongStatus.Draft}</SelectItem>
-//                                         </SelectContent>
-//                                     </Select>
-//                                     {form.formState.errors.status && (
-//                                         <p className="text-sm text-red-600">{form.formState.errors.status.message}</p>
-//                                     )}
-//                                 </div>
-//                             </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label
+                                        htmlFor="audioUrl"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        Audio URL <span className="text-red-500">*</span>
+                                    </label>
+                                    {errors.audioUrl && <p className="text-sm font-medium text-destructive">{errors.audioUrl.message}</p>}
+                                </div>
+                                <Input
+                                    id="audioUrl"
+                                    placeholder="Enter audio URL"
+                                    {...register("audioUrl", {
+                                        required: "Audio URL is required",
+                                        pattern: {
+                                            value: /^(https?:\/\/).+\.(mp3|wav)$/,
+                                            message: "Please enter a valid audio URL (mp3 or wav)",
+                                        },
+                                    })}
+                                    className={errors.audioUrl ? "border-destructive" : ""}
+                                />
+                                <p className="text-sm text-muted-foreground">The URL to the audio file (mp3 or wav).</p>
+                            </div>
 
-//                             <div className="flex justify-end gap-4">
-//                                 <Button
-//                                     type="button"
-//                                     variant="outline"
-//                                     onClick={handleCancel}
-//                                     disabled={loading}
-//                                     className="cursor-pointer"
-//                                 >
-//                                     Cancel
-//                                 </Button>
-//                                 <Button type="submit" disabled={loading} className="cursor-pointer">
-//                                     {loading ? 'Saving...' : 'Save'} <Check />
-//                                 </Button>
-//                             </div>
-//                         </form>
-//                     )}
-//                 </CardContent>
-//             </Card>
-//         </div>
-//     );
-// };
+                            <div className="flex justify-end gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className='cursor-pointer'
+                                    onClick={() => {
+                                        reset();
+                                        navigate('/admin/songs');
+                                    }}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button type="submit" className="flex items-center gap-1 cursor-pointer">
+                                    <Save className="h-4 w-4" />
+                                    Save Song
+                                </Button>
+                            </div>
+                        </form>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
+    );
+};
 
-// export default ManageEditSong;
+export default ManageEditSong;
