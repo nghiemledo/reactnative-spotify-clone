@@ -188,7 +188,7 @@ const ManageEditAlbum: React.FC = () => {
                                 </div>
                                 <Select
                                     onValueChange={(value) => setValue("genreId", value)}
-                                    value={watch('genreId')} // Đảm bảo giá trị hiện tại được hiển thị
+                                    value={watch('genreId')}
                                     {...register("genreId", {
                                         required: "Genre is required",
                                     })}
@@ -219,7 +219,7 @@ const ManageEditAlbum: React.FC = () => {
                                 </div>
                                 <Select
                                     onValueChange={(value) => setValue("artistId", value)}
-                                    value={watch('artistId')} // Đảm bảo giá trị hiện tại được hiển thị
+                                    value={watch('artistId')}
                                     {...register("artistId", {
                                         required: "Artist is required",
                                     })}
