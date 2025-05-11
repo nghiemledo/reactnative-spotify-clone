@@ -21,7 +21,7 @@ import SettingGeneral from '@/pages/admin/setting/general';
 import SettingRoles from '@/pages/admin/setting/roles';
 import SettingStorage from '@/pages/admin/setting/storage';
 import ManageAddSong from '@/pages/admin/song/add';
-// import ManageEditSong from '@/pages/admin/song/edit';
+import ManageEditSong from '@/pages/admin/song/edit';
 import ManageSong from '@/pages/admin/song/index';
 import ManageViewSong from '@/pages/admin/song/view';
 import ManageUser from '@/pages/admin/user';
@@ -55,9 +55,9 @@ const privateRoutes = [
     { path: `${privatePrefix}/albums/:id/edit`, component: ManageEditAlbum },
 
     { path: `${privatePrefix}/songs`, component: ManageSong },
-    { path: `${privatePrefix}/songs/:slug`, component: ManageViewSong },
+    { path: `${privatePrefix}/songs/:id`, component: ManageViewSong },
     { path: `${privatePrefix}/songs/add`, component: ManageAddSong },
-    // { path: `${privatePrefix}/songs/:slug/edit`, component: ManageEditSong },
+    { path: `${privatePrefix}/songs/:id/edit`, component: ManageEditSong },
 
     { path: `${privatePrefix}/genres`, component: ManageGenre },
     { path: `${privatePrefix}/genres/:id`, component: ManageViewGenre },
