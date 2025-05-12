@@ -8,11 +8,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import { EyeIcon } from "../eye-icon";
 import { EditIcon } from "../edit-icon";
 import { DeleteIcon } from "../delete-icon";
-import { cn } from "@/lib/utils";
 import DeleteModal from "../delete-modal";
-import { useAppDispatch } from "@/store/store";
+import { RootState, useAppDispatch, useAppSelector } from "@/store/store";
 import { deleteSongData } from "@/store/song/song.actions";
 import { useNavigate } from "react-router-dom";
+import { formatDate } from "@/utils/formatDate";
 
 export const columns: ColumnDef<Song>[] = [
     {
@@ -25,41 +25,51 @@ export const columns: ColumnDef<Song>[] = [
         header: "Title",
     },
     {
-        accessorKey: "artist",
-        header: "Artist",
-    },
-    {
-        accessorKey: "album",
-        header: "Album",
-    },
-    {
-        accessorKey: "duration",
-        header: "Duration",
-    },
-    {
-        accessorKey: "releaseDate",
-        header: "Release Date",
-    },
-    {
-        accessorKey: "genre",
-        header: "Genre",
-    },
-    {
-        accessorKey: "status",
-        header: "Status",
+        accessorKey: "coverImage",
+        header: "Cover Image",
         cell: ({ row }) => {
-            const status = row.getValue("status") as string;
             return (
-                <span
-                    className={cn(
-                        "px-2 py-1 text-sm font-medium rounded",
-                        status === "Published" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                    )}
-                >
-                    {status}
-                </span>
-            );
+                <div className="w-10 h-10">
+                    <img className="w-full h-full object-cover rounded-xl" src={row.original.coverImage} alt={row.original.title} />
+                </div>
+            )
+        }
+    },
+    {
+        accessorKey: "artistId",
+        header: "Artist",
+        cell: ({ row }) => {
+            const { artistData } = useAppSelector((state: RootState) => state.artist);
+            const artist = artistData.find((a) => a.id === row.original.artistId);
+            return <>{artist?.name || "Unknown Artist"}</>;
         },
+    },
+    {
+        accessorKey: "genreId",
+        header: "Genre",
+        cell: ({ row }) => {
+            const { genreData } = useAppSelector((state: RootState) => state.genre);
+            const genre = genreData.find((g) => g.id === row.original.genreId);
+            return <>{genre?.name || "Unknown Genre"}</>;
+        },
+    },
+    {
+        accessorKey: "albumId",
+        header: "Album",
+        cell: ({ row }) => {
+            const { albumData } = useAppSelector((state: RootState) => state.album);
+            const album = albumData.find((g) => g.id === row.original.albumId);
+            return <>{album?.title || "Unknown Album"}</>;
+        }
+    },
+    {
+        accessorKey: "createdAt",
+        header: "Release Date",
+        cell: ({ row }) => {
+            return (
+                <>{formatDate(row.original.createdAt!)}</>
+            )
+        }
     },
     {
         id: "actions",
@@ -71,11 +81,11 @@ export const columns: ColumnDef<Song>[] = [
             const [loading, setLoading] = useState(false);
 
             const handleView = () => {
-                navigate(`/admin/songs/${row.original.slug}`);
+                navigate(`/admin/songs/${row.original.id}`);
             };
 
             const handleEdit = () => {
-                navigate(`/admin/songs/${row.original.slug}/edit`);
+                navigate(`/admin/songs/${row.original.id}/edit`);
             }
 
             const handleDelete = async () => {
@@ -100,7 +110,7 @@ export const columns: ColumnDef<Song>[] = [
                 <div className="relative flex items-center gap-3">
                     <TooltipProvider>
                         <Tooltip>
-                            <TooltipTrigger asChild>
+                            <TooltipTrigger asChild disabled>
                                 <span className="text-lg cursor-pointer active:opacity-50"
                                     onClick={handleView}
                                 >
@@ -112,7 +122,7 @@ export const columns: ColumnDef<Song>[] = [
                             </TooltipContent>
                         </Tooltip>
                         <Tooltip>
-                            <TooltipTrigger asChild>
+                            <TooltipTrigger asChild disabled>
                                 <span className="text-lg cursor-pointer active:opacity-50"
                                     onClick={handleEdit}
                                 >

@@ -6,6 +6,7 @@ import {
     ListMusic,
     Settings,
     BarChart4,
+    Component,
 } from "lucide-react";
 
 export const SidebarData = {
@@ -47,6 +48,15 @@ export const SidebarData = {
             items: [
                 { title: "All Songs", url: "/admin/songs" },
                 { title: "Add Song", url: "/admin/songs/add" },
+            ],
+        },
+        {
+            title: "Genre Management",
+            url: "/admin/genres",
+            icon: Component,
+            items: [
+                { title: "All Genres", url: "/admin/genres" },
+                { title: "Add Genre", url: "/admin/genres/add" },
             ],
         },
         {

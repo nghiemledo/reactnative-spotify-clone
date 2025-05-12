@@ -6,7 +6,7 @@ import { Song } from "@/types/song.type";
 
 export const getSongData = createAsyncThunk(GET_SONGS, async (_, { signal, rejectWithValue }) => {
     try {
-        const response = await axiosClient.get(`/songs`, {
+        const response = await axiosClient.get(`/song`, {
             signal: signal,
         });
         if (response.data.status === true) {
@@ -22,7 +22,7 @@ export const getSongById = createAsyncThunk(
     GET_SONG_BY_ID,
     async (id: string, { signal, rejectWithValue }) => {
         try {
-            const response = await axiosClient.get(`/songs/${id}`, { signal });
+            const response = await axiosClient.get(`/song/${id}`, { signal });
             if (response.data.status === true) {
                 return response.data.data;
             }
@@ -37,7 +37,7 @@ export const getSongBySlug = createAsyncThunk(
     GET_SONG_BY_SLUG,
     async (slug: string, { signal, rejectWithValue }) => {
         try {
-            const response = await axiosClient.get(`/songs/${slug}`, { signal });
+            const response = await axiosClient.get(`/song/${slug}`, { signal });
             if (response.data.status === true) {
                 return response.data.data;
             }
@@ -52,7 +52,7 @@ export const postSongData = createAsyncThunk(
     POST_SONG,
     async (body: Omit<Song, 'id' | 'createdAt' | 'updatedAt'>, { signal, rejectWithValue }) => {
         try {
-            const response = await axiosClient.post(`/songs`, body, { signal });
+            const response = await axiosClient.post(`/song`, body, { signal });
             if (response.data.status === true) {
                 return response.data.data;
             }
@@ -64,7 +64,7 @@ export const postSongData = createAsyncThunk(
 );
 
 export const putSongData = createAsyncThunk(PUT_SONG, async (body: Song, thunkAPI) => {
-    const response = await axiosClient.put(`/songs`, body, {
+    const response = await axiosClient.put(`/song`, body, {
         signal: thunkAPI.signal
     });
     return response.data.data

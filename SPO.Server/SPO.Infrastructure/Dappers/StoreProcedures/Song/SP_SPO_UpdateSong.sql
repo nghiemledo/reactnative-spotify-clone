@@ -12,6 +12,7 @@ GO
 create procedure [dbo].[SP_SPO_UpdateSong] (
     @Id nvarchar(450),
     @Title nvarchar(MAX),
+    @CoverImage nvarchar(MAX),
     @GenreId nvarchar(MAX),
     @Duration int,
     @ArtistId nvarchar(MAX),
@@ -23,6 +24,7 @@ begin
     update Songs set
         Id = @Id,  
         Title = @Title,
+        CoverImage = @CoverImage,
         GenreId = @GenreId,
         Duration = @Duration,
         ArtistId = @ArtistId,

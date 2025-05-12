@@ -4,6 +4,7 @@ import AdminLayout from './layouts/AdminLayout'
 import AuthLayout from './layouts/AuthLayout';
 import { ThemeProvider } from './components/theme-provider';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import Loading from './components/loading';
 
 function App() {
   return (
@@ -14,10 +15,13 @@ function App() {
 }
 
 function AppRoutes() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   const role = localStorage.getItem('role')
-  const canAccess = role === 'Admin' || role === 'SysAdmin'
+  const canAccess = role === 'Admin' || role === 'SysAdmin';
+  if (isLoading) {
+    return <Loading />
+  }
   return (
     <>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">

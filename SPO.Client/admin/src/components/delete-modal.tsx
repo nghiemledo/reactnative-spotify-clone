@@ -20,14 +20,13 @@ type Props = {
 }
 
 const DeleteModal: React.FC<Props> = ({ deleteModalOpen, setDeleteModalOpen, row, loading, handleDelete }) => {
-    
     return (
         <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Delete data</DialogTitle>
                     <DialogDescription>
-                        Are you sure want to delete <strong>{row.original.name}</strong>? This action can not be undo.
+                        Are you sure want to delete data <strong>{row.original.name || row.original.title || row.original.fullName}</strong>? This action can not be undo.
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
@@ -37,7 +36,7 @@ const DeleteModal: React.FC<Props> = ({ deleteModalOpen, setDeleteModalOpen, row
                         disabled={loading}
                         className='cursor-pointer'
                     >
-                        Hủy
+                        Cancel
                     </Button>
                     <Button
                         variant="destructive"

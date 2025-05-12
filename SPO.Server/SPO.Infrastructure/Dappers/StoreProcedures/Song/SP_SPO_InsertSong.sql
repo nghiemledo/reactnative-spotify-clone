@@ -12,6 +12,7 @@ GO
 create procedure [dbo].[SP_SPO_InsertSong] (
     @Id nvarchar(450),
     @Title nvarchar(MAX),
+    @CoverImage nvarchar(MAX),
     @GenreId nvarchar(MAX),
     @Duration int,
     @ArtistId nvarchar(MAX),
@@ -23,6 +24,7 @@ begin
     insert into Songs( 
         Id, 
         Title,
+        CoverImage,
         GenreId,
         Duration,
         ArtistId,
@@ -33,6 +35,7 @@ begin
     values (
         @Id,  
         @Title,
+        @CoverImage,
         @GenreId,
         @Duration,
         @ArtistId,

@@ -1,10 +1,20 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux";
 import { songReducer } from "./song/song.slice";
+import { genreReducer } from "./genre/genre.slice";
+import { artistReducer } from "./artist/artist.slice";
+import { albumReducer } from "./album/album.slice";
+import { userReducer } from "./user/user.slice";
+import { playlistReducer } from "./playlist/playlist.slice";
 
 export const store = configureStore({
     reducer: {
-        song: songReducer
+        song: songReducer,
+        genre: genreReducer,
+        artist: artistReducer,
+        album: albumReducer,
+        user: userReducer,
+        playlist: playlistReducer
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({ serializableCheck: false }),
