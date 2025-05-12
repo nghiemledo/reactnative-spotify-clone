@@ -4,13 +4,17 @@ import { songReducer } from "./song/song.slice";
 import { genreReducer } from "./genre/genre.slice";
 import { artistReducer } from "./artist/artist.slice";
 import { albumReducer } from "./album/album.slice";
+import { userReducer } from "./user/user.slice";
+import { playlistReducer } from "./playlist/playlist.slice";
 
 export const store = configureStore({
     reducer: {
         song: songReducer,
         genre: genreReducer,
         artist: artistReducer,
-        album: albumReducer
+        album: albumReducer,
+        user: userReducer,
+        playlist: playlistReducer
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({ serializableCheck: false }),
