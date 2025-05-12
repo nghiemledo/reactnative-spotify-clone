@@ -16,6 +16,7 @@ import ManageEditGenre from '@/pages/admin/genre/edit';
 import ManageViewGenre from '@/pages/admin/genre/view';
 import AdminPage from '@/pages/admin/index';
 import ManagePlaylist from '@/pages/admin/playlist';
+import ManageAddPlaylist from '@/pages/admin/playlist/add';
 import ManageReportsPlaylist from '@/pages/admin/playlist/reports';
 import SettingGeneral from '@/pages/admin/setting/general';
 import SettingRoles from '@/pages/admin/setting/roles';
@@ -65,6 +66,7 @@ const privateRoutes = [
     { path: `${privatePrefix}/genres/:id/edit`, component: ManageEditGenre },
 
     { path: `${privatePrefix}/playlists`, component: ManagePlaylist },
+    { path: `${privatePrefix}/playlists/add`, component: ManageAddPlaylist },
     { path: `${privatePrefix}/playlists/reports`, component: ManageReportsPlaylist },
 
     { path: `${privatePrefix}/users`, component: ManageUser },
