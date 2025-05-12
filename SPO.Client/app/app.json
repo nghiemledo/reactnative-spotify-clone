@@ -28,7 +28,7 @@
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ],
-      "jsEngine": "jsc",
+      "jsEngine": "hermes",
       "config": {
         "usesCleartextTraffic": true,
         "foregroundService": {
@@ -45,10 +45,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+      
     },
+    
     "extra": {
       "eas": {
-        "projectId": "ae503e7a-f373-43bc-aab1-ce61f98ced5b"
+        "projectId": "22179ceb-5dfa-4be1-9a96-323b018681e6"
       }
     }
   }
