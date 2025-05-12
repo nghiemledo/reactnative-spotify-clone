@@ -1,29 +1,13 @@
 import React, { useState } from "react";
-import { FlatList, ScrollView, TouchableOpacity, Animated, StatusBar } from "react-native";
+import {
+  FlatList,
+  ScrollView,
+  TouchableOpacity,
+  Animated,
+  StatusBar,
+} from "react-native";
 import { YStack, XStack, Text, Image, H3, Button, Avatar } from "tamagui";
 import { Play } from "@tamagui/lucide-icons";
-
-// Sample data for sections
-const radioItems = [
-  {
-    id: "1",
-    title: "Low G",
-    artists: "tlinh, Low G, RPT MCK",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "Hà Anh Tuấn",
-    artists: "Vũ., Emcee L (Da LAB)",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "3",
-    title: "tlinh",
-    artists: "tlinh, Wren",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
 
 const chartItems = [
   {
@@ -178,59 +162,80 @@ export default function HomeScreen() {
 
   return (
     <YStack flex={1} backgroundColor="#000000">
-      <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="light-content"
+      />
       <ScrollView
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
         onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } }}],
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
       >
-        <YStack flex={1} backgroundColor="transparent" padding="$4" marginTop={StatusBar.currentHeight || 0}>
+        <YStack
+          flex={1}
+          backgroundColor="transparent"
+          padding="$4"
+          marginTop={StatusBar.currentHeight || 0}
+        >
           {/* Header with Avatar and Buttons */}
           <XStack alignItems="center" space="$2" marginBottom="$4">
-      <Avatar circular size="$4">
-        <Avatar.Image
-          accessibilityLabel="User Avatar"
-          src="https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg"
-        />
-        <Avatar.Fallback backgroundColor="$blue10" />
-      </Avatar>
-      <Button
-        size="$3"
-        backgroundColor={selectedButton === "All" ? "#1DB954" : "rgba(255, 255, 255, 0.2)"}
-        borderRadius={50}
-        borderColor="$text"
-        onPress={() => handleButtonPress("All")}
-      >
-        <Text color={selectedButton === "All" ? "black" : "white"}>
-          All
-        </Text>
-      </Button>
-      <Button
-        size="$3"
-        backgroundColor={selectedButton === "Music" ? "#1DB954" : "rgba(255, 255, 255, 0.2)"}
-        borderRadius={50}
-        borderColor="$text"
-        onPress={() => handleButtonPress("Music")}
-      >
-        <Text color={selectedButton === "Music" ? "black" : "white"}>
-          Music
-        </Text>
-      </Button>
-      <Button
-        size="$3"
-        backgroundColor={selectedButton === "Podcasts" ? "#1DB954" : "rgba(255, 255, 255, 0.2)"}
-        borderRadius={50}
-        borderColor="$text"
-        onPress={() => handleButtonPress("Podcasts")}
-      >
-        <Text color={selectedButton === "Podcasts" ? "black" : "white"}>
-          Podcasts
-        </Text>
-      </Button>
-    </XStack>
+            <Avatar circular size="$4">
+              <Avatar.Image
+                accessibilityLabel="User Avatar"
+                src="https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg"
+              />
+              <Avatar.Fallback backgroundColor="$blue10" />
+            </Avatar>
+            <Button
+              size="$3"
+              backgroundColor={
+                selectedButton === "All"
+                  ? "#1DB954"
+                  : "rgba(255, 255, 255, 0.2)"
+              }
+              borderRadius={50}
+              borderColor="$text"
+              onPress={() => handleButtonPress("All")}
+            >
+              <Text color={selectedButton === "All" ? "black" : "white"}>
+                All
+              </Text>
+            </Button>
+            <Button
+              size="$3"
+              backgroundColor={
+                selectedButton === "Music"
+                  ? "#1DB954"
+                  : "rgba(255, 255, 255, 0.2)"
+              }
+              borderRadius={50}
+              borderColor="$text"
+              onPress={() => handleButtonPress("Music")}
+            >
+              <Text color={selectedButton === "Music" ? "black" : "white"}>
+                Music
+              </Text>
+            </Button>
+            <Button
+              size="$3"
+              backgroundColor={
+                selectedButton === "Podcasts"
+                  ? "#1DB954"
+                  : "rgba(255, 255, 255, 0.2)"
+              }
+              borderRadius={50}
+              borderColor="$text"
+              onPress={() => handleButtonPress("Podcasts")}
+            >
+              <Text color={selectedButton === "Podcasts" ? "black" : "white"}>
+                Podcasts
+              </Text>
+            </Button>
+          </XStack>
 
           {/* Popular Radio Section */}
           <H3 color="white" marginBottom="$3">
