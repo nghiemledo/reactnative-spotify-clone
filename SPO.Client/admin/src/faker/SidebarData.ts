@@ -7,6 +7,7 @@ import {
     Settings,
     BarChart4,
     Component,
+    Mic,
 } from "lucide-react";
 
 export const SidebarData = {
@@ -66,6 +67,15 @@ export const SidebarData = {
             items: [
                 { title: "All Playlists", url: "/admin/playlists" },
                 { title: "Reported Playlists", url: "/admin/playlists/reports" },
+            ],
+        },
+        {
+            title: "Podcast Management",
+            url: "/admin/podcasts",
+            icon: Mic,
+            items: [
+                { title: "All Podcasts", url: "/admin/podcasts" },
+                { title: "Add Podcast", url: "/admin/podcasts/add" },
             ],
         },
         {
