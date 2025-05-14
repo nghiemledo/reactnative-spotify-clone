@@ -13,7 +13,7 @@ namespace SPO.Server.Extensions
                 options.AddPolicy(name: "spo-clone",
                                   policy =>
                                   {
-                                      policy.WithOrigins("http://localhost:3000", "https://spoc.vercel.app", "http://localhost:5173")
+                                      policy.WithOrigins("*")
                                       .AllowAnyHeader()
                                       .AllowAnyMethod()
                                       .AllowCredentials();
