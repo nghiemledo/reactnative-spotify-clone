@@ -52,7 +52,7 @@ jobs:
           docker-compose -f docker-compose.yml build \
             --build-arg BUILDKIT_INLINE_CACHE=1
           # Push images
-          docker-compose -f docker-compose.yml push backend frontend
+          docker-compose -f docker-compose.yml push backend
         continue-on-error: false
 
       - name: Deploy to production server
