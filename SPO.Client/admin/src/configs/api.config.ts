@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export const PRIVATE_API = process.env.NEXT_PUBLIC_API_URL;
+// export const PRIVATE_API = process.env.NEXT_PUBLIC_API_URL;
+
+export const PRIVATE_API = "https://ituda.id.vn/api"
 
 import axios from 'axios'
 
