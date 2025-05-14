@@ -1,5 +1,4 @@
 import { DataTable } from '@/components/data-table';
-import { columns } from '@/components/podcast-show/columns';
 import Loading from '@/components/loading';
 import { Button } from '@/components/ui/button';
 import { RootState, useAppDispatch, useAppSelector } from '@/store/store';
@@ -8,6 +7,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getPodcastShowData } from '@/store/podcast-show/podcast-show.actions';
 import { getPodcastCategoryData } from '@/store/podcast-category/podcast-category.actions';
+import { columns } from '@/components/podcast-show/columns';
 
 const ManagePodcastShows: React.FC = () => {
     const { podcastShowData, loading } = useAppSelector((state: RootState) => state.podcastShow);
