@@ -43,11 +43,11 @@ const ManageViewPodcastCategory: React.FC = () => {
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium leading-none">
-                                    Podcast Category Name
+                                    Category Name
                                 </label>
                                 <p className="text-base text-foreground">{podcastCategoryDetail.name}</p>
                                 <p className="text-sm text-muted-foreground">
-                                    The name of the podcast category displayed to users.
+                                    The name of the podacast category displayed to users.
                                 </p>
                             </div>
                             <div className="space-y-2">
@@ -58,7 +58,7 @@ const ManageViewPodcastCategory: React.FC = () => {
                                     {podcastCategoryDetail.description || 'No description provided.'}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                    A brief description of the Podcast Category.
+                                    A brief description of the podcast category.
                                 </p>
                             </div>
                             <div className="space-y-2">
@@ -66,10 +66,12 @@ const ManageViewPodcastCategory: React.FC = () => {
                                     Created At
                                 </label>
                                 <p className="text-base text-foreground">
-                                    {formatDate(podcastCategoryDetail.createdAt!)}
+                                    {podcastCategoryDetail.createdAt
+                                        ? formatDate(podcastCategoryDetail.createdAt)
+                                        : 'No created date'}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                    The date and time when the Podcast Category was created.
+                                    The date and time when the podcast category was created.
                                 </p>
                             </div>
                             <div className="space-y-2">
@@ -77,10 +79,12 @@ const ManageViewPodcastCategory: React.FC = () => {
                                     Updated At
                                 </label>
                                 <p className="text-base text-foreground">
-                                    {formatDate(podcastCategoryDetail?.updatedAt || "")}
+                                    {podcastCategoryDetail.updatedAt
+                                        ? formatDate(podcastCategoryDetail.updatedAt)
+                                        : 'No updated date'}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                    The date and time when the Podcast Category was last updated.
+                                    The date and time when the podcast category was last updated.
                                 </p>
                             </div>
                             <div className="flex justify-end">
@@ -90,7 +94,7 @@ const ManageViewPodcastCategory: React.FC = () => {
                             </div>
                         </div>
                     ) : (
-                        <div>No Podcast Category data found.</div>
+                        <div>No podcast category data found.</div>
                     )}
                 </CardContent>
             </Card>

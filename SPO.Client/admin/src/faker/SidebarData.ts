@@ -75,8 +75,8 @@ export const SidebarData = {
             icon: Mic,
             items: [
                 { title: "Category", url: "/admin/podcast-categories" },
-                { title: "Episode", url: "/admin/podcast-episodes" },
                 { title: "Show", url: "/admin/podcast-shows" },
+                { title: "Episode", url: "/admin/podcast-episodes" },
             ],
         },
         {
