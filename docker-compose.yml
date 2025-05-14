@@ -7,7 +7,7 @@ services:
     container_name: wa-backend
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=${secrets.CONNECTION_STRING}
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
     networks:
       - app-network
     restart: always
