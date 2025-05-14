@@ -37,6 +37,6 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 RUN find /app -name "*.pdb" -delete && \
     find /app -name "*.xml" -delete
 
-EXPOSE 80
+EXPOSE 81
 
 ENTRYPOINT ["dotnet", "SPO.Server.dll"]
