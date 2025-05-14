@@ -7,6 +7,7 @@ import { albumReducer } from "./album/album.slice";
 import { userReducer } from "./user/user.slice";
 import { playlistReducer } from "./playlist/playlist.slice";
 import { podcastCategoryReducer } from "./podcast-category/podcast-category.slice";
+import { podcastShowReducer } from "./podcast-show/podcast-show.slice";
 
 export const store = configureStore({
     reducer: {
@@ -16,7 +17,8 @@ export const store = configureStore({
         album: albumReducer,
         user: userReducer,
         playlist: playlistReducer,
-        podcastCategory: podcastCategoryReducer
+        podcastCategory: podcastCategoryReducer,
+        podcastShow: podcastShowReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({ serializableCheck: false }),
