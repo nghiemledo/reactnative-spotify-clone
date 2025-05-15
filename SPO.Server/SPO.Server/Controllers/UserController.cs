@@ -11,6 +11,9 @@ using SPO.Domain.Entities.UserRoles;
 using SPO.Infrastructure.Repositories.UserRoles;
 using SPO.Application.DataTransferObjects.Request.UserRoles.User;
 using SPO.Domain.Wrappers;
+using SPO.Infrastructure.Repositories;
+using SPO.Application.DataTransferObjects.Request.UserToken;
+using System.Security.Cryptography;
 
 namespace SPO.Server.Controllers
 {
@@ -24,10 +27,10 @@ namespace SPO.Server.Controllers
         private readonly IUserRoleRepository _userRoleRepository;
         private readonly IRoleRepository _roleRepostitory;
         private readonly IConfiguration _configuration;
-
+        private readonly IUserTokenRepository _userTokenRepository;
 
         public UserController(IUserRepository userRepository, IMapper mapper, ApplicationDbContext context, IConfiguration configuration, IUserRoleRepository userRoleRepository
-            , IRoleRepository roleRepostitory)
+            , IRoleRepository roleRepostitory, IUserTokenRepository userTokenRepository)
         {
             _userRepository = userRepository;
             _mapper = mapper;
@@ -36,6 +39,7 @@ namespace SPO.Server.Controllers
             _userRepository = userRepository;
             _userRoleRepository = userRoleRepository;
             _roleRepostitory = roleRepostitory;
+            _userTokenRepository = userTokenRepository;
         }
 
         [HttpGet]
@@ -55,6 +59,34 @@ namespace SPO.Server.Controllers
             return Ok(await Result<User>.SuccessAsync(query));
         }
 
+        //[HttpPost]
+        //[Route("login")]
+        //public async Task<IActionResult> Login([FromBody] LoginUserRequest request)
+        //{
+        //    var user = _context.Users.Where(x => x.Email == request.Email).FirstOrDefault();
+        //    if (user == null)
+        //    {
+        //        return BadRequest(await Result<LoginUserRequest>.FailAsync("Email không tồn tại"));
+        //    }
+        //    else
+        //    {
+        //        // Dùng mật khẩu đã lưu trong database để kiểm tra
+        //        bool isMatch = SPO.Common.Password.BCryptPasswordService.VerifyPassword(user.Passwordhash!, request.Password);
+        //        var userRole = _userRepository.GetRoleByUserId(user.Id);
+        //        //var userFunction = _functionDapperRepository.GetFunctionByRoleName(userRole.Result.Name);
+        //        if (isMatch)
+        //        {
+        //            var token = GenerateJwtToken(user);
+
+        //            //return Ok(await Result<User>.SuccessAsync(user));
+        //            return Ok(new { Token = token, user = user, status = true, role = userRole });
+        //        }
+        //        else
+        //            return BadRequest(await Result<LoginUserRequest>.FailAsync("Mật khẩu sai"));
+        //    }
+
+        //}
+
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginUserRequest request)
@@ -62,32 +94,60 @@ namespace SPO.Server.Controllers
             var user = _context.Users.Where(x => x.Email == request.Email).FirstOrDefault();
             if (user == null)
             {
-                return BadRequest(await Result<LoginUserRequest>.FailAsync("Email không tồn tại"));
+                return BadRequest(await Result<LoginUserRequest>.FailAsync("Email does not exist"));
             }
             else
             {
-                // Dùng mật khẩu đã lưu trong database để kiểm tra
                 bool isMatch = SPO.Common.Password.BCryptPasswordService.VerifyPassword(user.Passwordhash!, request.Password);
-                var userRole = _userRepository.GetRoleByUserId(user.Id);
-                //var userFunction = _functionDapperRepository.GetFunctionByRoleName(userRole.Result.Name);
+                var userRole = await _userRoleRepository.GetRoleByUserId(user.Id);
                 if (isMatch)
                 {
                     var token = GenerateJwtToken(user);
+                    var refreshToken = GenerateRefreshToken();
+                    var userToken = new CreateUserTokenRequest
+                    {
+                        UserId = user.Id,
+                        Value = refreshToken,
+                        LoginProvider = "Local",
+                        Name = "RefreshToken",
+                        Expires = DateTime.UtcNow.AddDays(7)
+                    };
+                    _userTokenRepository.AddAsync(userToken);
 
-                    //return Ok(await Result<User>.SuccessAsync(user));
-                    return Ok(new { Token = token, user = user, status = true, role = userRole });
+                    return Ok(new { Token = token, RefreshToken = refreshToken, user = user, status = true, role = userRole });
                 }
                 else
-                    return BadRequest(await Result<LoginUserRequest>.FailAsync("Mật khẩu sai"));
+                    return BadRequest(await Result<LoginUserRequest>.FailAsync("Password is not correct"));
             }
-
         }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest ReToken)
+        {
+            var refreshToken = await _userTokenRepository.GetByValueAsync(ReToken.token);
+            if (refreshToken == null || refreshToken.Expires < DateTime.Now)
+                return Unauthorized();
+
+            var user = await _userRepository.GetByIdAsync(refreshToken.UserId);
+            var newAccessToken = GenerateJwtToken(user);
+
+            return Ok(new { token = newAccessToken });
+        }
+
+       
+        private string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+
 
         [HttpPost]
         [Route("register")]
         public async Task<IActionResult> Register([FromBody] CreateUserRequest request)
         {
-
             request.Password = SPO.Common.Password.BCryptPasswordService.HashPassword(request.Password);
             await _userRepository.AddAsync(request);
             var role = await _roleRepostitory.GetByNameAsync("user");

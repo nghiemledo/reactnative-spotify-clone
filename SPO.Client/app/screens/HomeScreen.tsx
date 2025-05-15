@@ -24,7 +24,7 @@ import Sidebar from "../components/Sidebar";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { togglePlayback } from "../services/playerService"; // Import togglePlayback
 
-// Định nghĩa type cho các thành phần
+
 interface Artist {
   id: string;
   name: string;
@@ -206,6 +206,142 @@ export default function HomeScreen({ navigation }: { navigation: HomeScreenNavig
   const sidebarAnim = useRef(new Animated.Value(-Dimensions.get("window").width * 0.75)).current;
 
   const handleButtonPress = (buttonName: string) => setSelectedButton(buttonName);
+  return (
+    <YStack flex={1} backgroundColor="#000000">
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="light-content"
+      />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+      >
+        <YStack
+          flex={1}
+          backgroundColor="transparent"
+          padding="$4"
+          marginTop={StatusBar.currentHeight || 0}
+        >
+          {/* Header with Avatar and Buttons */}
+          <XStack alignItems="center" space="$2" marginBottom="$4">
+            <Avatar circular size="$4">
+              <Avatar.Image
+                accessibilityLabel="User Avatar"
+                src="https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg"
+              />
+              <Avatar.Fallback backgroundColor="$blue10" />
+            </Avatar>
+            <Button
+              size="$3"
+              backgroundColor={
+                selectedButton === "All"
+                  ? "#1DB954"
+                  : "rgba(255, 255, 255, 0.2)"
+              }
+              borderRadius={50}
+              borderColor="$text"
+              onPress={() => handleButtonPress("All")}
+            >
+              <Text color={selectedButton === "All" ? "black" : "white"}>
+                All
+              </Text>
+            </Button>
+            <Button
+              size="$3"
+              backgroundColor={
+                selectedButton === "Music"
+                  ? "#1DB954"
+                  : "rgba(255, 255, 255, 0.2)"
+              }
+              borderRadius={50}
+              borderColor="$text"
+              onPress={() => handleButtonPress("Music")}
+            >
+              <Text color={selectedButton === "Music" ? "black" : "white"}>
+                Music
+              </Text>
+            </Button>
+            <Button
+              size="$3"
+              backgroundColor={
+                selectedButton === "Podcasts"
+                  ? "#1DB954"
+                  : "rgba(255, 255, 255, 0.2)"
+              }
+              borderRadius={50}
+              borderColor="$text"
+              onPress={() => handleButtonPress("Podcasts")}
+            >
+              <Text color={selectedButton === "Podcasts" ? "black" : "white"}>
+                Podcasts
+              </Text>
+            </Button>
+          </XStack>
+
+          {/* Popular Radio Section */}
+          <H3 color="white" marginBottom="$3">
+            Popular radio
+          </H3>
+          <FlatList
+            data={radioItems}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity>
+                <YStack width={150} marginRight="$4">
+                  <Image
+                    source={{ uri: item.image }}
+                    width={150}
+                    height={150}
+                    borderRadius={2}
+                  />
+                  <Text color="white" fontWeight="bold" marginTop="$2">
+                    {item.title}
+                  </Text>
+                  <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+                    {item.artists}
+                  </Text>
+                </YStack>
+              </TouchableOpacity>
+            )}
+            scrollEnabled={false}
+          />
+
+          {/* Charts Section */}
+          <H3 color="white" marginTop="$6" marginBottom="$3">
+            Charts
+          </H3>
+          <FlatList
+            data={chartItems}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity>
+                <YStack width={120} marginRight="$4">
+                  <Image
+                    source={{ uri: item.image }}
+                    width={120}
+                    height={180}
+                    borderRadius={2}
+                  />
+                  <Text color="white" fontWeight="bold" marginTop="$2">
+                    {item.title}
+                  </Text>
+                  <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+                    {item.artists}
+                  </Text>
+                </YStack>
+              </TouchableOpacity>
+            )}
+            scrollEnabled={false}
+          />
 
   const toggleSidebar = () => {
     Animated.timing(sidebarAnim, {
