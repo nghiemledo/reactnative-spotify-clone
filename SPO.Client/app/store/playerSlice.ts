@@ -16,7 +16,7 @@ interface PlayerState {
   duration: number;
   queue: Track[];
   shuffle: boolean; // Trạng thái shuffle
-  loop: "off" | "track" | "queue"; // Chế độ loop: tắt, lặp track, lặp queue
+  loop: "off" | "track" | "queue"; // Trạng thái lặp lại
   volume: number; // Mức âm lượng (0.0 đến 1.0)
 }
 
