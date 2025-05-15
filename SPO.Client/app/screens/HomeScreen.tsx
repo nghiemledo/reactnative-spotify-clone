@@ -21,6 +21,7 @@ import SafeImage from "../components/SafeImage";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { Section } from "../types/section";
+import { useAppSelector } from "../store";
 
 // Dữ liệu mẫu cho Podcasts
 const relaxationItems = [
@@ -55,6 +56,8 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const scrollY = useRef(new Animated.Value(0)).current;
   const [selectedButton, setSelectedButton] = useState("All");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const user = useAppSelector((state) => state.auth.user);
+
   const sidebarAnim = useRef(
     new Animated.Value(-Dimensions.get("window").width * 0.75)
   ).current;
@@ -97,11 +100,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   };
 
   // Render item cho Podcasts
- 
 
   const renderArtistItem = ({ item }: { item: Artist }) => (
     <YStack mr="$4" width={120} items="center">
-      <SafeImage uri={item.urlAvatar} width={100} height={100} rounded={50} />
+      <SafeImage uri={user?.urlAvatar} width={100} height={100} rounded={50} />
       <Text color="white" fontWeight="600" mt="$2" numberOfLines={1}>
         {item.name}
       </Text>
@@ -136,7 +138,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     </XStack>
   );
 
-   const renderRelaxationItem = ({ item }: { item: any }) => (
+  const renderRelaxationItem = ({ item }: { item: any }) => (
     <XStack mr="$4" space="$3" py="$2" items="flex-start">
       <SafeImage uri={item.coverImage} width={80} height={80} rounded={8} />
       <YStack flex={1} space="$1">
