@@ -42,8 +42,14 @@ export default function TabNavigator() {
           tabBarIcon: ({ color }) => <Search color={color as any} size={24} />,
         }}
       />
-      {/* <Tab.Screen name="Playing" component={PlayingScreen} />
-      <Tab.Screen name="Detail" component={DetailPlaylistScreen}  /> */}
+      <Tab.Screen
+        name="Playing"
+        component={PlayingScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      {/* <Tab.Screen name="Detail" component={DetailPlaylistScreen}  /> */}
     </Tab.Navigator>
   );
 }
