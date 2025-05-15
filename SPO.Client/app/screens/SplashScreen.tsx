@@ -14,11 +14,11 @@ const SplashScreen = () => {
 
   React.useEffect(() => {
     setTimeout(() => {
-      if (user) {
-        navigation.navigate("Main");
-      } else {
-        navigation.navigate("Login");
-      }
+      // if (user) {
+      navigation.navigate("Main");
+      // } else {
+      //   navigation.navigate("Login");
+      // }
     }, 2000);
   }, [user, navigation]);
 

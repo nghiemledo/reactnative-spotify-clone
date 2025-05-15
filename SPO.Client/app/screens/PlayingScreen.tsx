@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ImageBackground, Image } from "react-native";
-import { YStack, Text, Button, XStack, Slider, AnimatePresence } from "tamagui";
+import { YStack, XStack, Text, Button } from "tamagui";
 import { LinearGradient } from "@tamagui/linear-gradient";
 import {
   Shuffle,
@@ -9,7 +9,11 @@ import {
   Play,
   Pause,
   SkipForward,
+  User,
+  ChevronLeft,
+  Ellipsis,
 } from "@tamagui/lucide-icons";
+import { MotiView } from "moti";
 import { useAppSelector, useAppDispatch } from "../store";
 import {
   togglePlayback,
@@ -18,31 +22,17 @@ import {
   seekTo,
   toggleShuffle,
   setLoopMode,
-  setVol,
 } from "../services/playerService";
 import { formatTime } from "../utils/timeUtils";
+import { Slider } from "tamagui";
 
 const PlayingScreen = () => {
   const dispatch = useAppDispatch();
-  const {
-    isPlaying,
-    currentTrack,
-    position,
-    duration,
-    playbackState,
-    shuffle,
-    loop,
-    volume,
-  } = useAppSelector((state) => state.player);
-
+  const { isPlaying, currentTrack, queue, shuffle, loop } = useAppSelector(
+    (state) => state.player
+  );
   const [isHovered, setIsHovered] = useState(false);
 
-  useEffect(() => {
-    // Không cần Animated từ React Native nữa
-  }, [isPlaying]);
-
-  const handleSeek = (value: number[]) => seekTo(value[0]);
-  const handleVolumeChange = (value: number[]) => setVol(value[0]);
   const handleToggleLoop = () =>
     setLoopMode(loop === "off" ? "track" : loop === "track" ? "queue" : "off");
 
@@ -54,138 +44,181 @@ const PlayingScreen = () => {
           "https://via.placeholder.com/400?text=No+Image",
       }}
       style={{ flex: 1 }}
-      blurRadius={10}
+      blurRadius={15}
     >
-      <YStack flex={1} justify="space-between" p="$4">
-        <LinearGradient
-          colors={["rgba(0,0,0,0.8)", "transparent"]}
-          locations={[0, 0.6]}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 200,
-          }}
-        />
-        <YStack z={1}>
-          <Text fontSize="$6" fontWeight="bold" color="white">
-            ĐANG PHÁT TỪ DANH SÁCH PHÁT
+      <LinearGradient
+        colors={["rgba(0,0,0,0.9)", "rgba(0,0,0,0.3)", "transparent"]}
+        locations={[0, 0.5, 1]}
+        style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+      />
+      <YStack flex={1} justify="space-between" p="$5">
+        {/* Header */}
+        <XStack justify="space-between" items="center">
+          <Button
+            icon={<ChevronLeft size="$3" color="#fff" />}
+            bg="transparent"
+            circular
+            onPress={() => {}}
+            chromeless
+          />
+          <Text fontSize="$5" color="#fff" fontWeight="600">
+            Now Playing
           </Text>
-          <Text fontSize="$4" color="white" opacity={0.7}>
-            8D Music Hits | 8D Songs 2022
-          </Text>
+          <Button
+            icon={<Ellipsis size="$3" color="#fff" />}
+            bg="transparent"
+            circular
+            onPress={() => {}}
+            chromeless
+          />
+        </XStack>
+        {/* Artwork Section */}
+        <YStack items="center" justify="center" flex={1}>
+          <MotiView
+            animate={{
+              rotate: isPlaying ? "360deg" : "0deg",
+              scale: isPlaying ? 1 : 0.95,
+            }}
+            transition={{
+              rotate: {
+                type: "timing",
+                duration: isPlaying ? 10000 : 0,
+                loop: isPlaying, // Xoay mãi khi đang phát
+              },
+              scale: {
+                type: "spring",
+                damping: 20,
+              },
+            }}
+            style={{
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+            }}
+          >
+            <Image
+              source={{
+                uri:
+                  currentTrack?.artwork ??
+                  "https://via.placeholder.com/300?text=No+Image",
+              }}
+              style={{
+                width: 320,
+                height: 320,
+                borderRadius: 160,
+                borderWidth: 2,
+                borderColor: "rgba(255,255,255,0.2)",
+              }}
+            />
+          </MotiView>
         </YStack>
-        <YStack z={1}>
-          <AnimatePresence>
-            <YStack
-              animation="bouncy"
-              rotate={isPlaying ? "360deg" : "0deg"}
-              // transition={{ transform: { type: "spring", damping: 10, stiffness: 100 } }}
+
+        {/* Track Info */}
+        <YStack items="center">
+          <YStack overflow="hidden" width="80%" maxW={300}>
+            <Text
+              fontSize="$9"
+              fontWeight="600"
+              color="#fff"
+              text={"center"}
+              numberOfLines={1}
             >
-              <Image
-                source={{
-                  uri:
-                    currentTrack?.artwork ??
-                    "https://via.placeholder.com/300?text=No+Image",
-                }}
-                style={{ width: 300, height: 300, borderRightWidth: 10 }}
-              />
-            </YStack>
-          </AnimatePresence>
-          <Text fontSize="$8" fontWeight="bold" color="white" mt="$3">
-            {currentTrack?.title ?? "Unknown Title"}
-          </Text>
-          <Text fontSize="$4" color="white" opacity={0.7}>
+              {currentTrack?.title ?? "Unknown Title"}
+            </Text>
+          </YStack>
+          <Text fontSize="$5" color="#fff" opacity={0.7}>
             {currentTrack?.artist ?? "Unknown Artist"}
           </Text>
         </YStack>
-        <YStack z={1}>
-          <XStack justify="space-between" px="$4">
-            <Text fontSize="$4" color="white">
-              {formatTime(position)}
+
+        {/* Progress Slider */}
+        <YStack>
+          <XStack justify="space-between" px="$2">
+            <Text fontSize="$4" color="#fff" fontWeight="500">
+              {formatTime(0)}
             </Text>
-            <Text fontSize="$4" color="white">
-              {formatTime(duration)}
+            <Text fontSize="$4" color="#fff" fontWeight="500">
+              {formatTime(currentTrack?.duration ?? 0)}
             </Text>
           </XStack>
           <Slider
-            value={[position]}
-            min={0}
-            max={duration}
+            size="$2"
+            my="$3"
+            width={"100%"}
+            defaultValue={[currentTrack?.position ?? 0]}
+            max={100}
             step={1}
-            onValueChange={handleSeek}
-            style={{ width: "100%" }}
-          />
+          >
+            <Slider.Track>
+              <Slider.TrackActive />
+            </Slider.Track>
+            <Slider.Thumb
+              size="$1"
+              circular
+              index={0}
+              style={{ backgroundColor: "#15803d" }}
+            />
+          </Slider>
         </YStack>
-        <YStack space="$4" z={1}>
-          <XStack space="$4">
-            <Button
-              icon={<Shuffle size="$2" color={shuffle ? "#1DB954" : "white"} />}
-              bg="transparent"
-              onPress={toggleShuffle}
-              borderBlockWidth="$10"
-            />
-            <Button
-              icon={
-                <Repeat
-                  size="$2"
-                  color={loop !== "off" ? "#1DB954" : "white"}
-                />
-              }
-              bg="transparent"
-              onPress={handleToggleLoop}
-              borderBlockWidth="$10"
-            />
-          </XStack>
-          <XStack space="$6">
-            <Button
-              icon={<SkipBack size="$3" color="white" />}
-              onPress={skipToPrevious}
-              borderBlockWidth="$10"
-              bg="transparent"
-            />
-            <YStack
-              animation="bouncy"
-              scale={isPlaying ? 1.2 : 1}
-              onHoverIn={() => setIsHovered(true)}
-              onHoverOut={() => setIsHovered(false)}
+
+        {/* Playback Controls */}
+        <XStack justify="center" items="center" space="$3">
+          <Button
+            icon={<Shuffle size="$2" color={shuffle ? "#15803d" : "#fff"} />}
+            bg="transparent"
+            circular
+            onPress={toggleShuffle}
+            chromeless
+          />
+          <Button
+            icon={<SkipBack size="$3" color="#fff" />}
+            bg="transparent"
+            circular
+            onPress={skipToPrevious}
+            chromeless
+          />
+          <YStack
+            onHoverIn={() => setIsHovered(true)}
+            onHoverOut={() => setIsHovered(false)}
+          >
+            <MotiView
+              animate={{ scale: isPlaying ? 1.1 : 1 }}
+              transition={{ type: "spring", damping: 20 }}
             >
               <Button
                 icon={
                   isPlaying ? (
-                    <Pause size="$4" color="white" />
+                    <Pause size="$4" color="#fff" />
                   ) : (
-                    <Play size="$4" color="white" />
+                    <Play size="$4" color="#fff" />
                   )
                 }
                 onPress={togglePlayback}
+                bg="$green9"
+                circular
                 size="$6"
-                borderBlockWidth="$10"
-                bg="#1DB954"
+                elevation="$2"
               />
-            </YStack>
-            <Button
-              icon={<SkipForward size="$3" color="white" />}
-              onPress={skipToNext}
-              borderBlockWidth="$10"
-              bg="transparent"
-            />
-          </XStack>
-        </YStack>
-        <YStack z={1}>
-          <Text fontSize="$4" color="white" text="center">
-            Âm lượng: {Math.round(volume * 100)}%
-          </Text>
-          <Slider
-            value={[volume]}
-            min={0}
-            max={1}
-            step={0.01}
-            onValueChange={handleVolumeChange}
-            style={{ width: "100%" }}
+            </MotiView>
+          </YStack>
+          <Button
+            icon={<SkipForward size="$3" color="#fff" />}
+            bg="transparent"
+            circular
+            onPress={skipToNext}
+            chromeless
           />
-        </YStack>
+          <Button
+            icon={
+              <Repeat size="$2" color={loop !== "off" ? "green" : "white"} />
+            }
+            bg="transparent"
+            circular
+            onPress={handleToggleLoop}
+            chromeless
+          />
+        </XStack>
       </YStack>
     </ImageBackground>
   );
