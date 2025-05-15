@@ -1,8 +1,8 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../screens/HomeScreen";
 import PlayingScreen from "../screens/PlayingScreen";
-import DetailPlaylistScreen from "../screens/DetailPlaylistScreen";
-import SearchScreen from "../screens/SearchScreen";
+import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
+import SearchScreen from "../screens/search/SearchScreen";
 import { Home, Search } from "@tamagui/lucide-icons";
 
 const Tab = createBottomTabNavigator();

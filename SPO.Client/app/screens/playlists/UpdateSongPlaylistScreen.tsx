@@ -12,7 +12,7 @@ import {
 import { TouchableOpacity, StatusBar } from "react-native";
 import { ArrowLeft, CircleMinus, Menu } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../navigation/AppNavigator";
+import { RootStackParamList } from "../../navigation/AppNavigator";
 import Toast, { BaseToastProps } from "react-native-toast-message";
 import DraggableFlatList, {
   ScaleDecorator,
@@ -128,7 +128,8 @@ const updateSongPlaylist = ({
   const [playlistName, setPlaylistName] = useState<string>("My playlist");
   const [songList, setSongList] = useState(songs);
   const [description, setDescription] = useState<string>("");
-  const [isEditingDescription, setIsEditingDescription] = useState<boolean>(false);
+  const [isEditingDescription, setIsEditingDescription] =
+    useState<boolean>(false);
   const [openModal, setOpenModal] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>(
     "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg"
@@ -155,9 +156,9 @@ const updateSongPlaylist = ({
 
   const handleSaveImage = () => {
     if (imageUrl) {
-      setImageUrl(imageUrl); 
+      setImageUrl(imageUrl);
     }
-    setOpenModal(false); 
+    setOpenModal(false);
   };
 
   return (
@@ -387,7 +388,6 @@ const updateSongPlaylist = ({
           )}
         />
       </YStack>
-
     </YStack>
   );
 };

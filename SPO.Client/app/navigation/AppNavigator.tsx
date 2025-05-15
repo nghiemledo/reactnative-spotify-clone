@@ -1,10 +1,8 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as React from "react";
-import TabNavigator from "./TabNavigator";
-import AddSongPlaylistScreen from "../screens/AddSongPlaylistScreen";
-import UpdateSongPlaylistScreen from "../screens/UpdateSongPlaylistScreen";
-import SplashScreen from "../screens/SplashScreen";
+import AddSongPlaylistScreen from "../screens/playlists/AddSongPlaylistScreen";
+import UpdateSongPlaylistScreen from "../screens/playlists/UpdateSongPlaylistScreen";
 import SplashNavigator from "./SplashNavigator";
 
 const Stack = createStackNavigator();

@@ -14,9 +14,15 @@ import {
   H1,
 } from "tamagui";
 import { TouchableOpacity, StatusBar, FlatList } from "react-native";
-import { ArrowLeft, CircleCheck, CirclePlus, Plus, Search } from "@tamagui/lucide-icons";
+import {
+  ArrowLeft,
+  CircleCheck,
+  CirclePlus,
+  Plus,
+  Search,
+} from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../navigation/AppNavigator";
+import { RootStackParamList } from "../../navigation/AppNavigator";
 import Toast, { BaseToastProps } from "react-native-toast-message";
 import { H6 } from "tamagui";
 
@@ -44,37 +50,35 @@ type AddSongPlaylistScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const toastConfig = {
-    success: ({ text1, text2 }: BaseToastProps) => (
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: "white",
-          padding: 12,
-          borderRadius: 10,
-          marginHorizontal: 16,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 2,
-        }}
-      >
-       
-        <XStack style={{ flex: 1 }} justify="space-between">
-          <Text fontSize="$3">{text1}</Text>
-        
-        </XStack>
-      </View>
-    ),
-  };
+  success: ({ text1, text2 }: BaseToastProps) => (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "white",
+        padding: 12,
+        borderRadius: 10,
+        marginHorizontal: 16,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+      }}
+    >
+      <XStack style={{ flex: 1 }} justify="space-between">
+        <Text fontSize="$3">{text1}</Text>
+      </XStack>
+    </View>
+  ),
+};
 
 const AddSongPlaylistScreen = ({
   navigation,
 }: {
   navigation: AddSongPlaylistScreenNavigationProp;
 }) => {
-   const [likedItems, setLikedItems] = useState<{ [key: number]: boolean }>({});
+  const [likedItems, setLikedItems] = useState<{ [key: number]: boolean }>({});
   const handlePress = (id: number) => {
     setLikedItems((prev) => {
       const isLiked = prev[id];
