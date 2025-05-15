@@ -7,29 +7,26 @@ import { GenderSelectionComponent } from "../components/GenderSelectionComponent
 import { TermsAndPreferencesComponent } from "../components/TermsAndPreferencesComponent";
 import { ArrowLeft } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../navigation/AppNavigator";
 import { StatusBar } from "react-native";
 import { z } from "zod";
-import { useDispatch, useSelector } from "react-redux";
-// import { register, setError } from "../store/authSlice";
-import { RootState, AppDispatch } from "../store";
+import { SlpashStackParamList } from "../navigation/SplashNavigator";
+import { useRegisterMutation } from "../services/AuthService";
 
-// Define Zod schema for form validation
 const formSchema = z.object({
-  email: z.string().email("Vui lòng nhập email hợp lệ"),
-  password: z.string().min(10, "Mật khẩu phải có ít nhất 10 ký tự"),
-  dob: z.string().nonempty("Vui lòng chọn hoặc nhập ngày sinh"),
-  phoneNumber: z.string().nonempty("Vui lòng nhập số điện thoại"),
-  gender: z.string().nonempty("Vui lòng chọn giới tính"),
-  firstname: z.string().nonempty("Vui lòng nhập tên"),
-  lastname: z.string().nonempty("Vui lòng nhập họ"),
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  dob: z.string().nonempty("Please enter your date of birth"),
+  phoneNumber: z.string().nonempty("Please enter your phone number"),
+  gender: z.string().nonempty("Please enter your gender"),
+  firstname: z.string().nonempty("Please enter first name"),
+  lastname: z.string().nonempty("Please enter last name"),
 });
 
 type FormSchemaKeys = keyof typeof formSchema.shape;
 type PickObject = Partial<Record<FormSchemaKeys, true>>;
 
 type RegisterFormScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+  SlpashStackParamList,
   "EmailRegister"
 >;
 
@@ -40,9 +37,6 @@ interface RegisterFormScreenProps {
 export default function EmailRegisterScreen({
   navigation,
 }: RegisterFormScreenProps) {
-  const dispatch = useDispatch<AppDispatch>();
-  // const { loading, error } = useSelector((state: RootState) => state.auth);
-
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({
     email: "",
@@ -54,24 +48,25 @@ export default function EmailRegisterScreen({
     lastname: "",
   });
   const [isTermsValid, setIsTermsValid] = useState(false);
+  const [register] = useRegisterMutation();
 
   const inputConfigs = [
     {
-      label: "Email của bạn là gì?",
-      placeholder: "Email",
+      label: "Your email",
+      placeholder: "Please enter your email",
       keyboardType: "email-address" as "email-address",
       secureTextEntry: false,
       key: "email",
     },
     {
-      label: "Tạo một mật khẩu",
-      placeholder: "Mật khẩu",
+      label: "Password",
+      placeholder: "Please enter your password",
       keyboardType: "default" as "default",
       secureTextEntry: true,
       key: "password",
     },
     {
-      label: "Ngày sinh của bạn là gì?",
+      label: "Birth date",
       placeholder: "DD/MM/YYYY",
       keyboardType: "default" as "default",
       secureTextEntry: false,
@@ -79,14 +74,14 @@ export default function EmailRegisterScreen({
       component: "dateInput",
     },
     {
-      label: "Số điện thoại của bạn là gì?",
-      placeholder: "Số điện thoại",
+      label: "Phone number",
+      placeholder: "Please enter your phone number",
       keyboardType: "phone-pad" as "phone-pad",
       secureTextEntry: false,
       key: "phoneNumber",
     },
     {
-      label: "Giới tính của bạn là gì?",
+      label: "Gender",
       placeholder: "",
       keyboardType: "default" as "default",
       secureTextEntry: false,
@@ -94,21 +89,21 @@ export default function EmailRegisterScreen({
       component: "genderSelection",
     },
     {
-      label: "Họ và tên của bạn là gì?",
+      label: "Name",
       fields: [
         {
-          label: "Họ",
-          placeholder: "Họ",
-          keyboardType: "default" as "default",
-          secureTextEntry: false,
-          key: "lastname",
-        },
-        {
-          label: "Tên",
-          placeholder: "Tên",
+          label: "First name",
+          placeholder: "Please enter your first name",
           keyboardType: "default" as "default",
           secureTextEntry: false,
           key: "firstname",
+        },
+        {
+          label: "Last name",
+          placeholder: "Please enter your last name",
+          keyboardType: "default" as "default",
+          secureTextEntry: false,
+          key: "lastname",
         },
       ],
       component: "nameInput",
@@ -156,39 +151,44 @@ export default function EmailRegisterScreen({
           year < 1900 ||
           year > 2025
         ) {
-          alert("Ngày sinh không hợp lệ (DD/MM/YYYY)");
+          alert("Date of birth invalid (DD/MM/YYYY)");
           return;
         }
         const daysInMonth = new Date(year, month - 1, 0).getDate();
         if (day > daysInMonth) {
-          alert("Ngày không hợp lệ cho tháng này");
+          alert("Invalid date for the selected month");
           return;
         }
       }
 
       // Validate terms and conditions for the last step
       if (step === 5 && !isTermsValid) {
-        alert("Vui lòng chọn ít nhất một tùy chọn liên quan đến tiếp thị");
+        alert("Please accept the terms and conditions");
         return;
       }
 
       if (step < inputConfigs.length - 1) {
         setStep(step + 1);
       } else {
-        // Gọi API đăng ký với các trường yêu cầu
-        // await dispatch(
-        //   register({
-        //     lastName: formData.lastname,
-        //     firstName: formData.firstname,
-        //     email: formData.email,
-        //     phoneNumber: formData.phoneNumber,
-        //     password: formData.password,
-        //   })
-        // ).unwrap();
-
-        console.log("Đăng ký với:", formData);
-        alert("Đăng ký thành công! Vui lòng đăng nhập.");
-        navigation.navigate("login");
+        try {
+          const response = await register({
+            lastName: formData.lastname,
+            firstName: formData.firstname,
+            email: formData.email,
+            phoneNumber: formData.phoneNumber,
+            password: formData.password,
+          }).unwrap();
+          if (response) {
+            alert("Registration successful");
+            navigation.navigate("Login");
+          } else {
+            alert("Registration failed");
+          }
+        } catch (err: any) {
+          // Handle error thrown by unwrap()
+          alert(err?.data?.message || "Registration failed");
+          return;
+        }
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -207,7 +207,7 @@ export default function EmailRegisterScreen({
         navigation.goBack();
       } catch (error) {
         console.error("goBack failed:", error);
-        navigation.navigate("register");
+        navigation.navigate("Register");
       }
     }
   };

@@ -5,9 +5,10 @@ import { ArrowLeft } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import EmailLoginForm from "../components/EmailLoginForm";
+import { SlpashStackParamList } from "../navigation/SplashNavigator";
 
 type EmailLoginScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+  SlpashStackParamList,
   "EmailLogin"
 >;
 

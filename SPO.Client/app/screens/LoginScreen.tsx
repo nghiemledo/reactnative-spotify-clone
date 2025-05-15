@@ -1,12 +1,12 @@
 import React from "react";
 import { YStack, XStack, Button, Text, Image } from "tamagui";
-import { ListMusic, Mail, Smartphone } from "@tamagui/lucide-icons";
+import { Mail, Smartphone } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../navigation/AppNavigator";
+import { SlpashStackParamList } from "../navigation/SplashNavigator";
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "login"
+  SlpashStackParamList,
+  "Login"
 >;
 
 export default function LoginScreen({
@@ -115,7 +115,7 @@ export default function LoginScreen({
             color="#1DB954"
             fontSize="$4"
             fontWeight="bold"
-            onPress={() => navigation.navigate("register")}
+            onPress={() => navigation.navigate("Register")}
           >
             Sign up
           </Text>
