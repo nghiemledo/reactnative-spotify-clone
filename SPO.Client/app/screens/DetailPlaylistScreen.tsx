@@ -11,9 +11,8 @@ import {
 } from "tamagui";
 import { FlatList, ScrollView, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../navigation/AppNavigator"; 
 import { useDispatch } from "react-redux";
-import { playSong } from "../store/playerSlice";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
@@ -85,7 +84,7 @@ const queueItems = [
 
 type QueueScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "DetailPlaylist"
+  "detailPlaylist"
 >;
 
 export default function DetailPlaylistScreen({
@@ -134,8 +133,8 @@ export default function DetailPlaylistScreen({
 
   return (
     <LinearGradient
-      padding={0}
-      margin={0}
+      p={0}
+      m={0}
       flex={1}
       colors={["#D9F99D", "#000000"]}
       start={[0, 0]}
@@ -175,10 +174,10 @@ export default function DetailPlaylistScreen({
                 chromeless
                 icon={ArrowLeft}
                 color="white"
-                padding={0}
-                backgroundColor="transparent"
+                p={0}
+                bg="transparent"
                 pressStyle={{
-                  backgroundColor: "transparent",
+                  bg: "transparent",
                   borderBlockColor: "transparent",
                 }}
               />
@@ -205,20 +204,20 @@ export default function DetailPlaylistScreen({
           { useNativeDriver: false }
         )}
       >
-        <YStack flex={1} marginTop="$6" padding="$4">
+        <YStack flex={1} mt="$6" p="$4">
           {/* Thanh tìm kiếm */}
           <Animated.View style={{ opacity: searchOpacity }}>
-            <XStack marginTop="$6" marginBottom="$6">
+            <XStack mt="$6" mb="$6">
               <Input
                 size="$3.5"
                 borderWidth={0}
-                borderRadius="$2"
-                backgroundColor="rgba(255, 255, 255, 0.2)"
+                rounded="$2"
+                bg="rgba(255, 255, 255, 0.2)"
                 color="white"
                 placeholder="Tìm trong danh sách phát"
                 placeholderTextColor="rgba(255, 255, 255, 0.6)"
                 flex={1}
-                margin="auto"
+                m="auto"
                 style={{
                   fontSize: 15,
                   paddingLeft: 40,
@@ -226,14 +225,14 @@ export default function DetailPlaylistScreen({
                 }}
                 focusStyle={{
                   borderWidth: 0,
-                  backgroundColor: "rgba(255, 255, 255, 0.3)",
+                  bg: "rgba(255, 255, 255, 0.3)",
                 }}
               />
               <XStack
                 position="absolute"
-                left="$3"
-                top="$2.5"
-                alignItems="center"
+                l="$3"
+                t="$2.5"
+                items="center"
                 pointerEvents="none"
               >
                 <Search size="$1" color="rgba(255, 255, 255, 0.6)" />
@@ -241,12 +240,12 @@ export default function DetailPlaylistScreen({
             </XStack>
           </Animated.View>
           <XStack
-            alignItems="center"
+            items="center"
             flex={1}
-            justifyContent="center"
-            alignSelf="center"
-            marginBottom={0}
-            padding={0}
+            justify="center"
+            self="center"
+            mb={0}
+            p={0}
           >
             <Animated.Image
               source={{ uri: queueItems[0].image }}
@@ -265,12 +264,12 @@ export default function DetailPlaylistScreen({
             />
           </XStack>
 
-          <H3 marginTop={0} marginBottom="$3" color="white" fontWeight="bold">
+          <H3 mt={0} mb="$3" color="white" fontWeight="bold">
             Danh sách phát của tôi
           </H3>
 
           <YStack>
-            <XStack alignItems="center" space="$3" marginBottom="$3">
+            <XStack items="center" space="$3" mb="$3">
               <Avatar circular size="$2">
                 <Avatar.Image
                   accessibilityLabel="Cam"
@@ -278,25 +277,25 @@ export default function DetailPlaylistScreen({
                 />
                 <Avatar.Fallback backgroundColor="$blue10" />
               </Avatar>
-              <YStack alignItems="center">
+              <YStack items="center">
                 <Text
                   fontSize={13}
                   fontWeight="bold"
                   color="white"
-                  textAlign="center"
+                  text="center"
                 >
                   Lương Hoàng Hải
                 </Text>
               </YStack>
             </XStack>
-            <XStack alignItems="center" space="$2" marginBottom="$3">
+            <XStack items="center" space="$2" mb="$3">
               <Globe size={18} color="#ffff" />
-              <YStack alignItems="center">
+              <YStack items="center">
                 <Text
                   fontSize={13}
                   fontWeight="bold"
                   color="white"
-                  textAlign="center"
+                  text="center"
                 >
                   47 ph
                 </Text>
@@ -304,61 +303,61 @@ export default function DetailPlaylistScreen({
             </XStack>
           </YStack>
 
-          <XStack space="$4" marginBottom="$4" justifyContent="space-between">
+          <XStack space="$4" mb="$4" justify="space-between">
             <XStack gap="$4">
               <Button
                 disabled
-                backgroundColor="transparent"
+                bg="transparent"
                 color="white"
-                margin={0}
-                padding={0}
+                m={0}
+                p={0}
                 icon={
                   <ArrowDownCircle size="$2" color="white" strokeWidth={1} />
                 }
-                hoverStyle={{ backgroundColor: "transparent" }}
+                hoverStyle={{ bg: "transparent" }}
                 pressStyle={{
-                  backgroundColor: "transparent",
+                  bg: "transparent",
                   borderBlockColor: "transparent",
                 }}
               />
               <Button
                 disabled
-                backgroundColor="transparent"
+                bg="transparent"
                 color="white"
-                margin={0}
-                padding={0}
+                m={0}
+                p={0}
                 icon={<UserPlus size="$2" color="white" strokeWidth={1} />}
-                hoverStyle={{ backgroundColor: "transparent" }}
+                hoverStyle={{ bg: "transparent" }}
                 pressStyle={{
-                  backgroundColor: "transparent",
+                  bg: "transparent",
                   borderBlockColor: "transparent",
                 }}
               />
               <Button
                 disabled
-                backgroundColor="transparent"
+                bg="transparent"
                 color="white"
-                margin={0}
-                padding={0}
+                m={0}
+                p={0}
                 icon={<Share2 size="$2" color="white" strokeWidth={1} />}
-                hoverStyle={{ backgroundColor: "transparent" }}
+                hoverStyle={{ bg: "transparent" }}
                 pressStyle={{
-                  backgroundColor: "transparent",
+                  bg: "transparent",
                   borderBlockColor: "transparent",
                 }}
               />
               <Button
                 disabled
-                backgroundColor="transparent"
+                bg="transparent"
                 color="white"
-                margin={0}
-                padding={0}
+                m={0}
+                p={0}
                 icon={
                   <EllipsisVertical size="$2" color="white" strokeWidth={1} />
                 }
-                hoverStyle={{ backgroundColor: "transparent" }}
+                hoverStyle={{ bg: "transparent" }}
                 pressStyle={{
-                  backgroundColor: "transparent",
+                  bg: "transparent",
                   borderBlockColor: "transparent",
                 }}
               />
@@ -366,23 +365,23 @@ export default function DetailPlaylistScreen({
             <XStack gap="$4">
               <Button
                 disabled
-                backgroundColor="transparent"
+                bg="transparent"
                 color="white"
-                margin={0}
-                padding={0}
+                m={0}
+                p={0}
                 icon={<Shuffle size="$2" color="white" strokeWidth={1} />}
-                hoverStyle={{ backgroundColor: "transparent" }}
+                hoverStyle={{ bg: "transparent" }}
                 pressStyle={{
-                  backgroundColor: "transparent",
+                  bg: "transparent",
                   borderBlockColor: "transparent",
                 }}
               />
               <Button
                 disabled
-                backgroundColor="#1DB954"
-                margin={0}
-                padding={0}
-                borderRadius={100}
+                bg="#1DB954"
+                m={0}
+                p={0}
+                rounded={100}
                 width="$4"
                 height="$4"
                 icon={
@@ -392,15 +391,14 @@ export default function DetailPlaylistScreen({
             </XStack>
           </XStack>
 
-          <XStack space="$2" marginBottom="$4">
+          <XStack space="$2" mb="$4">
             <Button
               size="$3"
-              backgroundColor="rgba(255, 255, 255, 0.2)"
-              borderRadius={50}
-              borderColor="$text"
+              bg="rgba(255, 255, 255, 0.2)"
+              rounded={50}
               onPress={() => console.log("Thêm bài hát")}
             >
-              <XStack alignItems="center" space="$1">
+              <XStack items="center" space="$1" onPress={() => navigation.navigate("addSongPlaylist")}>
                 <Plus color="white" size="$1" />
                 <Text color="white" fontWeight="bold" fontSize="$3">
                   Thêm
@@ -409,12 +407,11 @@ export default function DetailPlaylistScreen({
             </Button>
             <Button
               size="$3"
-              backgroundColor="rgba(255, 255, 255, 0.2)"
-              borderRadius={50}
-              borderColor="$text"
+              bg="rgba(255, 255, 255, 0.2)"
+              rounded={50}
               onPress={() => console.log("Sắp xếp")}
             >
-              <XStack alignItems="center" space="$1">
+              <XStack items="center" space="$1">
                 <ChevronsUpDown color="white" size="$1" />
                 <Text fontWeight="bold" color="white" fontSize="$3">
                   Sắp xếp
@@ -423,12 +420,11 @@ export default function DetailPlaylistScreen({
             </Button>
             <Button
               size="$3"
-              backgroundColor="rgba(255, 255, 255, 0.2)"
-              borderRadius={50}
-              borderColor="$text"
-              onPress={() => console.log("Chỉnh sửa")}
+              bg="rgba(255, 255, 255, 0.2)"
+              rounded={50}
+              onPress={() => navigation.navigate("updateSongPlaylist")}
             >
-              <XStack alignItems="center" space="$1">
+              <XStack items="center" space="$1">
                 <Pen color="white" size="$1" />
                 <Text fontWeight="bold" color="white" fontSize="$3">
                   Chỉnh sửa
@@ -445,16 +441,15 @@ export default function DetailPlaylistScreen({
             renderItem={({ item }) => (
               <TouchableOpacity
                 onPress={() => {
-                  dispatch(playSong(item.title));
                   navigation.navigate("PlayerModal");
                 }}
               >
                 <XStack
-                  alignItems="center"
-                  justifyContent="space-between"
-                  paddingVertical="$2"
+                  items="center"
+                  justify="space-between"
+                  py="$2"
                 >
-                  <XStack alignItems="center" gap="$3" flex={1}>
+                  <XStack items="center" gap="$3" flex={1}>
                     <Image
                       source={{ uri: item.image }}
                       width={50}
@@ -471,9 +466,9 @@ export default function DetailPlaylistScreen({
                     </YStack>
                   </XStack>
                   <Button
-                    backgroundColor="transparent"
+                    bg="transparent"
                     
-                    padding={0}
+                    p={0}
                     icon={
                       <EllipsisVertical
                         size="$2"
@@ -482,7 +477,7 @@ export default function DetailPlaylistScreen({
                       />
                     }
                     pressStyle={{
-                      backgroundColor: "transparent",
+                      bg: "transparent",
                       borderBlockColor: "transparent",
                     }}
                   />
