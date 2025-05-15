@@ -8,12 +8,19 @@ import UpdateSongPlaylistScreen from "../screens/UpdateSongPlaylistScreen";
 const Stack = createStackNavigator();
 
 export type RootStackParamList = {
-  // Home: undefined;
+  Home: undefined;
   detailPlaylist: undefined;
   addSongPlaylist: undefined;
   updateSongPlaylist: undefined;
-  // Album: { id: string };
   PlayerModal: undefined;
+  Profile: undefined;
+  Search: undefined;
+  WhatsNew: undefined;
+  Recents: undefined;
+  Settings: undefined;
+  Album: { id: string };
+  Artist: { id: string };
+  Podcast: { id: string };
 };
 
 export default function AppNavigator() {
