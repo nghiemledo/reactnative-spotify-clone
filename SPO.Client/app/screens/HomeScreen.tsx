@@ -1,93 +1,48 @@
-import React, { useState } from "react";
-import { FlatList, ScrollView, TouchableOpacity, Animated, StatusBar } from "react-native";
-import { YStack, XStack, Text, Image, H3, Button, Avatar } from "tamagui";
+import React, { useState, useRef } from "react";
+import {
+  FlatList,
+  TouchableOpacity,
+  Animated,
+  StatusBar,
+  Dimensions,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import {
+  YStack,
+  XStack,
+  Text,
+  Image,
+  H4,
+  Button,
+  Avatar,
+  Spinner,
+} from "tamagui";
 import { Play } from "@tamagui/lucide-icons";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import Sidebar from "../components/home/Sidebar";
+import { RootStackParamList } from "../navigation/AppNavigator";
+import { togglePlayback } from "../services/playerService";
+import {
+  useGetSongsQuery,
+  useGetAlbumsQuery,
+  useGetArtistsQuery,
+} from "../services/api";
 
-// Sample data for sections
-const radioItems = [
-  {
-    id: "1",
-    title: "Low G",
-    artists: "tlinh, Low G, RPT MCK",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "Hà Anh Tuấn",
-    artists: "Vũ., Emcee L (Da LAB)",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "3",
-    title: "tlinh",
-    artists: "tlinh, Wren",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
+// Component hình ảnh an toàn với fallback
+const SafeImage = ({ uri, ...props }: any) => {
+  const [error, setError] = useState(false);
+  const imageUri =
+    uri && uri !== "null" ? uri : "https://via.placeholder.com/150";
+  return (
+    <Image
+      {...props}
+      source={{ uri: error ? "https://via.placeholder.com/150" : imageUri }}
+      onError={() => setError(true)}
+    />
+  );
+};
 
-const chartItems = [
-  {
-    id: "1",
-    title: "HOT",
-    artists: "SOOBIN, buitruonglinh",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "Top 50 Vietnam",
-    artists: "Your daily update",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
-
-const albumItems = [
-  {
-    id: "1",
-    title: "THE WXRDIES",
-    artists: "Wxrdie",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "Đánh Đổi",
-    artists: "Obito, Shiki",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
-
-const artistItems = [
-  {
-    id: "1",
-    title: "Sơn Tùng M-TP",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "tlinh",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
-
-const recentItems = [
-  {
-    id: "1",
-    title: "STARBOY",
-    artists: "The Weeknd, Daft Punk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "People",
-    artists: "Libianca",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "3",
-    title: "Đừng Làm Trái Tim Anh Đau",
-    artists: "Sơn Tùng M-TP",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
 
 const relaxationItems = [
   {
@@ -109,63 +64,43 @@ const relaxationItems = [
     image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
   },
 ];
+type HomeScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "Home"
+>;
 
-const newReleasesItems = [
-  {
-    id: "1",
-    title: "Priceless (feat. LISA)",
-    artists: "Maroon 5, LISA",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "I Said I Love You First...",
-    artists: "Selena Gomez, benny blanco",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "3",
-    title: "Lose",
-    artists: "Don Toliver, The A",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
 
-const uniquelyYoursItems = [
-  {
-    id: "1",
-    title: "daylist",
-    artists: "Your day in a playlist.",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "On Repeat",
-    artists: "Songs you love right now",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
+type Section = {
+  id: string;
+  type: "horizontal" | "vertical";
+  title?: string;
+  data?: any[];
+  loading?: boolean;
+  error?: string | null;
+  renderItem?: ({ item }: { item: any }) => React.ReactElement;
+};
 
-const podcastItems = [
-  {
-    id: "1",
-    title: "Những trang thư có lửa về hào khí dân tộc Việt Nam | Podcast...",
-    artists: "Episode · Vì sao thế nhỉ!",
-    date: "Apr 27 · 17min",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    description:
-      "Thư ra tiền tuyến, thư về hậu phương. Từng dòng từng câu khắc khoải đôi bờ đã vượt qua khoảng cách, thời gian, và cả sự sống và cái chết...",
-  },
-  {
-    id: "2",
-    title: "Mặt nạ đau khổ - Tri Kỷ Cảm Xúc #377",
-    artists: "Episode · Tri Kỷ Cảm Xúc",
-    date: "Apr 28 · 20min",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    description:
-      'Một tập podcast đầy cảm xúc với những suy tư và sự đồng cảm với những người đang đeo "mặt nạ" để che giấu tổn thương.',
-  },
-];
+export default function HomeScreen({
+  navigation,
+}: {
+  navigation: HomeScreenNavigationProp;
+}) {
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const [selectedButton, setSelectedButton] = useState<string>("All");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
+  const followingAnim = useRef(new Animated.Value(-100)).current; // Animation for Following button
+  const sidebarAnim = useRef(
+    new Animated.Value(-Dimensions.get("window").width * 0.75)
+  ).current;
+
+  // Sử dụng RTK Query để lấy dữ liệu
+  const {
+    data: songs = [],
+    isLoading: isSongsLoading,
+    error: songsError,
+  } = useGetSongsQuery();
+
 
 export default function HomeScreen() {
   const scrollY = React.useRef(new Animated.Value(0)).current;
@@ -461,11 +396,396 @@ export default function HomeScreen() {
                   </XStack>
                 </YStack>
               </TouchableOpacity>
-            )}
-            scrollEnabled={false}
-          />
+  const {
+    data: albums = [],
+    isLoading: isAlbumsLoading,
+    error: albumsError,
+  } = useGetAlbumsQuery();
+
+  const {
+    data: artists = [],
+    isLoading: isArtistsLoading,
+    error: artistsError,
+  } = useGetArtistsQuery();
+
+  const handleButtonPress = (buttonName: string) => {
+    setSelectedButton(buttonName);
+    if (buttonName === "Podcasts") {
+      setShowFollowing(true);
+      Animated.timing(followingAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(followingAnim, {
+        toValue: -100,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setShowFollowing(false));
+    }
+  };
+
+  const toggleSidebar = () => {
+    Animated.timing(sidebarAnim, {
+      toValue: isSidebarOpen ? -Dimensions.get("window").width * 0.75 : 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  // Hàm lấy tên nghệ sĩ từ artistId
+  const getArtistName = (artistId: string | undefined) => {
+    if (!artistId) return "Unknown Artist";
+    const artist = artists.find((a) => a.id === artistId);
+    return artist?.name || "Unknown Artist";
+  };
+
+  // Biến đổi dữ liệu từ API
+  const transformData = () => {
+    const radioItems = songs.map((song) => ({
+      id: song.id,
+      title: song.title,
+      artists: getArtistName(song.artistId),
+      image: song.coverImage || "https://via.placeholder.com/150",
+    }));
+
+    const chartItems = songs.map((song) => ({
+      id: song.id,
+      title: song.title,
+      artists: getArtistName(song.artistId),
+      image: song.coverImage || "https://via.placeholder.com/120",
+    }));
+
+    const relaxationItems = songs.map((song) => ({
+      id: song.id,
+      title: song.title,
+      artists: getArtistName(song.artistId),
+      image: song.coverImage || "https://via.placeholder.com/150",
+    }));
+
+    return [
+      {
+        id: "radio",
+        type: "horizontal",
+        title: "Popular radio",
+        data: radioItems,
+        loading: isSongsLoading,
+        error: songsError?.toString(),
+        renderItem: ({ item }) => (
+          <TouchableOpacity>
+            <YStack width={150} mr="$4">
+              <SafeImage
+                uri={item.image}
+                width={150}
+                height={150}
+                borderRadius={10}
+              />
+              <Text color="white" fontWeight="bold" mt="$2">
+                {item.title}
+              </Text>
+              <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+                {item.artists}
+              </Text>
+            </YStack>
+          </TouchableOpacity>
+        ),
+      },
+      {
+        id: "charts",
+        type: "horizontal",
+        title: "Charts",
+        data: chartItems,
+        loading: isSongsLoading,
+        error: songsError?.toString(),
+        renderItem: ({ item }) => (
+          <TouchableOpacity>
+            <YStack width={120} mr="$4">
+              <SafeImage
+                uri={item.image}
+                width={120}
+                height={180}
+                borderRadius={10}
+              />
+              <Text color="white" fontWeight="bold" mt="$2">
+                {item.title}
+              </Text>
+              <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+                {item.artists}
+              </Text>
+            </YStack>
+          </TouchableOpacity>
+        ),
+      },
+      {
+        id: "albums",
+        type: "horizontal",
+        title: "Popular albums",
+        data: albums,
+        loading: isAlbumsLoading,
+        error: albumsError?.toString(),
+        renderItem: ({ item }) => (
+          <TouchableOpacity>
+            <YStack width={120} mr="$4">
+              <SafeImage
+                uri={item.coverImage}
+                width={120}
+                height={120}
+                borderRadius={10}
+              />
+              <Text color="white" fontWeight="bold" mt="$2" numberOfLines={1}>
+                {item.title}
+              </Text>
+              <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+                {getArtistName(item.artistId)}
+              </Text>
+            </YStack>
+          </TouchableOpacity>
+        ),
+      },
+      {
+        id: "artists",
+        type: "horizontal",
+        title: "Popular artists",
+        data: artists,
+        loading: isArtistsLoading,
+        error: artistsError?.toString(),
+        renderItem: ({ item }) => (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("ArtistScreen", { artistId: item.id })
+            }
+          >
+            <YStack width={100} mr="$4" items="center">
+              <SafeImage
+                uri={item.urlAvatar}
+                width={100}
+                height={100}
+                borderRadius={50}
+              />
+              <Text
+                color="white"
+                fontWeight="bold"
+                mt="$2"
+                text="center"
+                numberOfLines={1}
+              >
+                {item.name}
+              </Text>
+            </YStack>
+          </TouchableOpacity>
+        ),
+      },
+      {
+        id: "songs",
+        type: "vertical",
+        title: "Your recent rotation",
+        data: songs,
+        loading: isSongsLoading,
+        error: songsError?.toString(),
+        renderItem: ({ item }) => (
+          <TouchableOpacity onPress={() => togglePlayback(item)}>
+            <XStack items="center" py="$2">
+              <SafeImage
+                uri={item.coverImage}
+                width={50}
+                height={50}
+                borderRadius={10}
+              />
+              <YStack ml="$3" flex={1}>
+                <Text color="white" fontWeight="bold" numberOfLines={1}>
+                  {item.title}
+                </Text>
+                <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+                  {Math.floor(item.duration / 60)}:
+                  {(item.duration % 60).toString().padStart(2, "0")}
+                </Text>
+              </YStack>
+              <Button
+                bg="white"
+                rounded={100}
+                width="$3"
+                height="$3"
+                p={0}
+                icon={<Play size="$1" color="black" />}
+              />
+            </XStack>
+          </TouchableOpacity>
+        ),
+      },
+    ];
+  };
+
+  const sections = transformData();
+
+  const renderSection = ({ item: section }: { item: Section }) => {
+    if (section.loading)
+      return (
+        <YStack items="center" p={4}>
+          <Spinner size="large" color="$blue10" />
         </YStack>
-      </ScrollView>
+      );
+    if (section.error)
+      return (
+        <Text color="red" text="center">
+          {section.error}
+        </Text>
+      );
+    if (!section.data?.length) return null;
+
+    return (
+      <YStack mb="$6">
+        <H4 color="white" mb={3}>
+          {section.title}
+        </H4>
+        <FlatList
+          data={section.data}
+          horizontal={section.type === "horizontal"}
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id}
+          renderItem={section.renderItem}
+        />
+      </YStack>
+    );
+  };
+
+  return (
+    <YStack flex={1} bg="rgb(25, 27, 31)" pl={20}>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="light-content"
+      />
+
+      {/* Sidebar */}
+      <Animated.View
+        style={{
+          width: Dimensions.get("window").width * 0.75,
+          transform: [{ translateX: sidebarAnim }],
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          backgroundColor: "#111",
+          zIndex: 10,
+        }}
+      >
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={toggleSidebar}
+          navigation={navigation}
+        />
+      </Animated.View>
+
+      {/* Nội dung chính */}
+      <Animated.View
+        style={{
+          flex: 1,
+          transform: [
+            {
+              translateX: sidebarAnim.interpolate({
+                inputRange: [-Dimensions.get("window").width * 0.75, 0],
+                outputRange: [0, Dimensions.get("window").width * 0.75],
+              }),
+            },
+          ],
+        }}
+      >
+        {/* Header */}
+        <XStack
+          items="center"
+          space="$2"
+          py={10}
+          mt={StatusBar.currentHeight || 0}
+          z={1}
+        >
+          <TouchableOpacity onPress={toggleSidebar}>
+            <Avatar circular size="$4">
+              <Avatar.Image
+                accessibilityLabel="User Avatar"
+                src="https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg"
+              />
+              <Avatar.Fallback backgroundColor="$blue10" />
+            </Avatar>
+          </TouchableOpacity>
+
+          {["All", "Music", "Podcasts"].map((button) => (
+            <Button
+              ml={7}
+              key={button}
+              size="$3"
+              bg={
+                selectedButton === button
+                  ? "#1DB954"
+                  : "rgba(255, 255, 255, 0.2)"
+              }
+              rounded={50}
+              onPress={() => handleButtonPress(button)}
+            >
+              <Text color={selectedButton === button ? "black" : "white"}>
+                {button}
+              </Text>
+            </Button>
+          ))}
+          
+          {showFollowing && (
+            <Animated.View
+              style={{
+                transform: [{ translateX: followingAnim }],
+              }}
+            >
+              <Button
+                size="$3"
+                bg="rgba(255, 255, 255, 0.2)"
+                rounded={50}
+                onPress={() => handleButtonPress("Following")}
+              >
+                <Text color="white">Following</Text>
+              </Button>
+            </Animated.View>
+          )}
+        </XStack>
+
+        {/* Danh sách nội dung */}
+        <Animated.View
+          style={{
+            flex: 1,
+            opacity: sidebarAnim.interpolate({
+              inputRange: [-Dimensions.get("window").width * 0.75, 0],
+              outputRange: [1, 0.5],
+            }),
+          }}
+        >
+          <FlatList
+            data={sections}
+            renderItem={renderSection}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            scrollEventThrottle={16}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+              { useNativeDriver: false }
+            )}
+            pointerEvents={isSidebarOpen ? "none" : "auto"}
+            contentContainerStyle={{ paddingBottom: 80 }}
+          />
+        </Animated.View>
+
+        {/* Overlay khi sidebar mở */}
+        {isSidebarOpen && (
+          <TouchableWithoutFeedback onPress={toggleSidebar}>
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+              }}
+            />
+          </TouchableWithoutFeedback>
+        )}
+      </Animated.View>
     </YStack>
   );
 }

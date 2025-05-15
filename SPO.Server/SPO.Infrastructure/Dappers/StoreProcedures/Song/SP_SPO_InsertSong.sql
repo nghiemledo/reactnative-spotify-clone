@@ -10,36 +10,38 @@ GO
 
 -- drop procedure [SP_SPO_InsertSong]
 create procedure [dbo].[SP_SPO_InsertSong] (
+    @Id nvarchar(450),
     @Title nvarchar(MAX),
-    @Slug nvarchar(MAX),
-    @Duration NVARCHAR(MAX),
-    @ReleaseDate nvarchar(MAX),
-    @Genre nvarchar(MAX),
-    @ArtistId nvarchar(max),
-    @AlbumId nvarchar(max)
+    @CoverImage nvarchar(MAX),
+    @GenreId nvarchar(MAX),
+    @Duration int,
+    @ArtistId nvarchar(MAX),
+    @AlbumId nvarchar(MAX),
+    @AudioUrl nvarchar(MAX)
 )
 as
 begin
     insert into Songs( 
         Id, 
         Title,
-        Slug,
+        CoverImage,
+        GenreId,
         Duration,
-        ReleaseDate,
-        Genre,
         ArtistId,
         AlbumId,
-        CreatedAt
+        CreatedAt,
+        AudioUrl
      )
-    values (NEWID(),  
+    values (
+        @Id,  
         @Title,
-        @Slug,
+        @CoverImage,
+        @GenreId,
         @Duration,
-        @ReleaseDate,
-        @Genre,
         @ArtistId,
         @AlbumId,
-        SYSDATETIMEOFFSET()
+        SYSDATETIMEOFFSET(),
+        @AudioUrl
         );
 end
 go
