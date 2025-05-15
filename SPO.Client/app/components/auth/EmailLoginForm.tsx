@@ -11,8 +11,8 @@ import {
 import { TouchableOpacity } from "react-native";
 import { Eye, EyeOff } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { SlpashStackParamList } from "../navigation/SplashNavigator";
-import { useLoginMutation } from "../services/AuthService";
+import { SlpashStackParamList } from "../../navigation/SplashNavigator";
+import { useLoginMutation } from "../../services/AuthService";
 
 type EmailLoginScreenNavigationProp = NativeStackNavigationProp<
   SlpashStackParamList,
