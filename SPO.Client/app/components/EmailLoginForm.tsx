@@ -3,7 +3,7 @@ import { YStack, XStack, Text, Button, Input, AnimatePresence, View } from "tama
 import { TouchableOpacity } from "react-native";
 import { Eye, EyeOff } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../navigation/AppNavigator";
 import { useDispatch, useSelector } from "react-redux";
 import { login, setError } from "../store/authSlice";
 import { RootState, AppDispatch } from "../store";
@@ -49,7 +49,7 @@ const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ navigation }) => {
       await AsyncStorage.setItem("authToken", result.token);
       await AsyncStorage.setItem("refreshToken", result.refreshToken);
       alert("Đăng nhập thành công!.");
-      navigation.navigate("Main", { screen: "Home" });
+      navigation.navigate("Home");
     } catch (err) {
       // Error is handled by Redux state, no need to set local error
     }
@@ -72,8 +72,8 @@ const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ navigation }) => {
   }, [apiError, dispatch]);
 
   return (
-    <YStack flex={1} paddingBottom={32}>
-      <YStack marginBottom={60}>
+    <YStack flex={1} pb={32} px={16} bg="#000" pt={60}>
+      <YStack mb={60}>
         {/* Error Message */}
         <AnimatePresence>
           {displayError ? (
@@ -82,7 +82,7 @@ const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ navigation }) => {
               enterStyle={{ opacity: 0, y: -10 }}
               exitStyle={{ opacity: 0, y: -10 }}
             >
-              <Text color="#ff4444" fontSize={14} marginBottom={16}>
+              <Text color="#ff4444" fontSize={14} mb={16}>
                 {displayError}
               </Text>
             </View>
@@ -90,16 +90,16 @@ const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ navigation }) => {
         </AnimatePresence>
 
         {/* Email Input */}
-        <YStack marginBottom={32}>
-          <Text color="white" fontSize={20} fontWeight="bold" marginBottom={16}>
+        <YStack mb={32}>
+          <Text color="white" fontSize={20} fontWeight="bold" mb={16}>
             Email hoặc tên người dùng
           </Text>
           <Input
             value={email}
             onChangeText={setEmail}
-            backgroundColor="#444"
+            bg="#444"
             color="white"
-            borderRadius={7}
+            rounded={7}
             fontSize={18}
             placeholderTextColor="#bbb"
             width="100%"
@@ -112,14 +112,14 @@ const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ navigation }) => {
 
         {/* Password Input */}
         <YStack>
-          <Text color="white" fontSize={20} fontWeight="bold" marginBottom={16}>
+          <Text color="white" fontSize={20} fontWeight="bold" mb={16}>
             Mật khẩu
           </Text>
-          <XStack alignItems="center" backgroundColor="#444" borderRadius={7}>
+          <XStack items="center" bg="#444" rounded={7}>
             <Input
               value={password}
               onChangeText={setPassword}
-              backgroundColor="transparent"
+              bg="transparent"
               color="white"
               fontSize={18}
               width="85%"
@@ -139,10 +139,10 @@ const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ navigation }) => {
         </YStack>
       </YStack>
 
-      <XStack justifyContent="center">
+      <XStack justify="center">
         <Button
-          backgroundColor="#1DB954"
-          borderRadius={32}
+          bg="#1DB954"
+          rounded={32}
           width={160}
           height={60}
           onPress={handleLogin}
