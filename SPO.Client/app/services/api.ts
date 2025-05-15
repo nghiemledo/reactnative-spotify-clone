@@ -8,7 +8,7 @@ import {
 import { RootState } from "../store";
 import { setCredentials, logout, setToken } from "../store/authSlice";
 
-const BASE_URL = "http://localhost:8099/api/";
+const BASE_URL = "https://ituda.id.vn/api/";
 
 // Cấu hình baseQuery với token xác thực
 const baseQuery = fetchBaseQuery({
@@ -73,5 +73,6 @@ const baseQueryWithReauth: BaseQueryFn<
 export const baseRestApi = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
+  tagTypes: ["Song", "Album", "Artist", "Genre"],
   endpoints: () => ({}),
 });
