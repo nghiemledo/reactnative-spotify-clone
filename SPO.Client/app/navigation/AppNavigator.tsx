@@ -4,11 +4,15 @@ import * as React from "react";
 import TabNavigator from "./TabNavigator";
 import AddSongPlaylistScreen from "../screens/AddSongPlaylistScreen";
 import UpdateSongPlaylistScreen from "../screens/UpdateSongPlaylistScreen";
+import SplashScreen from "../screens/SplashScreen";
+import SplashNavigator from "./SplashNavigator";
 
 const Stack = createStackNavigator();
 
 export type RootStackParamList = {
   Home: undefined;
+  Login: undefined;
+  Register: undefined;
   detailPlaylist: undefined;
   addSongPlaylist: undefined;
   updateSongPlaylist: undefined;
@@ -28,8 +32,8 @@ export default function AppNavigator() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
-          name="Main"
-          component={TabNavigator}
+          name="SplashNavigator"
+          component={SplashNavigator}
           options={{ headerShown: false }}
         />
         <Stack.Screen
