@@ -13,181 +13,40 @@ import {
   XStack,
   Text,
   Image,
-  H3,
+  H4,
   Button,
   Avatar,
   Spinner,
 } from "tamagui";
 import { Play } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../components/home/Sidebar";
 import { RootStackParamList } from "../navigation/AppNavigator";
-import { togglePlayback } from "../services/playerService"; // Import togglePlayback
+import { togglePlayback } from "../services/playerService";
+import {
+  useGetSongsQuery,
+  useGetAlbumsQuery,
+  useGetArtistsQuery,
+} from "../services/api";
 
-// Định nghĩa type cho các thành phần
-interface Artist {
-  id: string;
-  name: string;
-  bio: string;
-  urlAvatar: string;
-  createdAt: string;
-  updatedAt: string | null;
-}
+// Component hình ảnh an toàn với fallback
+const SafeImage = ({ uri, ...props }: any) => {
+  const [error, setError] = useState(false);
+  const imageUri =
+    uri && uri !== "null" ? uri : "https://via.placeholder.com/150";
+  return (
+    <Image
+      {...props}
+      source={{ uri: error ? "https://via.placeholder.com/150" : imageUri }}
+      onError={() => setError(true)}
+    />
+  );
+};
 
-interface Song {
-  id: string;
-  title: string;
-  coverImage: string;
-  genreId: string;
-  duration: number;
-  counter: number;
-  audioUrl: string;
-  artistId: string;
-  albumId: string;
-  createdAt: string;
-  updatedAt: string | null;
-}
-
-interface Album {
-  id: string;
-  title: string;
-  releaseDate: string;
-  coverImage: string;
-  genreId: string;
-  artistId: string;
-  createdAt: string;
-  updatedAt: string | null;
-}
-
-// Dữ liệu mẫu
-const radioItems = [
-  { id: "1", title: "Low G", artists: "tlinh, Low G, RPT MCK", image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg" },
-  { id: "2", title: "Hà Anh Tuấn", artists: "Vũ., Emcee L (Da LAB)", image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg" },
-  { id: "3", title: "tlinh", artists: "tlinh, Wren", image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg" },
-];
-
-const chartItems = [
-  { id: "1", title: "HOT", artists: "SOOBIN, buitruonglinh", image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg" },
-  { id: "2", title: "Top 50 Vietnam", artists: "Your daily update", image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg" },
-];
-
-const relaxationItems = [
-  { id: "1", title: "Êm Đêm", artists: "Thư giãn cùng nhịp giai điệu du em", image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg" },
-  { id: "2", title: "Lofi Chill Điệu Thu Giãn", artists: "Slacker Jack, cakofonic, CHU VAN CONG", image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg" },
-  { id: "3", title: "Thoải", artists: "Kend Eilish", image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg" },
-];
-
-const newReleasesItems = [
-  { id: "1", title: "Priceless (feat. LISA)", artists: "Maroon 5, LISA", image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg" },
-  { id: "2", title: "I Said I Love You First...", artists: "Selena Gomez, benny blanco", image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg" },
-  { id: "3", title: "Lose", artists: "Don Toliver, The A", image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg" },
-];
-
-const uniquelyYoursItems = [
-  { id: "1", title: "daylist", artists: "Your day in a playlist.", image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg" },
-  { id: "2", title: "On Repeat", artists: "Songs you love right now", image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg" },
-];
-
-const podcastItems = [
-  {
-    id: "1",
-    title: "Những trang thư có lửa về hào khí dân tộc Việt Nam | Podcast...",
-    artists: "Episode · Vì sao thế nhỉ!",
-    date: "Apr 27 · 17min",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    description: "Thư ra tiền tuyến, thư về hậu phương...",
-  },
-  {
-    id: "2",
-    title: "Mặt nạ đau khổ - Tri Kỷ Cảm Xúc #377",
-    artists: "Episode · Tri Kỷ Cảm Xúc",
-    date: "Apr 28 · 20min",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    description: "Một tập podcast đầy cảm xúc với những suy tư và sự đồng cảm...",
-  },
-];
-
-// Dữ liệu mẫu cho artists, albums, songs
-const sampleArtists: Artist[] = [
-  {
-    id: "1",
-    name: "Low G",
-    bio: "Rapper nổi tiếng Việt Nam",
-    urlAvatar: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    createdAt: "2023-01-01",
-    updatedAt: null,
-  },
-  {
-    id: "2",
-    name: "Hà Anh Tuấn",
-    bio: "Ca sĩ nhạc nhẹ Việt Nam",
-    urlAvatar: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    createdAt: "2023-01-01",
-    updatedAt: null,
-  },
-  {
-    id: "3",
-    name: "tlinh",
-    bio: "Nữ rapper trẻ tài năng",
-    urlAvatar: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    createdAt: "2023-01-01",
-    updatedAt: null,
-  },
-];
-
-const sampleAlbums: Album[] = [
-  {
-    id: "1",
-    title: "Album Low G",
-    releaseDate: "2023-06-01",
-    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    genreId: "rap",
-    artistId: "1",
-    createdAt: "2023-01-01",
-    updatedAt: null,
-  },
-  {
-    id: "2",
-    title: "Album Hà Anh Tuấn",
-    releaseDate: "2023-07-01",
-    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    genreId: "pop",
-    artistId: "2",
-    createdAt: "2023-01-01",
-    updatedAt: null,
-  },
-];
-
-const sampleSongs: Song[] = [
-  {
-    id: "1",
-    title: "Simple Love",
-    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    genreId: "rap",
-    duration: 180,
-    counter: 1000,
-    audioUrl: "https://example.com/audio1.mp3",
-    artistId: "1",
-    albumId: "1",
-    createdAt: "2023-01-01",
-    updatedAt: null,
-  },
-  {
-    id: "2",
-    title: "Cơn Mưa Ngang Qua",
-    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    genreId: "pop",
-    duration: 240,
-    counter: 2000,
-    audioUrl: "https://example.com/audio2.mp3",
-    artistId: "2",
-    albumId: "2",
-    createdAt: "2023-01-01",
-    updatedAt: null,
-  },
-];
-
-type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "Home">;
+type HomeScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "Home"
+>;
 
 type Section = {
   id: string;
@@ -199,13 +58,56 @@ type Section = {
   renderItem?: ({ item }: { item: any }) => React.ReactElement;
 };
 
-export default function HomeScreen({ navigation }: { navigation: HomeScreenNavigationProp }) {
+export default function HomeScreen({
+  navigation,
+}: {
+  navigation: HomeScreenNavigationProp;
+}) {
   const scrollY = useRef(new Animated.Value(0)).current;
   const [selectedButton, setSelectedButton] = useState<string>("All");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const sidebarAnim = useRef(new Animated.Value(-Dimensions.get("window").width * 0.75)).current;
+  const [showFollowing, setShowFollowing] = useState(false);
+  const followingAnim = useRef(new Animated.Value(-100)).current; // Animation for Following button
+  const sidebarAnim = useRef(
+    new Animated.Value(-Dimensions.get("window").width * 0.75)
+  ).current;
 
-  const handleButtonPress = (buttonName: string) => setSelectedButton(buttonName);
+  // Sử dụng RTK Query để lấy dữ liệu
+  const {
+    data: songs = [],
+    isLoading: isSongsLoading,
+    error: songsError,
+  } = useGetSongsQuery();
+
+  const {
+    data: albums = [],
+    isLoading: isAlbumsLoading,
+    error: albumsError,
+  } = useGetAlbumsQuery();
+
+  const {
+    data: artists = [],
+    isLoading: isArtistsLoading,
+    error: artistsError,
+  } = useGetArtistsQuery();
+
+  const handleButtonPress = (buttonName: string) => {
+    setSelectedButton(buttonName);
+    if (buttonName === "Podcasts") {
+      setShowFollowing(true);
+      Animated.timing(followingAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(followingAnim, {
+        toValue: -100,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setShowFollowing(false));
+    }
+  };
 
   const toggleSidebar = () => {
     Animated.timing(sidebarAnim, {
@@ -216,180 +118,210 @@ export default function HomeScreen({ navigation }: { navigation: HomeScreenNavig
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // Kiểm tra Play icon để tránh undefined
-  const PlayIcon = Play || (() => null);
+  // Hàm lấy tên nghệ sĩ từ artistId
+  const getArtistName = (artistId: string | undefined) => {
+    if (!artistId) return "Unknown Artist";
+    const artist = artists.find((a) => a.id === artistId);
+    return artist?.name || "Unknown Artist";
+  };
 
-  const sections: Section[] = [
-    {
-      id: "radio",
-      type: "horizontal",
-      title: "Popular radio",
-      data: radioItems,
-      renderItem: ({ item }) => (
-        <TouchableOpacity>
-          <YStack width={150} marginRight="$4">
-            <Image source={{ uri: item.image }} width={150} height={150} borderRadius={2} />
-            <Text color="white" fontWeight="bold" marginTop="$2">{item.title}</Text>
-            <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">{item.artists}</Text>
-          </YStack>
-        </TouchableOpacity>
-      ),
-    },
-    {
-      id: "charts",
-      type: "horizontal",
-      title: "Charts",
-      data: chartItems,
-      renderItem: ({ item }) => (
-        <TouchableOpacity>
-          <YStack width={120} marginRight="$4">
-            <Image source={{ uri: item.image }} width={120} height={180} borderRadius={2} />
-            <Text color="white" fontWeight="bold" marginTop="$2">{item.title}</Text>
-            <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">{item.artists}</Text>
-          </YStack>
-        </TouchableOpacity>
-      ),
-    },
-    {
-      id: "albums",
-      type: "horizontal",
-      title: "Popular albums",
-      data: sampleAlbums,
-      loading: false,
-      error: null,
-      renderItem: ({ item }) => (
-        <TouchableOpacity>
-          <YStack width={120} marginRight="$4">
-            <Image source={{ uri: item.coverImage }} width={120} height={120} borderRadius={2} />
-            <Text color="white" fontWeight="bold" marginTop="$2" numberOfLines={1}>{item.title}</Text>
-            <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">{new Date(item.releaseDate).toLocaleDateString()}</Text>
-          </YStack>
-        </TouchableOpacity>
-      ),
-    },
-    {
-      id: "artists",
-      type: "horizontal",
-      title: "Popular artists",
-      data: sampleArtists,
-      loading: false,
-      error: null,
-      renderItem: ({ item }) => (
-        <TouchableOpacity>
-          <YStack width={100} marginRight="$4" alignItems="center">
-            <Image source={{ uri: item.urlAvatar }} width={100} height={100} borderRadius={50} />
-            <Text color="white" fontWeight="bold" marginTop="$2" textAlign="center" numberOfLines={1}>{item.name}</Text>
-          </YStack>
-        </TouchableOpacity>
-      ),
-    },
-    {
-      id: "songs",
-      type: "vertical",
-      title: "Your recent rotation",
-      data: sampleSongs,
-      loading: false,
-      error: null,
-      renderItem: ({ item }) => (
-        <TouchableOpacity>
-          <XStack alignItems="center" paddingVertical="$2">
-            <Image source={{ uri: item.coverImage }} width={50} height={50} borderRadius={2} />
-            <YStack marginLeft="$3" flex={1}>
-              <Text color="white" fontWeight="bold" numberOfLines={1}>{item.title}</Text>
+  // Biến đổi dữ liệu từ API
+  const transformData = () => {
+    const radioItems = songs.map((song) => ({
+      id: song.id,
+      title: song.title,
+      artists: getArtistName(song.artistId),
+      image: song.coverImage || "https://via.placeholder.com/150",
+    }));
+
+    const chartItems = songs.map((song) => ({
+      id: song.id,
+      title: song.title,
+      artists: getArtistName(song.artistId),
+      image: song.coverImage || "https://via.placeholder.com/120",
+    }));
+
+    const relaxationItems = songs.map((song) => ({
+      id: song.id,
+      title: song.title,
+      artists: getArtistName(song.artistId),
+      image: song.coverImage || "https://via.placeholder.com/150",
+    }));
+
+    return [
+      {
+        id: "radio",
+        type: "horizontal",
+        title: "Popular radio",
+        data: radioItems,
+        loading: isSongsLoading,
+        error: songsError?.toString(),
+        renderItem: ({ item }) => (
+          <TouchableOpacity>
+            <YStack width={150} mr="$4">
+              <SafeImage
+                uri={item.image}
+                width={150}
+                height={150}
+                borderRadius={10}
+              />
+              <Text color="white" fontWeight="bold" mt="$2">
+                {item.title}
+              </Text>
               <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                {Math.floor(item.duration / 60)}:{(item.duration % 60).toString().padStart(2, "0")}
+                {item.artists}
               </Text>
             </YStack>
-            <TouchableOpacity
-              style={{
-                backgroundColor: "#ffffff",
-                borderRadius: 50,
-                width: 32,
-                height: 32,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-              onPress={() => togglePlayback()} // Sử dụng togglePlayback từ playerService
-            >
-              <Play size={16} color="#000000" />
-            </TouchableOpacity>
-          </XStack>
-        </TouchableOpacity>
-      ),
-    },
-    {
-      id: "relaxation",
-      type: "horizontal",
-      title: "Relaxation",
-      data: relaxationItems,
-      renderItem: ({ item }) => (
-        <TouchableOpacity>
-          <YStack width={150} marginRight="$4">
-            <Image source={{ uri: item.image }} width={150} height={150} borderRadius={2} />
-            <Text color="white" fontWeight="bold" marginTop="$2">{item.title}</Text>
-            <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">{item.artists}</Text>
-          </YStack>
-        </TouchableOpacity>
-      ),
-    },
-    {
-      id: "newReleases",
-      type: "horizontal",
-      title: "New Releases",
-      data: newReleasesItems,
-      renderItem: ({ item }) => (
-        <TouchableOpacity>
-          <YStack width={150} marginRight="$4">
-            <Image source={{ uri: item.image }} width={150} height={150} borderRadius={2} />
-            <Text color="white" fontWeight="bold" marginTop="$2">{item.title}</Text>
-            <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">{item.artists}</Text>
-          </YStack>
-        </TouchableOpacity>
-      ),
-    },
-    {
-      id: "uniquelyYours",
-      type: "horizontal",
-      title: "Uniquely Yours",
-      data: uniquelyYoursItems,
-      renderItem: ({ item }) => (
-        <TouchableOpacity>
-          <YStack width={150} marginRight="$4">
-            <Image source={{ uri: item.image }} width={150} height={150} borderRadius={2} />
-            <Text color="white" fontWeight="bold" marginTop="$2">{item.title}</Text>
-            <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">{item.artists}</Text>
-          </YStack>
-        </TouchableOpacity>
-      ),
-    },
-    {
-      id: "podcasts",
-      type: "vertical",
-      title: "Podcasts",
-      data: podcastItems,
-      renderItem: ({ item }) => (
-        <TouchableOpacity>
-          <XStack alignItems="center" paddingVertical="$2">
-            <Image source={{ uri: item.image }} width={50} height={50} borderRadius={2} />
-            <YStack marginLeft="$3" flex={1}>
-              <Text color="white" fontWeight="bold" numberOfLines={1}>{item.title}</Text>
-              <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">{item.artists}</Text>
-              <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">{item.date}</Text>
+          </TouchableOpacity>
+        ),
+      },
+      {
+        id: "charts",
+        type: "horizontal",
+        title: "Charts",
+        data: chartItems,
+        loading: isSongsLoading,
+        error: songsError?.toString(),
+        renderItem: ({ item }) => (
+          <TouchableOpacity>
+            <YStack width={120} mr="$4">
+              <SafeImage
+                uri={item.image}
+                width={120}
+                height={180}
+                borderRadius={10}
+              />
+              <Text color="white" fontWeight="bold" mt="$2">
+                {item.title}
+              </Text>
+              <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+                {item.artists}
+              </Text>
             </YStack>
-          </XStack>
-        </TouchableOpacity>
-      ),
-    },
-  ];
+          </TouchableOpacity>
+        ),
+      },
+      {
+        id: "albums",
+        type: "horizontal",
+        title: "Popular albums",
+        data: albums,
+        loading: isAlbumsLoading,
+        error: albumsError?.toString(),
+        renderItem: ({ item }) => (
+          <TouchableOpacity>
+            <YStack width={120} mr="$4">
+              <SafeImage
+                uri={item.coverImage}
+                width={120}
+                height={120}
+                borderRadius={10}
+              />
+              <Text color="white" fontWeight="bold" mt="$2" numberOfLines={1}>
+                {item.title}
+              </Text>
+              <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+                {getArtistName(item.artistId)}
+              </Text>
+            </YStack>
+          </TouchableOpacity>
+        ),
+      },
+      {
+        id: "artists",
+        type: "horizontal",
+        title: "Popular artists",
+        data: artists,
+        loading: isArtistsLoading,
+        error: artistsError?.toString(),
+        renderItem: ({ item }) => (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("ArtistScreen", { artistId: item.id })
+            }
+          >
+            <YStack width={100} mr="$4" items="center">
+              <SafeImage
+                uri={item.urlAvatar}
+                width={100}
+                height={100}
+                borderRadius={50}
+              />
+              <Text
+                color="white"
+                fontWeight="bold"
+                mt="$2"
+                text="center"
+                numberOfLines={1}
+              >
+                {item.name}
+              </Text>
+            </YStack>
+          </TouchableOpacity>
+        ),
+      },
+      {
+        id: "songs",
+        type: "vertical",
+        title: "Your recent rotation",
+        data: songs,
+        loading: isSongsLoading,
+        error: songsError?.toString(),
+        renderItem: ({ item }) => (
+          <TouchableOpacity onPress={() => togglePlayback(item)}>
+            <XStack items="center" py="$2">
+              <SafeImage
+                uri={item.coverImage}
+                width={50}
+                height={50}
+                borderRadius={10}
+              />
+              <YStack ml="$3" flex={1}>
+                <Text color="white" fontWeight="bold" numberOfLines={1}>
+                  {item.title}
+                </Text>
+                <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+                  {Math.floor(item.duration / 60)}:
+                  {(item.duration % 60).toString().padStart(2, "0")}
+                </Text>
+              </YStack>
+              <Button
+                bg="white"
+                rounded={100}
+                width="$3"
+                height="$3"
+                p={0}
+                icon={<Play size="$1" color="black" />}
+              />
+            </XStack>
+          </TouchableOpacity>
+        ),
+      },
+    ];
+  };
+
+  const sections = transformData();
 
   const renderSection = ({ item: section }: { item: Section }) => {
-    if (section.loading) return <YStack alignItems="center" padding="$4"><Spinner size="large" color="$blue10" /></YStack>;
-    if (section.error) return <Text color="red" textAlign="center">{section.error}</Text>;
-    if (!section.data || !section.renderItem) return null;
+    if (section.loading)
+      return (
+        <YStack items="center" p={4}>
+          <Spinner size="large" color="$blue10" />
+        </YStack>
+      );
+    if (section.error)
+      return (
+        <Text color="red" text="center">
+          {section.error}
+        </Text>
+      );
+    if (!section.data?.length) return null;
 
     return (
-      <YStack marginBottom="$6">
-        <H3 color="white" marginBottom="$3">{section.title}</H3>
+      <YStack mb="$6">
+        <H4 color="white" mb={3}>
+          {section.title}
+        </H4>
         <FlatList
           data={section.data}
           horizontal={section.type === "horizontal"}
@@ -402,8 +334,14 @@ export default function HomeScreen({ navigation }: { navigation: HomeScreenNavig
   };
 
   return (
-    <YStack flex={1} backgroundColor="#000000" paddingLeft={20}>
-      <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
+    <YStack flex={1} bg="rgb(25, 27, 31)" pl={20}>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="light-content"
+      />
+
+      {/* Sidebar */}
       <Animated.View
         style={{
           width: Dimensions.get("window").width * 0.75,
@@ -415,26 +353,34 @@ export default function HomeScreen({ navigation }: { navigation: HomeScreenNavig
           zIndex: 10,
         }}
       >
-        <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} navigation={navigation} />
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={toggleSidebar}
+          navigation={navigation}
+        />
       </Animated.View>
+
+      {/* Nội dung chính */}
       <Animated.View
         style={{
           flex: 1,
-          transform: [{ translateX: sidebarAnim.interpolate({
-            inputRange: [-Dimensions.get("window").width * 0.75, 0],
-            outputRange: [0, Dimensions.get("window").width * 0.75],
-          }) }],
+          transform: [
+            {
+              translateX: sidebarAnim.interpolate({
+                inputRange: [-Dimensions.get("window").width * 0.75, 0],
+                outputRange: [0, Dimensions.get("window").width * 0.75],
+              }),
+            },
+          ],
         }}
       >
-        {/* Header cố định ở đầu */}
+        {/* Header */}
         <XStack
-          alignItems="center"
+          items="center"
           space="$2"
-          paddingVertical="$4"
-          marginTop={StatusBar.currentHeight || 0}
-          backgroundColor="#000000"
-          zIndex={1}
-          elevation={2}
+          py={10}
+          mt={StatusBar.currentHeight || 0}
+          z={1}
         >
           <TouchableOpacity onPress={toggleSidebar}>
             <Avatar circular size="$4">
@@ -445,38 +391,45 @@ export default function HomeScreen({ navigation }: { navigation: HomeScreenNavig
               <Avatar.Fallback backgroundColor="$blue10" />
             </Avatar>
           </TouchableOpacity>
-          <Button
-            size="$3"
-            backgroundColor={
-              selectedButton === "All" ? "#1DB954" : "rgba(255, 255, 255, 0.2)"
-            }
-            borderRadius={50}
-            onPress={() => handleButtonPress("All")}
-          >
-            <Text color={selectedButton === "All" ? "black" : "white"}>All</Text>
-          </Button>
-          <Button
-            size="$3"
-            backgroundColor={
-              selectedButton === "Music" ? "#1DB954" : "rgba(255, 255, 255, 0.2)"
-            }
-            borderRadius={50}
-            onPress={() => handleButtonPress("Music")}
-          >
-            <Text color={selectedButton === "Music" ? "black" : "white"}>Music</Text>
-          </Button>
-          <Button
-            size="$3"
-            backgroundColor={
-              selectedButton === "Podcasts" ? "#1DB954" : "rgba(255, 255, 255, 0.2)"
-            }
-            borderRadius={50}
-            onPress={() => handleButtonPress("Podcasts")}
-          >
-            <Text color={selectedButton === "Podcasts" ? "black" : "white"}>Podcasts</Text>
-          </Button>
+
+          {["All", "Music", "Podcasts"].map((button) => (
+            <Button
+              ml={7}
+              key={button}
+              size="$3"
+              bg={
+                selectedButton === button
+                  ? "#1DB954"
+                  : "rgba(255, 255, 255, 0.2)"
+              }
+              rounded={50}
+              onPress={() => handleButtonPress(button)}
+            >
+              <Text color={selectedButton === button ? "black" : "white"}>
+                {button}
+              </Text>
+            </Button>
+          ))}
+          
+          {showFollowing && (
+            <Animated.View
+              style={{
+                transform: [{ translateX: followingAnim }],
+              }}
+            >
+              <Button
+                size="$3"
+                bg="rgba(255, 255, 255, 0.2)"
+                rounded={50}
+                onPress={() => handleButtonPress("Following")}
+              >
+                <Text color="white">Following</Text>
+              </Button>
+            </Animated.View>
+          )}
         </XStack>
 
+        {/* Danh sách nội dung */}
         <Animated.View
           style={{
             flex: 1,
@@ -492,11 +445,16 @@ export default function HomeScreen({ navigation }: { navigation: HomeScreenNavig
             keyExtractor={(item) => item.id}
             showsVerticalScrollIndicator={false}
             scrollEventThrottle={16}
-            onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+              { useNativeDriver: false }
+            )}
             pointerEvents={isSidebarOpen ? "none" : "auto"}
-            contentContainerStyle={{ paddingTop: 0 }}
+            contentContainerStyle={{ paddingBottom: 80 }}
           />
         </Animated.View>
+
+        {/* Overlay khi sidebar mở */}
         {isSidebarOpen && (
           <TouchableWithoutFeedback onPress={toggleSidebar}>
             <View
@@ -506,7 +464,6 @@ export default function HomeScreen({ navigation }: { navigation: HomeScreenNavig
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: "rgba(0, 0, 0, 0.3)",
               }}
             />
           </TouchableWithoutFeedback>
