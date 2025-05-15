@@ -17,40 +17,36 @@ import {
   removeTrackFromQueue,
   setShuffle,
   setLoop,
-  setVolume,
 } from "../store/playerSlice";
+import { Track } from "../types/track";
 
 // Định nghĩa interface Track
-interface Track {
-  id: string;
-  url: string;
-  title?: string;
-  artist?: string;
-  artwork?: string;
-}
 
 // Danh sách tracks mẫu
 const tracks: Track[] = [
   {
     id: "track1",
     url: "https://thantrieu.com/resources/music/1130295695.mp3",
+    duration: 200,
     title: "SoundHelix Song 1",
     artist: "SoundHelix",
-    artwork: "https://via.placeholder.com/150?text=Song+1",
+    artwork: "https://thantrieu.com/resources/arts/1130295695.webp",
   },
   {
     id: "track2",
     url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    duration: 200,
     title: "SoundHelix Song 2",
     artist: "SoundHelix",
-    artwork: "https://via.placeholder.com/150?text=Song+2",
+    artwork: "https://thantrieu.com/resources/arts/1121429554.webp",
   },
   {
     id: "track3",
     url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+    duration: 200,
     title: "SoundHelix Song 3",
     artist: "SoundHelix",
-    artwork: "https://via.placeholder.com/150?text=Song+3",
+    artwork: "https://thantrieu.com/resources/arts/1130295694.webp",
   },
 ];
 
@@ -58,8 +54,9 @@ const tracks: Track[] = [
 export const setupPlayer = async () => {
   try {
     await TrackPlayer.setupPlayer();
-    console.log("TrackPlayer setup successfully");
-
+    console.log("TrackPlayer setup completed");
+    await playbackService();
+    console.log("Playback service started");
     await TrackPlayer.updateOptions({
       capabilities: [
         Capability.Play,
@@ -93,19 +90,21 @@ export const setupPlayer = async () => {
 
     // Đặt track đầu tiên làm track hiện tại
     const track = await TrackPlayer.getTrack(0);
+
     if (track) {
       store.dispatch(
         setCurrentTrack({
-          id: track.id,
-          url: String(track.url),
+          id: track.id ?? "",
+          url: String(track.url ?? ""),
+          position: track.position,
+          duration: track.duration,
           title: track.title,
           artist: track.artist,
+          artwork:
+            track.artwork !== undefined ? String(track.artwork) : undefined,
         })
       );
     }
-
-    // Khởi tạo âm lượng
-    await TrackPlayer.setVolume(1.0);
   } catch (error) {
     console.error("Setup Player Error:", error);
   }
@@ -161,30 +160,6 @@ export async function playbackService() {
         console.log("Remote Stop triggered");
       } catch (error) {
         console.error("Remote Stop Error:", error);
-      }
-    });
-
-    TrackPlayer.addEventListener(Event.PlaybackTrackChanged, async (event) => {
-      try {
-        if (event.nextTrack !== null) {
-          const track = await TrackPlayer.getTrack(event.nextTrack);
-          if (track) {
-            store.dispatch(
-              setCurrentTrack({
-                id: track.id,
-                url: String(track.url),
-                title: track.title,
-                artist: track.artist,
-              })
-            );
-            console.log("Track changed to:", track.title);
-          } else {
-            store.dispatch(setCurrentTrack(null));
-            console.log("No track found for index:", event.nextTrack);
-          }
-        }
-      } catch (error) {
-        console.error("Track Change Error:", error);
       }
     });
 
@@ -275,6 +250,7 @@ export const skipToNext = async () => {
       }
     } else {
       await TrackPlayer.skipToNext();
+      store.dispatch(setPlaying(true));
       console.log("Skipped to next track");
     }
   } catch (error) {
@@ -284,8 +260,25 @@ export const skipToNext = async () => {
 
 export const skipToPrevious = async () => {
   try {
-    await TrackPlayer.skipToPrevious();
-    console.log("Skipped to previous track");
+    const state = store.getState().player;
+    if (state.shuffle) {
+      const queue = await TrackPlayer.getQueue();
+      const mappedQueue = queue.map((track) => ({
+        id: track.id || "",
+        url: String(track.url || ""),
+        title: track.title,
+        artist: track.artist,
+      }));
+      const randomIndex = getRandomTrackIndex(mappedQueue, state.currentTrack);
+      if (randomIndex !== -1) {
+        await TrackPlayer.skip(randomIndex);
+        console.log("Skipped to random track");
+      }
+    } else {
+      await TrackPlayer.skipToPrevious();
+      store.dispatch(setPlaying(true));
+      console.log("Skipped to next track");
+    }
   } catch (error) {
     console.error("Skip To Previous Error:", error);
   }
@@ -365,17 +358,5 @@ export const setLoopMode = async (mode: "off" | "track" | "queue") => {
     console.log("Loop mode set to:", mode);
   } catch (error) {
     console.error("Set Loop Mode Error:", error);
-  }
-};
-
-// Hàm quản lý âm lượng
-export const setVol = async (volume: number) => {
-  try {
-    const clampedVolume = Math.max(0, Math.min(1, volume));
-    await TrackPlayer.setVolume(clampedVolume);
-    store.dispatch(setVolume(clampedVolume));
-    console.log("Volume set to:", clampedVolume);
-  } catch (error) {
-    console.error("Set Volume Error:", error);
   }
 };
