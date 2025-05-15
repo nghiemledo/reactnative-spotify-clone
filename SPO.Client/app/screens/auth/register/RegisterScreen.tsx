@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import { YStack, XStack, Button, Text, Image } from "tamagui";
 import { Mail, Smartphone } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../navigation/AppNavigator";
-import { SlpashStackParamList } from "../navigation/SplashNavigator";
+import { RootStackParamList } from "../../../navigation/AppNavigator";
+import { SlpashStackParamList } from "../../../navigation/SplashNavigator";
 
 type RegisterScreenNavigationProp = NativeStackNavigationProp<
   SlpashStackParamList,
@@ -98,7 +98,7 @@ export default function RegisterScreen({
           justify="flex-start"
         >
           <Image
-            source={require("../assets/logo-gg.png")}
+            source={require("../../../assets/logo-gg.png")}
             height={"$3"}
             width={"$3"}
           />

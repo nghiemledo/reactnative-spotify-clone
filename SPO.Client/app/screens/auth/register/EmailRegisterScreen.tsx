@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { YStack, XStack, Button, Text } from "tamagui";
 import { TouchableOpacity } from "react-native";
-import { InputComponent } from "../components/InputComponent";
-import { DatePickerComponent } from "../components/DatePickerComponent";
-import { GenderSelectionComponent } from "../components/GenderSelectionComponent";
-import { TermsAndPreferencesComponent } from "../components/TermsAndPreferencesComponent";
+import { InputComponent } from "../../../components/InputComponent";
+import { DatePickerComponent } from "../../../components/DatePickerComponent";
+import { GenderSelectionComponent } from "../../../components/GenderSelectionComponent";
+import { TermsAndPreferencesComponent } from "../../../components/TermsAndPreferencesComponent";
 import { ArrowLeft } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StatusBar } from "react-native";
 import { z } from "zod";
-import { SlpashStackParamList } from "../navigation/SplashNavigator";
-import { useRegisterMutation } from "../services/AuthService";
+import { SlpashStackParamList } from "../../../navigation/SplashNavigator";
+import { useRegisterMutation } from "../../../services/AuthService";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email"),

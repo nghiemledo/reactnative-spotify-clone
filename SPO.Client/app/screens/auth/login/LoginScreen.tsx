@@ -2,7 +2,7 @@ import React from "react";
 import { YStack, XStack, Button, Text, Image } from "tamagui";
 import { Mail, Smartphone } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { SlpashStackParamList } from "../navigation/SplashNavigator";
+import { SlpashStackParamList } from "../../../navigation/SplashNavigator";
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   SlpashStackParamList,
@@ -93,7 +93,7 @@ export default function LoginScreen({
           justify="flex-start"
         >
           <Image
-            source={require("../assets/logo-gg.png")}
+            source={require("../../../assets/logo-gg.png")}
             height={"$3"}
             width={"$3"}
           />

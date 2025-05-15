@@ -1,10 +1,10 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import TabNavigator from "./TabNavigator";
-import LoginScreen from "../screens/LoginScreen";
+import LoginScreen from "../screens/auth/login/LoginScreen";
 import SplashScreen from "../screens/SplashScreen";
-import EmailLoginScreen from "../screens/EmailLoginScreen";
-import RegisterScreen from "../screens/RegisterScreen";
-import EmailRegisterScreen from "../screens/EmailRegisterScreen";
+import EmailLoginScreen from "../screens/auth/login/EmailLoginScreen";
+import RegisterScreen from "../screens/auth/register/RegisterScreen";
+import EmailRegisterScreen from "../screens/auth/register/EmailRegisterScreen";
 
 const Stack = createStackNavigator();
 export type SlpashStackParamList = {
