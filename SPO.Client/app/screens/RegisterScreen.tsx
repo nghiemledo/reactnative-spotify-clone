@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import { YStack, XStack, Button, Text, Image } from "tamagui";
 import { Mail, Smartphone } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../navigation/AppNavigator";
 
 type RegisterScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "Register"
+  "register"
 >;
 
 export default function RegisterScreen({
@@ -19,33 +19,33 @@ export default function RegisterScreen({
   };
 
   return (
-    <YStack flex={1} alignItems="center" backgroundColor="#000" padding="$4">
-      <YStack height={"50%"} alignItems="center" justifyContent="center">
-        <Text fontSize="$8" fontWeight="bold" color="#fff" marginBottom="$6">
-          Spotify
-        </Text>
+    <YStack flex={1} items="center" bg="#000" p="$4">
+      <YStack height={"50%"} items="center" justify="center">
         <Text
           fontSize="$9"
-          textAlign="center"
+          text="center"
           fontWeight="bold"
           color="#fff"
-          marginBottom="$2"
+          mb="$2"
         >
-          Đăng ký để bắt đầu để nghe
+          Sign up to start
+        </Text>
+        <Text fontSize="$9" text="center" fontWeight="bold" color="#fff">
+          Listening
         </Text>
       </YStack>
 
-      <YStack width={"100%"} justifyContent="center">
+      <YStack width={"100%"} justify="center">
         <Button
-          backgroundColor="#1DB954"
-          borderRadius="$10"
-          marginVertical="$2"
-          paddingVertical="$3"
+          bg="#1DB954"
+          rounded="$10"
+          my="$2"
+          py="$3"
           height="$5"
           width="100%"
           flexDirection="row"
-          alignItems="center"
-          justifyContent="flex-start"
+          items="center"
+          justify="flex-start"
           onPress={handleEmailRegister}
         >
           <Mail color="black" size="$2" />
@@ -53,48 +53,48 @@ export default function RegisterScreen({
             color="black"
             fontSize="$5"
             flex={1}
-            textAlign="center"
+            text="center"
             fontWeight="bold"
           >
-            Tiếp tục với email
+            Continue with email
           </Text>
         </Button>
         <Button
-          backgroundColor="transparent"
+          bg="transparent"
           borderColor="#fff"
           borderWidth={1}
-          borderRadius="$10"
+          rounded="$10"
           height="$5"
-          marginVertical="$2"
-          paddingVertical="$3"
+          my="$2"
+          py="$3"
           width="100%"
           flexDirection="row"
-          alignItems="center"
-          justifyContent="flex-start"
+          items="center"
+          justify="flex-start"
         >
           <Smartphone color="#fff" size="$2" />
           <Text
             color="#fff"
             fontSize="$5"
             flex={1}
-            textAlign="center"
+            text="center"
             fontWeight="bold"
           >
-            Tiếp tục bằng số điện thoại
+            Continue with phone number
           </Text>
         </Button>
         <Button
-          backgroundColor="transparent"
+          bg="transparent"
           borderColor="#fff"
           borderWidth={1}
-          borderRadius="$10"
-          marginVertical="$2"
+          rounded="$10"
+          my="$2"
           height="$5"
-          paddingVertical="$3"
+          py="$3"
           width="100%"
           flexDirection="row"
-          alignItems="center"
-          justifyContent="flex-start"
+          items="center"
+          justify="flex-start"
         >
           <Image
             source={require("../assets/logo-gg.png")}
@@ -105,23 +105,23 @@ export default function RegisterScreen({
             color="#fff"
             fontSize="$5"
             flex={1}
-            textAlign="center"
+            text="center"
             fontWeight="bold"
           >
-            Tiếp tục bằng Google
+            Continue with Google
           </Text>
         </Button>
-        <XStack alignItems="center" justifyContent="center" marginTop="$4">
+        <XStack items="center" justify="center" mt="$4">
           <Text color="#fff" fontSize="$4">
-            Bạn đã có tài khoản?{" "}
+            Already have an account?{" "}
           </Text>
           <Text
             color="#1DB954"
             fontSize="$4"
             fontWeight="bold"
-            onPress={() => navigation.navigate("Main", { screen: "login" })}
+            onPress={() => navigation.navigate("login")}
           >
-            Đăng nhập
+            Log in
           </Text>
         </XStack>
       </YStack>

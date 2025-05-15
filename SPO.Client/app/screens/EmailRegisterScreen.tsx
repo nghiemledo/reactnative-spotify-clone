@@ -7,11 +7,11 @@ import { GenderSelectionComponent } from "../components/GenderSelectionComponent
 import { TermsAndPreferencesComponent } from "../components/TermsAndPreferencesComponent";
 import { ArrowLeft } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../navigation/AppNavigator";
 import { StatusBar } from "react-native";
 import { z } from "zod";
 import { useDispatch, useSelector } from "react-redux";
-import { register, setError } from "../store/authSlice";
+// import { register, setError } from "../store/authSlice";
 import { RootState, AppDispatch } from "../store";
 
 // Define Zod schema for form validation
@@ -41,7 +41,7 @@ export default function EmailRegisterScreen({
   navigation,
 }: RegisterFormScreenProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  // const { loading, error } = useSelector((state: RootState) => state.auth);
 
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({
@@ -136,7 +136,8 @@ export default function EmailRegisterScreen({
         formSchema.pick(pickObject).parse(currentFields);
       } else if (currentConfig.key) {
         const currentField = {
-          [currentConfig.key]: formData[currentConfig.key as keyof typeof formData],
+          [currentConfig.key]:
+            formData[currentConfig.key as keyof typeof formData],
         };
         const pickObject: PickObject = { [currentConfig.key]: true };
         formSchema.pick(pickObject).parse(currentField);
@@ -175,19 +176,19 @@ export default function EmailRegisterScreen({
         setStep(step + 1);
       } else {
         // Gọi API đăng ký với các trường yêu cầu
-        await dispatch(
-          register({
-            lastName: formData.lastname,
-            firstName: formData.firstname,
-            email: formData.email,
-            phoneNumber: formData.phoneNumber,
-            password: formData.password,
-          })
-        ).unwrap();
+        // await dispatch(
+        //   register({
+        //     lastName: formData.lastname,
+        //     firstName: formData.firstname,
+        //     email: formData.email,
+        //     phoneNumber: formData.phoneNumber,
+        //     password: formData.password,
+        //   })
+        // ).unwrap();
 
         console.log("Đăng ký với:", formData);
         alert("Đăng ký thành công! Vui lòng đăng nhập.");
-        navigation.navigate("Main", { screen: "login" }); 
+        navigation.navigate("login");
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -206,59 +207,54 @@ export default function EmailRegisterScreen({
         navigation.goBack();
       } catch (error) {
         console.error("goBack failed:", error);
-        navigation.navigate("Register");
+        navigation.navigate("register");
       }
     }
   };
 
   // Hiển thị lỗi từ API nếu có
-  useEffect(() => {
-    if (error) {
-      alert(error);
-      dispatch(setError(null));
-    }
-  }, [error, dispatch]);
+  // useEffect(() => {
+  //   if (error) {
+  //     alert(error);
+  //     dispatch(setError(null));
+  //   }
+  // }, [error, dispatch]);
 
   return (
-    <YStack flex={1} backgroundColor="#000">
+    <YStack flex={1} bg="#000">
       <StatusBar barStyle="light-content" backgroundColor="#000" />
       {/* Navbar */}
       <XStack
         position="absolute"
-        top={0}
-        left={0}
-        right={0}
+        t={0}
+        l={0}
+        r={0}
         height={60}
-        alignItems="center"
-        paddingHorizontal="$4"
-        backgroundColor="#000"
-        zIndex={1000}
-        paddingTop={StatusBar.currentHeight || 20}
+        items="center"
+        px="$4"
+        bg="#000"
+        z={1000}
+        pt={StatusBar.currentHeight || 20}
       >
-        <XStack flex={1} justifyContent="flex-start">
+        <XStack flex={1} justify="flex-start">
           <TouchableOpacity onPress={handleBack} style={{ padding: 10 }}>
             <Button
               size="$8"
               chromeless
               icon={<ArrowLeft color="white" />}
               color="white"
-              padding={0}
-              backgroundColor="transparent"
+              p={0}
+              bg="transparent"
               pressStyle={{
-                backgroundColor: "transparent",
+                bg: "transparent",
                 borderBlockColor: "transparent",
               }}
             />
           </TouchableOpacity>
         </XStack>
 
-        <XStack flex={1} justifyContent="center">
-          <Text
-            fontSize="$4"
-            fontWeight="bold"
-            color="white"
-            textAlign="center"
-          >
+        <XStack flex={1} justify="center">
+          <Text fontSize="$4" fontWeight="bold" color="white" text="center">
             Tạo tài khoản
           </Text>
         </XStack>
@@ -266,12 +262,7 @@ export default function EmailRegisterScreen({
         <XStack flex={1} />
       </XStack>
 
-      <YStack
-        alignItems="flex-start"
-        justifyContent="center"
-        padding="$4"
-        paddingTop={80}
-      >
+      <YStack items="flex-start" justify="center" p="$4" pt={80}>
         {currentConfig.component === "dateInput" ? (
           <DatePickerComponent
             label={currentConfig.label}
@@ -283,7 +274,7 @@ export default function EmailRegisterScreen({
           <GenderSelectionComponent
             onSelect={handleChange("gender")}
             initialGender={formData.gender}
-          /> 
+          />
         ) : currentConfig.component === "nameInput" ? (
           <YStack width="100%" space="$4">
             {currentConfig.fields!.map((field) => (
@@ -304,7 +295,9 @@ export default function EmailRegisterScreen({
             label={currentConfig.label}
             placeholder={currentConfig.placeholder}
             value={formData[currentConfig.key as keyof typeof formData]}
-            onChange={currentConfig.key ? handleChange(currentConfig.key) : () => {}}
+            onChange={
+              currentConfig.key ? handleChange(currentConfig.key) : () => {}
+            }
             keyboardType={currentConfig.keyboardType}
             secureTextEntry={currentConfig.secureTextEntry}
           />
@@ -313,14 +306,14 @@ export default function EmailRegisterScreen({
           <TermsAndPreferencesComponent onValidationChange={setIsTermsValid} />
         )}
         <Button
-          backgroundColor="#1DB954"
-          borderRadius="$10"
+          bg="#1DB954"
+          rounded="$10"
           width="40%"
           height="$4"
           onPress={handleNext}
-          margin="auto"
-          marginTop="$4"
-          disabled={step === 5 && (!isTermsValid || loading)}
+          m="auto"
+          mt="$4"
+          // disabled={step === 5 && (!isTermsValid || loading)}
         >
           <Text color="#fff" fontSize="$4" fontWeight="bold">
             {step === inputConfigs.length - 1 ? "Tạo tài khoản" : "Tiếp"}
