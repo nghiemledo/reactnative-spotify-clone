@@ -3,16 +3,7 @@ import { FlatList } from "react-native-gesture-handler";
 import { H4, Text } from "tamagui";
 import { Spinner } from "tamagui";
 import { YStack } from "tamagui";
-
-type Section = {
-  id: string;
-  type: "horizontal" | "vertical";
-  title?: string;
-  data?: any[];
-  loading?: boolean;
-  error?: string | null;
-  renderItem?: ({ item }: { item: any }) => React.ReactElement;
-};
+import { Section } from "../types/section";
 
 export const SectionHelper = ({ item: section }: { item: Section }) => {
   if (section.loading)
