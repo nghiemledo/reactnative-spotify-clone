@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { YStack, Input, Text, XStack, Button } from "tamagui";
 import { KeyboardTypeOptions } from "react-native";
-import { Eye, EyeOff } from "lucide-react-native";
+import { Eye, EyeOff } from "@tamagui/lucide-icons";
 
 interface InputComponentProps {
   label: string;
@@ -57,18 +57,18 @@ export const InputComponent: React.FC<InputComponentProps> = ({
   };
 
   return (
-    <YStack width="100%" alignItems="flex-start">
-      <Text fontSize="$8" fontWeight="bold" color="#fff" marginBottom="$4">
+    <YStack width="100%" items="flex-start">
+      <Text fontSize="$8" fontWeight="bold" color="#fff" mb="$4">
         {label}
       </Text>
       <XStack
         width="100%"
-        backgroundColor="#333"
+        bg="#333"
         borderColor="transparent"
         borderWidth={1}
-        borderRadius="$4"
-        alignItems="center"
-        paddingRight="$2"
+        rounded="$4"
+        items="center"
+        pr="$2"
       >
         <Input
           value={value}
@@ -77,14 +77,14 @@ export const InputComponent: React.FC<InputComponentProps> = ({
           keyboardType={keyboardType}
           secureTextEntry={secureTextEntry && !showPassword}
           autoCapitalize={keyboardType === "email-address" ? "none" : "sentences"}
-          backgroundColor="transparent"
+          bg="transparent"
           color="#fff"
           borderColor="transparent"
           focusStyle={{
             borderColor: "transparent",
           }}
           borderWidth={0}
-          padding="$3"
+          p="$3"
           flex={1}
         />
         {secureTextEntry && (
@@ -99,10 +99,10 @@ export const InputComponent: React.FC<InputComponentProps> = ({
               )
             }
             onPress={togglePasswordVisibility}
-            padding="$2"
-            marginRight="$2"
-            backgroundColor="transparent"
-            pressStyle={{ backgroundColor: "transparent" }} 
+            p="$2"
+            mr="$2"
+            bg="transparent"
+            pressStyle={{ bg: "transparent" }} 
           />
         )}
       </XStack>
