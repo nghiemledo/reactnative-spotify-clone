@@ -154,8 +154,8 @@ export default function PodcastDetailScreen({
   // Memoize render comment item
   const renderCommentItem = useCallback(
     ({ item }: { item: typeof comments[0] }) => (
-      <YStack marginBottom="$4">
-        <XStack alignItems="center" gap="$3">
+      <YStack mb="$4">
+        <XStack items="center" gap="$3">
           <Avatar circular size="$3">
             <Avatar.Image
               accessibilityLabel="User Avatar"
@@ -164,7 +164,7 @@ export default function PodcastDetailScreen({
             <Avatar.Fallback backgroundColor="$blue10" />
           </Avatar>
           <YStack flex={1}>
-            <XStack justifyContent="space-between">
+            <XStack justify="space-between">
               <Text color="white" fontWeight="bold">
                 {item.user}
               </Text>
@@ -173,24 +173,24 @@ export default function PodcastDetailScreen({
               </Text>
             </XStack>
             <Text color="white">{item.comment}</Text>
-            <XStack gap="$3" marginTop="$2">
+            <XStack gap="$3" mt="$2">
               <Button
                 disabled
-                backgroundColor="transparent"
-                padding={0}
+                bg="transparent"
+                p={0}
                 icon={<Text color="white">❤️ {item.likes}</Text>}
                 pressStyle={{
-                  backgroundColor: "transparent",
+                  bg: "transparent",
                   borderBlockColor: "transparent",
                 }}
               />
               <Button
                 disabled
-                backgroundColor="transparent"
-                padding={0}
+                bg="transparent"
+                p={0}
                 icon={<Text color="white">💬</Text>}
                 pressStyle={{
-                  backgroundColor: "transparent",
+                  bg: "transparent",
                   borderBlockColor: "transparent",
                 }}
               />
@@ -209,8 +209,8 @@ export default function PodcastDetailScreen({
 
   return (
     <LinearGradient
-      padding={0}
-      margin={0}
+      p={0}
+      m={0}
       flex={1}
       colors={["#3a4a5a", "#000000"]}
       start={[0, 0]}
@@ -250,10 +250,10 @@ export default function PodcastDetailScreen({
                 chromeless
                 icon={ArrowLeft}
                 color="white"
-                padding={0}
-                backgroundColor="transparent"
+                p={0}
+                bg="transparent"
                 pressStyle={{
-                  backgroundColor: "transparent",
+                  bg: "transparent",
                   borderBlockColor: "transparent",
                 }}
               />
@@ -278,9 +278,9 @@ export default function PodcastDetailScreen({
         scrollEventThrottle={16}
         onScroll={handleScroll}
       >
-        <YStack flex={1} marginTop="$6" padding="$4">
+        <YStack flex={1} mt="$6" p="$4">
           {/* Podcast Image */}
-          <XStack alignItems="center" justifyContent="center" marginBottom={16}>
+          <XStack items="center" justify="center" mb={16}>
             <View
               style={{
                 borderRadius: 18,
@@ -305,37 +305,37 @@ export default function PodcastDetailScreen({
           </XStack>
 
           {/* Title & Show Info */}
-          <Text fontSize={24} fontWeight="bold" color="white" marginBottom={4}>
+          <Text fontSize={24} fontWeight="bold" color="white" mb={4}>
             {podcastEpisodeData.title}
           </Text>
-          <XStack alignItems="center" marginBottom={4}>
+          <XStack items="center" mb={4}>
             <Avatar circular size="$2">
               <Avatar.Image accessibilityLabel="Podcast Avatar" src={podcastEpisodeData.show.coverImage} />
               <Avatar.Fallback backgroundColor="$blue10" />
             </Avatar>
-            <Text fontSize={15} color="white" marginLeft={8}>
+            <Text fontSize={15} color="white" ml={8}>
               {podcastEpisodeData.show.title}
             </Text>
           </XStack>
-          <XStack alignItems="center" marginBottom={8}>
+          <XStack items="center" mb={8}>
             <Text color="rgba(255,255,255,0.7)" fontSize={13}>
               Mon • {formatDuration(podcastEpisodeData.duration)}
             </Text>
           </XStack>
 
           {/* Control Buttons */}
-          <XStack alignItems="center" justifyContent="space-between" marginBottom={12}>
+          <XStack items="center" justify="space-between" mb={12}>
             <XStack gap={16}>
-              <Button backgroundColor="rgba(255,255,255,0.05)" borderRadius={100} icon={<Image source={{uri: podcastEpisodeData.show.coverImage}} width={28} height={28} borderRadius={8}/>} />
-              <Button backgroundColor="rgba(255,255,255,0.05)" borderRadius={100} icon={<Plus size={20} color="white" />} />
-              <Button backgroundColor="rgba(255,255,255,0.05)" borderRadius={100} icon={<ArrowDownCircle size={20} color="white" />} />
-              <Button backgroundColor="rgba(255,255,255,0.05)" borderRadius={100} icon={<EllipsisVertical size={20} color="white" />} />
+              <Button bg="rgba(255,255,255,0.05)" rounded={100} icon={<Image source={{uri: podcastEpisodeData.show.coverImage}} width={28} height={28} rounded={8}/>} />
+              <Button bg="rgba(255,255,255,0.05)" rounded={100} icon={<Plus size={20} color="white" />} />
+              <Button bg="rgba(255,255,255,0.05)" rounded={100} icon={<ArrowDownCircle size={20} color="white" />} />
+              <Button bg="rgba(255,255,255,0.05)" rounded={100} icon={<EllipsisVertical size={20} color="white" />} />
             </XStack>
-            <Button backgroundColor="#1DB954" borderRadius={100} width={56} height={56} icon={<Play size={28} color="black" fill="black" />} />
+            <Button bg="#1DB954" rounded={100} width={56} height={56} icon={<Play size={28} color="black" fill="black" />} />
           </XStack>
 
           {/* Description with see more */}
-          <Text color="white" marginBottom={8}>
+          <Text color="white" mb={8}>
             {descToShow}
             {desc.length > descMaxLength && !showFullDesc && (
               <Text color="#1DB954" onPress={() => setShowFullDesc(true)}> see more</Text>
@@ -343,8 +343,8 @@ export default function PodcastDetailScreen({
           </Text>
 
           {/* Comments Card */}
-          <YStack backgroundColor="rgba(30,30,30,0.95)" borderRadius={18} padding={16} marginTop={16}>
-            <XStack justifyContent="space-between" alignItems="center" marginBottom={8}>
+          <YStack bg="rgba(30,30,30,0.95)" rounded={18} p={16} mt={16}>
+            <XStack justify="space-between" items="center" mb={8}>
               <Text color="white" fontWeight="bold" fontSize={18}>Comments</Text>
               <TouchableOpacity>
                 <Text color="#1DB954" fontWeight="bold">Show all (6)</Text>
@@ -357,7 +357,7 @@ export default function PodcastDetailScreen({
               renderItem={renderCommentItem}
             />
             {/* Ô nhập bình luận */}
-          <XStack marginTop="$3">
+          <XStack mt="$3">
             <Input
               size="$3.5"
               borderWidth={0}
@@ -375,7 +375,7 @@ export default function PodcastDetailScreen({
               }}
               focusStyle={{
                 borderWidth: 0,
-                backgroundColor: "rgba(255, 255, 255, 0.3)",
+                bg: "rgba(255, 255, 255, 0.3)",
               }}
             />
           </XStack>
