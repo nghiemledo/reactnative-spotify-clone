@@ -47,6 +47,7 @@ jobs:
         env:
           DOCKER_BUILDKIT: 1
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DB_CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
         run: |
           # Build images với BuildKit
           docker-compose -f docker-compose.yml build \
