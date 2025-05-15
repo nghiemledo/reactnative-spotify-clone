@@ -12,7 +12,7 @@ interface AuthResponse {
   role: string;
 }
 
-const entity = "auth";
+const entity = "user";
 
 export const authServices = baseRestApi.injectEndpoints({
   endpoints: (builder) => ({
