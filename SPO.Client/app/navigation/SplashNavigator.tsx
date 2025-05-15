@@ -1,4 +1,3 @@
-import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import TabNavigator from "./TabNavigator";
 import LoginScreen from "../screens/LoginScreen";
@@ -21,7 +20,7 @@ export default function SplashNavigator() {
       <Stack.Screen
         name="Main"
         component={TabNavigator}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <Stack.Screen
         name="Login"
