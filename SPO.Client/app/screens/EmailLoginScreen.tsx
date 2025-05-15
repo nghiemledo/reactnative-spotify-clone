@@ -3,7 +3,7 @@ import { YStack, XStack, Button } from "tamagui";
 import { TouchableOpacity, StatusBar } from "react-native";
 import { ArrowLeft } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../navigation/AppNavigator";
 import EmailLoginForm from "../components/EmailLoginForm";
 
 type EmailLoginScreenNavigationProp = NativeStackNavigationProp<
@@ -11,27 +11,26 @@ type EmailLoginScreenNavigationProp = NativeStackNavigationProp<
   "EmailLogin"
 >;
 
-const EmailLoginScreen = ({
+export default function EmailLoginScreen({
   navigation,
 }: {
   navigation: EmailLoginScreenNavigationProp;
-}) => {
+}) {
   return (
-    <YStack flex={1} backgroundColor="#111" paddingHorizontal={24}  paddingTop={80} >
-
+    <YStack flex={1} bg="#111">
       <XStack
         position="absolute"
-        top={0}
-        left={0}
-        right={0}
+        t={0}
+        l={0}
+        r={0}
         height={60}
-        alignItems="center"
-        paddingHorizontal="$3"
-        backgroundColor="#000"
-        zIndex={1000}
-        paddingTop={StatusBar.currentHeight || 20}
+        items="center"
+        px="$3"
+        bg="#000"
+        z={1000}
+        pt={StatusBar.currentHeight || 20}
       >
-        <XStack flex={1} justifyContent="flex-start">
+        <XStack flex={1} justify="flex-start">
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={{ padding: 10 }}
@@ -41,10 +40,10 @@ const EmailLoginScreen = ({
               chromeless
               icon={<ArrowLeft color="white" />}
               color="white"
-              padding={0}
-              backgroundColor="transparent"
+              p={0}
+              bg="transparent"
               pressStyle={{
-                backgroundColor: "transparent",
+                bg: "transparent",
                 borderBlockColor: "transparent",
               }}
             />
@@ -58,6 +57,4 @@ const EmailLoginScreen = ({
       <EmailLoginForm navigation={navigation} />
     </YStack>
   );
-};
-
-export default memo(EmailLoginScreen);
+}
