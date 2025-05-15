@@ -2,7 +2,7 @@ import React from "react";
 import { YStack, Button, Text, Image, XStack } from "tamagui";
 import { Mail, Smartphone } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../navigation/AppNavigator";
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -22,7 +22,7 @@ export default function LoginScreen({
       padding="$4"
       space="$4"
     >
-        <YStack height={"50%"} alignItems="center" justifyContent="center">
+      <YStack height={"50%"} alignItems="center" justifyContent="center">
         <Text fontSize="$8" fontWeight="bold" color="#fff" marginBottom="$6">
           Spotify
         </Text>
