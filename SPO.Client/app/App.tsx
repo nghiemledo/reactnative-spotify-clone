@@ -10,10 +10,10 @@ import { PortalProvider } from "tamagui";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
-  // useEffect(() => {
-  //   setupPlayer();
-  //   playbackService();
-  // }, []);
+  useEffect(() => {
+    setupPlayer();
+    // playbackService();
+  }, []);
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
