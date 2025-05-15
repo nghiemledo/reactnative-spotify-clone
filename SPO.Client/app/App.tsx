@@ -1,45 +1,32 @@
-import { StyleSheet, Text } from "react-native";
-import { useFonts } from "expo-font";
-import React from "react";
-import { persistor, store } from "./store";
+import { TamaguiProvider } from "@tamagui/core";
+import AppNavigator from "./navigation/AppNavigator";
+import { config } from "./tamagui.config";
 import { Provider } from "react-redux";
+import { persistor, store } from "./store/index";
 import { PersistGate } from "redux-persist/integration/react";
-import Navigation from "./navigation";
-import { config } from "@tamagui/config";
-import { createTamagui, TamaguiProvider, View } from "tamagui";
+import { useEffect } from "react";
+import { playbackService, setupPlayer } from "./services/playerService";
+import { PortalProvider } from "tamagui";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function App() {
-  const [fontsLoaded] = useFonts({
-    CircularStd: require("./assets/fonts/CircularStd-Bold.ttf"),
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
-
-  const DefaultText = ({ children }: { children: React.ReactNode }) => (
-    <Text style={{ fontFamily: "CircularStd" }}>{children}</Text>
-  );
-
-  const cf = createTamagui(config);
-
-
+const App = () => {
+  useEffect(() => {
+    setupPlayer();
+    // playbackService();
+  }, []);
   return (
-    <TamaguiProvider config={cf}>
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <Navigation />
-        </PersistGate>
-      </Provider>
-    </TamaguiProvider>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <TamaguiProvider config={config}>
+          <PortalProvider>
+            <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }}>
+              <AppNavigator />
+            </SafeAreaView>
+          </PortalProvider>
+        </TamaguiProvider>
+      </PersistGate>
+    </Provider>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+export default App;

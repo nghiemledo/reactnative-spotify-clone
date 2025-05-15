@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "client",
-    "slug": "client",
+    "name": "app",
+    "slug": "app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -19,14 +19,39 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "versionCode": 1,
+      "package": "com.truong1510.app",
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ],
+      "jsEngine": "hermes",
+      "config": {
+        "usesCleartextTraffic": true,
+        "foregroundService": {
+          "type": "mediaPlayback"
+        }
+      },
+      "kotlinVersion": "1.9.22",
+      "splash": {
+        "backgroundColor": "#FFFFFF"
+      },
+      "gradleProps": {
+        "org.gradle.jvmargs": "-Xmx4g -XX:MaxMetaspaceSize=1g"
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
+      
     },
-    "plugins": [
-      "expo-font",
-      "expo-secure-store"
-    ]
+    
+    "extra": {
+      "eas": {
+        "projectId": "22179ceb-5dfa-4be1-9a96-323b018681e6"
+      }
+    }
   }
 }

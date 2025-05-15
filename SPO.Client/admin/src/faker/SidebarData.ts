@@ -6,14 +6,11 @@ import {
     ListMusic,
     Settings,
     BarChart4,
+    Component,
+    Mic,
 } from "lucide-react";
 
 export const SidebarData = {
-    user: {
-        name: "Admin",
-        email: "admin@spotifyclone.com",
-        avatar: "/avatars/admin.jpg",
-    },
     navMain: [
         {
             title: "Analytics",
@@ -55,12 +52,31 @@ export const SidebarData = {
             ],
         },
         {
+            title: "Genre Management",
+            url: "/admin/genres",
+            icon: Component,
+            items: [
+                { title: "All Genres", url: "/admin/genres" },
+                { title: "Add Genre", url: "/admin/genres/add" },
+            ],
+        },
+        {
             title: "Playlist Management",
             url: "/admin/playlists",
             icon: ListMusic,
             items: [
                 { title: "All Playlists", url: "/admin/playlists" },
                 { title: "Reported Playlists", url: "/admin/playlists/reports" },
+            ],
+        },
+        {
+            title: "Podcast Management",
+            url: "/admin/podcasts",
+            icon: Mic,
+            items: [
+                { title: "Category", url: "/admin/podcast-categories" },
+                { title: "Show", url: "/admin/podcast-shows" },
+                { title: "Episode", url: "/admin/podcast-episodes" },
             ],
         },
         {
