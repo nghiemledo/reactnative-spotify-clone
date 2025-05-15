@@ -1,8 +1,11 @@
-import { JSX, useRef } from "react";
-import { YStack, XStack, Text } from "tamagui";
+import { useCallback, useEffect, useRef } from "react";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import { Dimensions, TouchableOpacity } from "react-native";
+import { YStack, XStack, Text, Button } from "tamagui";
 import { Plus, Clock, QrCode } from "@tamagui/lucide-icons";
-import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-import { Portal } from "@tamagui/portal";
 
 interface PlayingBottomSheetProps {
   isOpen: boolean;
@@ -12,98 +15,95 @@ interface PlayingBottomSheetProps {
   onShowSpotifyCode: () => void;
 }
 
-const PlayingBottomSheet = ({
+const PlayingBottomSheet: React.FC<PlayingBottomSheetProps> = ({
   isOpen,
   onClose,
   onAddToPlaylist,
   onSleepTimer,
   onShowSpotifyCode,
-}: PlayingBottomSheetProps) => {
+}) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const screenHeight = Dimensions.get("window").height;
+  const snapPoints = ["30%"];
 
-  // Snap points for the BottomSheet
-  const snapPoints = ["25%", "50%"];
+  useEffect(() => {
+    if (isOpen) {
+      bottomSheetRef.current?.expand();
+    } else {
+      bottomSheetRef.current?.close();
+    }
+  }, [isOpen]);
 
-  // Open or close the BottomSheet based on isOpen prop
-  if (isOpen) {
-    bottomSheetRef.current?.expand();
-  } else {
-    bottomSheetRef.current?.close();
-  }
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        onPress={onClose}
+      />
+    ),
+    [onClose]
+  );
 
-  const renderBottomSheetContent = () => (
-    <YStack bg="$background" rounded="$5" p="$4" flex={1}>
-      <Text fontSize="$6" fontWeight="600" color="$color" mb="$4">
-        Options
-      </Text>
-      <YStack space="$3">
-        <XStack
-          items="center"
-          space="$3"
-          onPress={() => {
-            onAddToPlaylist();
-            onClose();
-          }}
-          pressStyle={{ opacity: 0.7 }}
-        >
-          <Plus size="$2" color="$color" />
-          <Text fontSize="$5" color="$color">
-            Add to Playlist
-          </Text>
-        </XStack>
-        <XStack
-          items="center"
-          space="$3"
-          onPress={() => {
-            onSleepTimer();
-            onClose();
-          }}
-          pressStyle={{ opacity: 0.7 }}
-        >
-          <Clock size="$2" color="$color" />
-          <Text fontSize="$5" color="$color">
-            Sleep Timer
-          </Text>
-        </XStack>
-        <XStack
-          items="center"
-          space="$3"
-          onPress={() => {
-            onShowSpotifyCode();
-            onClose();
-          }}
-          pressStyle={{ opacity: 0.7 }}
-        >
-          <QrCode size="$2" color="$color" />
-          <Text fontSize="$5" color="$color">
-            Show Spotify Code
-          </Text>
-        </XStack>
-      </YStack>
-    </YStack>
+  const handleSheetChange = useCallback(
+    (index: number) => {
+      if (index === -1) {
+        onClose();
+      }
+    },
+    [onClose]
   );
 
   return (
-    <Portal>
-      <BottomSheet
-        ref={bottomSheetRef}
-        snapPoints={snapPoints}
-        backdropComponent={(props: JSX.IntrinsicAttributes) => (
-          <BottomSheetBackdrop
-            {...props}
-            disappearsOnIndex={-1}
-            appearsOnIndex={0}
-            opacity={0.5}
-            onPress={onClose}
-          />
-        )}
-        backgroundStyle={{ backgroundColor: "transparent" }}
-        handleIndicatorStyle={{ backgroundColor: "$color" }}
-        onClose={onClose}
+    <BottomSheet
+      ref={bottomSheetRef}
+      index={isOpen ? 0 : -1}
+      snapPoints={snapPoints}
+      backdropComponent={renderBackdrop}
+      backgroundStyle={{ backgroundColor: "#1A1A1A" }}
+      handleIndicatorStyle={{ backgroundColor: "white" }}
+      onChange={handleSheetChange}
+      enablePanDownToClose={true}
+    >
+      <BottomSheetView
+        style={{
+          backgroundColor: "#1A1A1A",
+          paddingHorizontal: 20,
+          paddingTop: 20,
+          height: screenHeight * 0.3,
+        }}
       >
-        {renderBottomSheetContent()}
-      </BottomSheet>
-    </Portal>
+        <YStack gap="$4">
+          <TouchableOpacity onPress={onAddToPlaylist}>
+            <XStack items="center" gap="$3">
+              <Plus size="$2" color="white" />
+              <Text fontSize="$5" color="white">
+                Add to Playlist
+              </Text>
+            </XStack>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={onSleepTimer}>
+            <XStack items="center" gap="$3">
+              <Clock size="$2" color="white" />
+              <Text fontSize="$5" color="white">
+                Sleep Timer
+              </Text>
+            </XStack>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={onShowSpotifyCode}>
+            <XStack items="center" gap="$3">
+              <QrCode size="$2" color="white" />
+              <Text fontSize="$5" color="white">
+                Show Spotify Code
+              </Text>
+            </XStack>
+          </TouchableOpacity>
+        </YStack>
+      </BottomSheetView>
+    </BottomSheet>
   );
 };
 
