@@ -18,6 +18,18 @@ import AdminPage from '@/pages/admin/index';
 import ManagePlaylist from '@/pages/admin/playlist';
 import ManageAddPlaylist from '@/pages/admin/playlist/add';
 import ManageReportsPlaylist from '@/pages/admin/playlist/reports';
+import ManagePodcastCategories from '@/pages/admin/podcast/category';
+import ManageAddPodcastCategory from '@/pages/admin/podcast/category/add';
+import ManageEditPodcastCategory from '@/pages/admin/podcast/category/edit';
+import ManageViewPodcastCategory from '@/pages/admin/podcast/category/view';
+import ManagePodcastEpisodes from '@/pages/admin/podcast/episode';
+import ManageAddPodcastEpisode from '@/pages/admin/podcast/episode/add';
+import ManageEditPodcastEpisode from '@/pages/admin/podcast/episode/edit';
+import ManageViewPodcastEpisode from '@/pages/admin/podcast/episode/view';
+import ManagePodcastShows from '@/pages/admin/podcast/show';
+import ManageAddPodcastShow from '@/pages/admin/podcast/show/add';
+import ManageEditPodcastShow from '@/pages/admin/podcast/show/edit';
+import ManageViewPodcastShow from '@/pages/admin/podcast/show/view';
 import SettingGeneral from '@/pages/admin/setting/general';
 import SettingRoles from '@/pages/admin/setting/roles';
 import SettingStorage from '@/pages/admin/setting/storage';
@@ -68,6 +80,21 @@ const privateRoutes = [
     { path: `${privatePrefix}/playlists`, component: ManagePlaylist },
     { path: `${privatePrefix}/playlists/add`, component: ManageAddPlaylist },
     { path: `${privatePrefix}/playlists/reports`, component: ManageReportsPlaylist },
+
+    { path: `${privatePrefix}/podcast-categories`, component: ManagePodcastCategories },
+    { path: `${privatePrefix}/podcast-categories/:id`, component: ManageViewPodcastCategory },
+    { path: `${privatePrefix}/podcast-categories/add`, component: ManageAddPodcastCategory },
+    { path: `${privatePrefix}/podcast-categories/:id/edit`, component: ManageEditPodcastCategory },
+
+    { path: `${privatePrefix}/podcast-episodes`, component: ManagePodcastEpisodes },
+    { path: `${privatePrefix}/podcast-episodes/:id`, component: ManageViewPodcastEpisode },
+    { path: `${privatePrefix}/podcast-episodes/add`, component: ManageAddPodcastEpisode },
+    { path: `${privatePrefix}/podcast-episodes/:id/edit`, component: ManageEditPodcastEpisode },
+
+    { path: `${privatePrefix}/podcast-shows`, component: ManagePodcastShows },
+    { path: `${privatePrefix}/podcast-shows/:id`, component: ManageViewPodcastShow },
+    { path: `${privatePrefix}/podcast-shows/add`, component: ManageAddPodcastShow },
+    { path: `${privatePrefix}/podcast-shows/:id/edit`, component: ManageEditPodcastShow },
 
     { path: `${privatePrefix}/users`, component: ManageUser },
     { path: `${privatePrefix}/users/add`, component: ManageAddUser },
