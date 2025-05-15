@@ -1,6 +1,6 @@
 import React from "react";
-import { YStack, Button, Text, Image, XStack } from "tamagui";
-import { Mail, Smartphone } from "@tamagui/lucide-icons";
+import { YStack, XStack, Button, Text, Image } from "tamagui";
+import { ListMusic, Mail, Smartphone } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 
@@ -14,117 +14,113 @@ export default function LoginScreen({
 }: {
   navigation: LoginScreenNavigationProp;
 }) {
+  const handleEmailLogin = () => {
+    navigation.navigate("EmailLogin");
+  };
   return (
-    <YStack
-      flex={1}
-      alignItems="center"
-      backgroundColor="#000"
-      padding="$4"
-      space="$4"
-    >
-      <YStack height={"50%"} alignItems="center" justifyContent="center">
-        <Text fontSize="$8" fontWeight="bold" color="#fff" marginBottom="$6">
-          Spotify
-        </Text>
-        <Text fontSize="$9" textAlign="center" fontWeight="bold" color="#fff">
-          Đăng nhập đến Spotify
-        </Text>
-      </YStack>
-
-      <YStack width="100%" space="$3">
-        {[
-          {
-            icon: <Mail color="black" size="$2" />,
-            text: "Đăng nhập với email",
-            bg: "#1DB954",
-            textColor: "black",
-            onPress: () => navigation.navigate("EmailLogin"),
-            accessibilityLabel: "Đăng nhập bằng email",
-          },
-          {
-            icon: <Smartphone color="#fff" size="$2" />,
-            text: "Đăng nhập bằng số điện thoại",
-            bg: "transparent",
-            borderColor: "#fff",
-            borderWidth: 1,
-            textColor: "#fff",
-            // onPress: () => navigation.navigate('PhoneLogin'),
-            accessibilityLabel: "Đăng nhập bằng số điện thoại",
-          },
-          {
-            icon: (
-              <Image
-                source={require("../assets/logo-gg.png")}
-                width="$2"
-                height="$2"
-                resizeMode="contain"
-              />
-            ),
-            text: "Đăng nhập với Google",
-            bg: "transparent",
-            borderColor: "#fff",
-            borderWidth: 1,
-            textColor: "#fff",
-            // onPress: () => navigation.navigate('GoogleAuth'),
-            accessibilityLabel: "Đăng nhập bằng Google",
-          },
-        ].map(
-          (
-            {
-              icon,
-              text,
-              bg,
-              textColor,
-              borderColor,
-              borderWidth,
-              onPress,
-              accessibilityLabel,
-            },
-            index
-          ) => (
-            <Button
-              key={index}
-              backgroundColor={bg}
-              borderColor={borderColor}
-              borderWidth={borderWidth}
-              borderRadius="$10"
-              height="$5"
-              paddingVertical="$3"
-              width="100%"
-              flexDirection="row"
-              alignItems="center"
-              justifyContent="flex-start"
-              onPress={onPress}
-              accessibilityLabel={accessibilityLabel}
-            >
-              {icon}
-              <Text
-                color={textColor}
-                fontSize="$5"
-                flex={1}
-                textAlign="center"
-                fontWeight="bold"
-              >
-                {text}
-              </Text>
-            </Button>
-          )
-        )}
-      </YStack>
-
-      <XStack alignItems="center" justifyContent="center" marginTop="$4">
-        <Text color="#fff" fontSize="$4">
-          Bạn chưa có tài khoản?{" "}
-        </Text>
+    <YStack flex={1} items="center" bg="#000" p="$4">
+      <YStack height={"50%"} items="center" justify="center">
         <Text
-          color="#1DB954"
-          fontSize="$4"
+          fontSize="$9"
+          text="center"
           fontWeight="bold"
-          onPress={() => navigation.navigate("Main", { screen: "register" })}
+          color="#fff"
+          mb="$2"
         >
-          Đăng ký
+          Log in to Spotify
         </Text>
-      </XStack>
+      </YStack>
+
+      <YStack width={"100%"} justify="center">
+        <Button
+          bg="#1DB954"
+          rounded="$10"
+          my="$2"
+          py="$3"
+          height="$5"
+          width="100%"
+          flexDirection="row"
+          items="center"
+          justify="flex-start"
+          onPress={handleEmailLogin}
+        >
+          <Mail color="black" size="$2" />
+          <Text
+            color="black"
+            fontSize="$5"
+            flex={1}
+            text="center"
+            fontWeight="bold"
+          >
+            Continue with email
+          </Text>
+        </Button>
+        <Button
+          bg="transparent"
+          borderColor="#fff"
+          borderWidth={1}
+          rounded="$10"
+          height="$5"
+          my="$2"
+          py="$3"
+          width="100%"
+          flexDirection="row"
+          items="center"
+          justify="flex-start"
+        >
+          <Smartphone color="#fff" size="$2" />
+          <Text
+            color="#fff"
+            fontSize="$5"
+            flex={1}
+            text="center"
+            fontWeight="bold"
+          >
+            Continue with phone number
+          </Text>
+        </Button>
+        <Button
+          bg="transparent"
+          borderColor="#fff"
+          borderWidth={1}
+          rounded="$10"
+          my="$2"
+          height="$5"
+          py="$3"
+          width="100%"
+          flexDirection="row"
+          items="center"
+          justify="flex-start"
+        >
+          <Image
+            source={require("../assets/logo-gg.png")}
+            height={"$3"}
+            width={"$3"}
+          />
+          <Text
+            color="#fff"
+            fontSize="$5"
+            flex={1}
+            text="center"
+            fontWeight="bold"
+          >
+            Continue with Google
+          </Text>
+        </Button>
+        <XStack items="center" justify="center" mt="$4">
+          <Text color="#fff" fontSize="$4">
+            Don't have an account?{" "}
+          </Text>
+          <Text
+            color="#1DB954"
+            fontSize="$4"
+            fontWeight="bold"
+            onPress={() => navigation.navigate("register")}
+          >
+            Sign up
+          </Text>
+        </XStack>
+      </YStack>
     </YStack>
   );
 }
