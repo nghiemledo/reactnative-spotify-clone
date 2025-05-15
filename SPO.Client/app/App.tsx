@@ -7,6 +7,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { useEffect } from "react";
 import { playbackService, setupPlayer } from "./services/playerService";
 import { PortalProvider } from "tamagui";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
   // useEffect(() => {
@@ -17,8 +18,10 @@ const App = () => {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <TamaguiProvider config={config}>
-           <PortalProvider>
-          <AppNavigator />
+          <PortalProvider>
+            <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }}>
+              <AppNavigator />
+            </SafeAreaView>
           </PortalProvider>
         </TamaguiProvider>
       </PersistGate>
