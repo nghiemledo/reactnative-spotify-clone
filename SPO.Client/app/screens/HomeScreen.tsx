@@ -43,10 +43,32 @@ const SafeImage = ({ uri, ...props }: any) => {
   );
 };
 
+
+const relaxationItems = [
+  {
+    id: "1",
+    title: "Êm Đêm",
+    artists: "Thư giãn cùng nhịp giai điệu du em",
+    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+  },
+  {
+    id: "2",
+    title: "Lofi Chill Điệu Thu Giãn",
+    artists: "Slacker Jack's, cakofonic, CHU VAN CONG",
+    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+  },
+  {
+    id: "3",
+    title: "Thoải",
+    artists: "Kend Eilish",
+    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+  },
+];
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Home"
 >;
+
 
 type Section = {
   id: string;
@@ -79,6 +101,301 @@ export default function HomeScreen({
     error: songsError,
   } = useGetSongsQuery();
 
+
+export default function HomeScreen() {
+  const scrollY = React.useRef(new Animated.Value(0)).current;
+  const [selectedButton, setSelectedButton] = useState("All");
+  const handleButtonPress = (buttonName: string) => setSelectedButton(buttonName);
+
+  return (
+    <YStack flex={1} backgroundColor="#000">
+      <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+      >
+        <YStack flex={1} backgroundColor="transparent" padding={20} marginTop={StatusBar.currentHeight || 0}>
+          {/* Filter Buttons */}
+          <XStack alignItems="center" space={12} marginBottom={24}>
+          <Avatar circular size="$4">
+              <Avatar.Image
+                accessibilityLabel="User Avatar"
+                src="https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg"
+              />
+              <Avatar.Fallback backgroundColor="$blue10" />
+            </Avatar>
+            <Button
+              backgroundColor={selectedButton === "All" ? "#1DB954" : "#23272b"}
+              borderRadius={24}
+              paddingHorizontal={20}
+              paddingVertical={10}
+              onPress={() => handleButtonPress("All")}
+            >
+              <Text color={selectedButton === "All" ? "black" : "white"} fontWeight="bold">All</Text>
+            </Button>
+            <Button
+              backgroundColor={selectedButton === "Music" ? "#1DB954" : "#23272b"}
+              borderRadius={24}
+              paddingHorizontal={20}
+              paddingVertical={10}
+              onPress={() => handleButtonPress("Music")}
+            >
+              <Text color={selectedButton === "Music" ? "black" : "white"} fontWeight="bold">Music</Text>
+            </Button>
+            <Button
+              backgroundColor={selectedButton === "Podcasts" ? "#1DB954" : "#23272b"}
+              borderRadius={24}
+              paddingHorizontal={20}
+              paddingVertical={10}
+              onPress={() => handleButtonPress("Podcasts")}
+            >
+              <Text color={selectedButton === "Podcasts" ? "black" : "white"} fontWeight="bold">Podcasts</Text>
+            </Button>
+          </XStack>
+
+          {/* Popular radio */}
+          <XStack justifyContent="space-between" alignItems="center" marginBottom={12}>
+            <Text fontSize={24} fontWeight="bold" color="white">Popular radio</Text>
+            <Text color="#b3b3b3" fontWeight="bold">Show all</Text>
+          </XStack>
+          <FlatList
+            data={radioItems}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={item => item.id}
+            contentContainerStyle={{ paddingBottom: 8 }}
+            renderItem={({ item }) => (
+              <TouchableOpacity>
+                <YStack width={170} marginRight={16}>
+                  <Image source={{ uri: item.image }} width={170} height={170} borderRadius={18} />
+                  <Text color="white" fontWeight="bold" marginTop={8} fontSize={16}>{item.title}</Text>
+                  <Text color="#b3b3b3" fontSize={13}>{item.artists}</Text>
+                </YStack>
+              </TouchableOpacity>
+            )}
+          />
+
+          {/* Your recent rotation */}
+          <XStack justifyContent="space-between" alignItems="center" marginTop={32} marginBottom={12}>
+            <Text fontSize={24} fontWeight="bold" color="white">Your recent rotation</Text>
+            <Text color="#b3b3b3" fontWeight="bold">Show all</Text>
+          </XStack>
+          <YStack>
+            {recentItems.map(item => (
+              <XStack key={item.id} alignItems="center" justifyContent="space-between" marginBottom={16}>
+                <XStack alignItems="center" gap={12} flex={1}>
+                  <Image source={{ uri: item.image }} width={56} height={56} borderRadius={12} />
+                  <YStack flex={1}>
+                    <Text fontSize={16} fontWeight="bold" color="white">{item.title}</Text>
+                    <Text fontSize={13} color="#b3b3b3">{item.artists}</Text>
+                  </YStack>
+                </XStack>
+                <Button backgroundColor="transparent" padding={0} icon={<Play size={24} color="white" />} />
+              </XStack>
+            ))}
+          </YStack>
+
+          {/* Popular albums and singles */}
+          <XStack justifyContent="space-between" alignItems="center" marginTop={32} marginBottom={12}>
+            <Text fontSize={24} fontWeight="bold" color="white">Popular albums and singles</Text>
+            <Text color="#b3b3b3" fontWeight="bold">Show all</Text>
+          </XStack>
+          <FlatList
+            data={albumItems}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={item => item.id}
+            contentContainerStyle={{ paddingBottom: 8 }}
+            renderItem={({ item }) => (
+              <TouchableOpacity>
+                <YStack width={170} marginRight={16}>
+                  <Image source={{ uri: item.image }} width={170} height={170} borderRadius={18} />
+                  <Text color="white" fontWeight="bold" marginTop={8} fontSize={16}>{item.title}</Text>
+                  <Text color="#b3b3b3" fontSize={13}>{item.artists}</Text>
+                </YStack>
+              </TouchableOpacity>
+            )}
+          />
+
+          {/* Popular artists */}
+          <XStack justifyContent="space-between" alignItems="center" marginTop={32} marginBottom={12}>
+            <Text fontSize={24} fontWeight="bold" color="white">Popular artists</Text>
+            <Text color="#b3b3b3" fontWeight="bold">Show all</Text>
+          </XStack>
+          <FlatList
+            data={artistItems}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={item => item.id}
+            contentContainerStyle={{ paddingBottom: 8 }}
+            renderItem={({ item }) => (
+              <TouchableOpacity>
+                <YStack width={110} marginRight={16} alignItems="center">
+                  <Image source={{ uri: item.image }} width={110} height={110} borderRadius={55} />
+                  <Text color="white" fontWeight="bold" marginTop={8} fontSize={15} textAlign="center">{item.title}</Text>
+                </YStack>
+              </TouchableOpacity>
+            )}
+          />
+
+          {/* Charts */}
+          <XStack justifyContent="space-between" alignItems="center" marginTop={32} marginBottom={12}>
+            <Text fontSize={24} fontWeight="bold" color="white">Charts</Text>
+            <Text color="#b3b3b3" fontWeight="bold">Show all</Text>
+          </XStack>
+          <FlatList
+            data={chartItems}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={item => item.id}
+            contentContainerStyle={{ paddingBottom: 8 }}
+            renderItem={({ item }) => (
+              <TouchableOpacity>
+                <YStack width={170} marginRight={16}>
+                  <Image source={{ uri: item.image }} width={170} height={170} borderRadius={18} />
+                  <Text color="white" fontWeight="bold" marginTop={8} fontSize={16}>{item.title}</Text>
+                  <Text color="#b3b3b3" fontSize={13}>{item.artists}</Text>
+                </YStack>
+              </TouchableOpacity>
+            )}
+          />
+
+          {/* Made For ... */}
+          <XStack justifyContent="space-between" alignItems="center" marginTop={32} marginBottom={12}>
+            <Text fontSize={24} fontWeight="bold" color="white">Made For Trà Nguyễn Văn Nhựt</Text>
+            <Text color="#b3b3b3" fontWeight="bold">Show all</Text>
+          </XStack>
+          <FlatList
+            data={uniquelyYoursItems}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={item => item.id}
+            contentContainerStyle={{ paddingBottom: 8 }}
+            renderItem={({ item }) => (
+              <TouchableOpacity>
+                <YStack width={170} marginRight={16}>
+                  <Image source={{ uri: item.image }} width={170} height={170} borderRadius={18} />
+                  <Text color="white" fontWeight="bold" marginTop={8} fontSize={16}>{item.title}</Text>
+                  <Text color="#b3b3b3" fontSize={13}>{item.artists}</Text>
+                </YStack>
+              </TouchableOpacity>
+            )}
+          />
+
+          {/* Find your next favorite song */}
+          <XStack justifyContent="space-between" alignItems="center" marginTop={32} marginBottom={12}>
+            <Text fontSize={24} fontWeight="bold" color="white">Find your next favorite song</Text>
+            <Text color="#b3b3b3" fontWeight="bold">Show all</Text>
+          </XStack>
+          <FlatList
+            data={newReleasesItems.slice(0, 3)}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={item => item.id}
+            contentContainerStyle={{ paddingBottom: 8 }}
+            renderItem={({ item }) => (
+              <TouchableOpacity>
+                <YStack width={170} marginRight={16}>
+                  <Image source={{ uri: item.image }} width={170} height={170} borderRadius={18} />
+                  <Text color="white" fontWeight="bold" marginTop={8} fontSize={16}>Similar to {item.title}</Text>
+                  <Text color="#b3b3b3" fontSize={13}>{item.artists}</Text>
+                </YStack>
+              </TouchableOpacity>
+            )}
+          />
+
+          {/* New releases for you */}
+          <XStack justifyContent="space-between" alignItems="center" marginTop={32} marginBottom={12}>
+            <Text fontSize={24} fontWeight="bold" color="white">New releases for you</Text>
+            <Text color="#b3b3b3" fontWeight="bold">Show all</Text>
+          </XStack>
+          <FlatList
+            data={newReleasesItems}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={item => item.id}
+            contentContainerStyle={{ paddingBottom: 8 }}
+            renderItem={({ item }) => (
+              <TouchableOpacity>
+                <YStack width={170} marginRight={16}>
+                  <Image source={{ uri: item.image }} width={170} height={170} borderRadius={18} />
+                  <Text color="white" fontWeight="bold" marginTop={8} fontSize={16}>{item.title}</Text>
+                  <Text color="#b3b3b3" fontSize={13}>{item.artists}</Text>
+                </YStack>
+              </TouchableOpacity>
+            )}
+          />
+          {/* Podcasts Section */}
+          <XStack justifyContent="space-between" alignItems="center" marginTop={32} marginBottom={12}>
+            <Text fontSize={24} fontWeight="bold" color="white">Podcasts</Text>
+            <Text color="#b3b3b3" fontWeight="bold">Show all</Text>
+          </XStack>
+          <FlatList
+            data={podcastItems}
+            keyExtractor={item => item.id}
+            contentContainerStyle={{ paddingBottom: 32 }}
+            renderItem={({ item }) => (
+              <TouchableOpacity>
+                <YStack
+                  backgroundColor="#23272b"
+                  padding={20}
+                  borderRadius={24}
+                  marginBottom={20}
+                  alignItems="center"
+                >
+                  <Image
+                    source={{ uri: item.image }}
+                    width={120}
+                    height={120}
+                    borderRadius={16}
+                  />
+                  <Text
+                    color="white"
+                    fontSize={20}
+                    fontWeight="bold"
+                    textAlign="center"
+                    marginTop={16}
+                    numberOfLines={2}
+                  >
+                    {item.title}
+                  </Text>
+                  <Text
+                    color="#b3b3b3"
+                    fontSize={15}
+                    marginTop={4}
+                    textAlign="center"
+                  >
+                    {item.artists}
+                  </Text>
+                  <Text
+                    color="#b3b3b3"
+                    fontSize={13}
+                    marginTop={2}
+                    textAlign="center"
+                  >
+                    {item.date}
+                  </Text>
+                  <Text
+                    color="#b3b3b3"
+                    fontSize={13}
+                    marginTop={8}
+                    numberOfLines={3}
+                    textAlign="center"
+                  >
+                    {item.description}
+                  </Text>
+                  <XStack marginTop={16} width="100%" justifyContent="space-between" alignItems="center">
+                    <Button backgroundColor="#333" borderRadius={16} paddingHorizontal={16}>
+                      <Text color="white" fontSize={13}>Preview episode</Text>
+                    </Button>
+                    <Button backgroundColor="#1DB954" borderRadius={100} width={48} height={48} icon={<Play size={28} color="black" fill="black" />} />
+                  </XStack>
+                </YStack>
+              </TouchableOpacity>
   const {
     data: albums = [],
     isLoading: isAlbumsLoading,
