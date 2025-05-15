@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { YStack, XStack, Text, Checkbox } from "tamagui";
 import { Linking, TouchableOpacity } from "react-native";
-import { CheckIcon } from "lucide-react-native";
+import { Check as CheckIcon } from "@tamagui/lucide-icons";
 import { CheckedState } from "tamagui";
 
 interface TermsAndPreferencesComponentProps {
@@ -43,7 +43,7 @@ export const TermsAndPreferencesComponent: React.FC<TermsAndPreferencesComponent
   };
 
   return (
-    <YStack marginTop="$4" alignItems="flex-start" gap={"$3"} height={"50%"}>
+    <YStack mt="$4" items="flex-start" gap={"$3"} height={"50%"}>
       <Text color="#fff" fontSize="$1" fontWeight={"bold"}>
         Bằng việc nhấn vào "Tạo tài khoản", bạn đồng ý với Điều khoản sử dụng
         và Chính sách quyền riêng tư của chúng tôi.
@@ -64,8 +64,8 @@ export const TermsAndPreferencesComponent: React.FC<TermsAndPreferencesComponent
           Chính sách quyền riêng tư
         </Text>
       </TouchableOpacity>
-      <XStack alignItems="center" justifyContent="space-between" width="100%">
-        <Text color="#fff" fontSize="$1" fontWeight="bold" flex={1} marginRight={"$3"}>
+      <XStack items="center" justify="space-between" width="100%">
+        <Text color="#fff" fontSize="$1" fontWeight="bold" flex={1} mr={"$3"}>
           Tôi không muốn nhận tin nhắn tiếp thị từ ứng dụng này.
         </Text>
         <Checkbox
@@ -86,8 +86,8 @@ export const TermsAndPreferencesComponent: React.FC<TermsAndPreferencesComponent
           </Checkbox.Indicator>
         </Checkbox>
       </XStack>
-      <XStack alignItems="center" justifyContent="space-between" width="100%">
-        <Text color="#fff" fontSize="$1" fontWeight="bold" flex={1} marginRight={"$3"}>
+      <XStack items="center" justify="space-between" width="100%">
+        <Text color="#fff" fontSize="$1" fontWeight="bold" flex={1} mr={"$3"}>
           Chia sẻ dữ liệu đăng ký của tôi với các nhà cung cấp nội dung chúng tôi nhằm mục đích tiếp thị.
         </Text>
         <Checkbox
