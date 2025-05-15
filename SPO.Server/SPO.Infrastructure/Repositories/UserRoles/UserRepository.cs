@@ -79,7 +79,7 @@ namespace SPO.Infrastructure.Repositories.UserRoles
 
         public async Task<Role?> GetRoleByUserId(string id)
         {
-            IEnumerable<Role> result = await _db.GetData<Role, dynamic>("[SP_SPO_GetRoleByUserId]", new { Id = id });
+            IEnumerable<Role> result = await _db.GetData<Role, dynamic>("[SP_SPO_GetRoleByUserId]", new { UserId = id });
             return result.FirstOrDefault();
         }
     }

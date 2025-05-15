@@ -8,5 +8,6 @@ namespace SPO.Domain.Entities.UserRoles
         public string? LoginProvider { get; set; }
         public string? Name { get; set; }
         public string? Value { get; set; }
+        public DateTimeOffset? Expires { get; set; }
     }
 }

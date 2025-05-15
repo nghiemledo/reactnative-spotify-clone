@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SPO.Infrastructure.Dappers.Base;
+using SPO.Infrastructure.Repositories;
 using SPO.Infrastructure.Repositories.UserRoles;
 
 namespace SPO.Infrastructure.Extensions
@@ -8,7 +9,6 @@ namespace SPO.Infrastructure.Extensions
     {
         public static void AddRepositories(this IServiceCollection services)
         {
-            // Register custom repositories
             AddRepository(services);
         }
         public static void AddRepository(this IServiceCollection services)
@@ -17,7 +17,18 @@ namespace SPO.Infrastructure.Extensions
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+            services.AddScoped<IUserTokenRepository, UserTokenRepository>();
             //services.AddScoped<IFunctionRepository, FunctionRepository>();
+            services.AddScoped<IArtistRepository, ArtistRepository>();
+            services.AddScoped<IGenreRepository, GenreRepository>();
+            services.AddScoped<IAlbumRepository, AlbumRepository>();
+            services.AddScoped<ISongRepository, SongRepository>();
+            services.AddScoped<IPlaylistRepository, PlaylistRepository>();
+            services.AddScoped<IPlaylistItemRepository, PlaylistItemRepository>();
+            services.AddScoped<IPodcastCategoryRepository, PodcastCategoryRepository>();
+            services.AddScoped<IPodcastShowRepository, PodcastShowRepository>();
+            services.AddScoped<IPodcastEpisodeRepository, PodcastEpisodeRepository>();
+
         }
     }
 }
