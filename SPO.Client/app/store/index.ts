@@ -16,7 +16,6 @@ const persistConfig = {
 const persistedPlayerReducer = persistReducer(persistConfig, playerReducer);
 const persistedAuthReducer = persistReducer(persistConfig, authReducer);
 
-// Cấu hình store
 export const store = configureStore({
   reducer: {
     player: persistedPlayerReducer,
