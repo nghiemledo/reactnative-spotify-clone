@@ -3,9 +3,8 @@ import { YStack, XStack, Text, Avatar } from "tamagui";
 import { User, Volume2, BarChart2, Info } from "@tamagui/lucide-icons";
 import { StatusBar, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../navigation/AppNavigator";
+import { RootStackParamList } from "../navigation/AppNavigator";
 
-// Sidebar Item Component
 const SidebarItem = ({
   icon,
   title,
@@ -16,12 +15,7 @@ const SidebarItem = ({
   onPress: () => void;
 }) => (
   <TouchableOpacity onPress={onPress}>
-    <XStack
-      items="center"
-      gap={12}
-      py={12}
-      px={16}
-    >
+    <XStack items="center" gap={12} py={12} px={16}>
       {icon}
       <Text color="white" fontSize={16}>
         {title}
@@ -44,8 +38,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navigation }) => {
     >
       <TouchableOpacity
         onPress={() => {
-          onClose(); // Đóng sidebar
-          navigation.navigate("Profile"); // Chuyển hướng ngay lập tức
+          onClose();
+          navigation.navigate("Profile");
         }}
       >
         <XStack
@@ -71,36 +65,29 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navigation }) => {
           </YStack>
         </XStack>
       </TouchableOpacity>
-      <SidebarItem
-        icon={<Volume2 color="#fff" size={24} />}
-        title="Add account"
-        onPress={() => {
-          onClose(); // Đóng sidebar
-          navigation.navigate("AddAccount"); // Chuyển hướng ngay lập tức
-        }}
-      />
+
       <SidebarItem
         icon={<BarChart2 color="#fff" size={24} />}
         title="What's new"
         onPress={() => {
-          onClose(); // Đóng sidebar
-          navigation.navigate("WhatsNew"); // Chuyển hướng ngay lập tức
+          onClose();
+          navigation.navigate("WhatsNew");
         }}
       />
       <SidebarItem
         icon={<Info color="#fff" size={24} />}
         title="Recents"
         onPress={() => {
-          onClose(); // Đóng sidebar
-          navigation.navigate("Recents"); // Chuyển hướng ngay lập tức
+          onClose();
+          navigation.navigate("Recents");
         }}
       />
       <SidebarItem
         icon={<User color="#fff" size={24} />}
         title="Settings and privacy"
         onPress={() => {
-          onClose(); // Đóng sidebar
-          navigation.navigate("Settings"); // Chuyển hướng ngay lập tức
+          onClose();
+          navigation.navigate("Settings");
         }}
       />
     </YStack>

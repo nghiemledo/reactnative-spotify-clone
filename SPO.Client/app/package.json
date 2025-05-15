@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "app", 
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
@@ -14,6 +14,7 @@
     "@react-native-community/slider": "^4.5.6",
     "@react-navigation/bottom-tabs": "^7.3.12",
     "@react-navigation/native": "^7.1.8",
+    "@react-navigation/native-stack": "^7.3.13",
     "@react-navigation/stack": "^6.3.29",
     "@reduxjs/toolkit": "^2.8.1",
     "@tamagui/animations-moti": "^1.126.12",
@@ -34,17 +35,18 @@
     "react": "18.2.0",
     "react-dom": "^19.1.0",
     "react-native": "0.75.1",
+    "react-native-draggable-flatlist": "^4.0.3",
     "react-native-gesture-handler": "^2.25.0",
     "react-native-reanimated": "^3.17.5",
     "react-native-safe-area-context": "^5.4.0",
     "react-native-screens": "^4.10.0",
     "react-native-svg": "^15.11.2",
+    "react-native-toast-message": "^2.3.0",
     "react-native-track-player": "3.2.0",
     "react-native-web": "^0.20.0",
     "react-redux": "^9.2.0",
     "redux-persist": "^6.0.0",
     "tamagui": "^1.126.12"
-    
   },
   "devDependencies": {
     "@babel/core": "7.27.1",
@@ -56,5 +58,6 @@
     "@babel/core": "7.27.1",
     "babel-core": "7.27.1"
   },
-  "private": true
+  "private": true,
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
