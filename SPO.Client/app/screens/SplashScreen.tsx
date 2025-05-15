@@ -2,7 +2,6 @@ import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { YStack, View, Image } from "tamagui";
 import { MotiView } from "moti";
-import { Svg, Circle, Path } from "react-native-svg";
 import { RootState, useAppSelector } from "../store";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { SlpashStackParamList } from "../navigation/SplashNavigator";
@@ -14,11 +13,11 @@ const SplashScreen = () => {
 
   React.useEffect(() => {
     setTimeout(() => {
-      // if (user) {
-      navigation.navigate("Main");
-      // } else {
-      //   navigation.navigate("Login");
-      // }
+      if (user) {
+        navigation.navigate("Main");
+      } else {
+        navigation.navigate("Login");
+      }
     }, 2000);
   }, [user, navigation]);
 
