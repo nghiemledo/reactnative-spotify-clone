@@ -14,9 +14,13 @@ import {
   Download,
   BarChart2,
   Info,
+  LogOut,
 } from "@tamagui/lucide-icons";
 import { StatusBar } from "react-native";
 import { RootStackParamList } from "../navigation/AppNavigator";
+import { HomeStackParamList } from "../navigation/HomeNavigator";
+import { useAppDispatch } from "../store";
+import { logout } from "../store/authSlice";
 
 // Settings Item Component
 const SettingsItem = ({
@@ -31,7 +35,7 @@ const SettingsItem = ({
   onPress: () => void;
 }) => (
   <TouchableOpacity onPress={onPress}>
-    <XStack alignItems="flex-start" gap={16}>
+    <XStack items="flex-start" gap={16}>
       {icon}
       <YStack>
         <Text color="white" fontWeight="bold" fontSize={16}>
@@ -46,7 +50,7 @@ const SettingsItem = ({
 );
 
 type SettingsScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+  HomeStackParamList,
   "Settings"
 >;
 
@@ -55,13 +59,8 @@ export default function SettingsScreen({
 }: {
   navigation: SettingsScreenNavigationProp;
 }) {
+  const dispatch = useAppDispatch();
   const settingsOptions = [
-    {
-      icon: <User color="#fff" size={24} />,
-      title: "Account",
-      subtitle: "Username",
-      onPress: () => navigation.navigate("Account"),
-    },
     {
       icon: <Music color="#fff" size={24} />,
       title: "Content and display",
@@ -116,65 +115,54 @@ export default function SettingsScreen({
       subtitle: "Version • Privacy Policy",
       onPress: () => navigation.navigate("About"),
     },
+    {
+      icon: <LogOut color="#fff" size={24} />,
+      title: "Logout",
+      subtitle: "",
+      onPress: () => {
+        dispatch(logout());
+        navigation.navigate("Login");
+      },
+    },
   ];
 
   return (
-    <YStack
-      flex={1}
-      backgroundColor="#111"
-      paddingTop={StatusBar.currentHeight}
-    >
-      <StatusBar barStyle="light-content" backgroundColor="#111" />
+    <YStack flex={1} bg="#111" pt={StatusBar.currentHeight}>
       {/* Header */}
       <XStack
-        alignItems="center"
-        justifyContent="space-between"
-        paddingHorizontal={16}
+        items="center"
+        justify="space-between"
+        px={16}
         height={60}
-        backgroundColor="#222"
+        bg="#222"
       >
         <Button
           chromeless
           icon={<ArrowLeft size={24} />}
           size="$4"
           color="white"
-          backgroundColor="transparent"
-          padding={0}
+          bg="transparent"
+          p={0}
           onPress={() => navigation.goBack()}
         />
         <Text color="white" fontSize={20} fontWeight="bold">
           Settings
         </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("")}>
-          <Button
-            chromeless
-            icon={<Search size={24} />}
-            size="$4"
-            color="white"
-            backgroundColor="transparent"
-            padding={0}
-          />
-        </TouchableOpacity>
       </XStack>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <YStack padding={24}>
+        <YStack p={24}>
           {/* Free account & Go Premium */}
-          <YStack alignItems="center" justifyContent="center">
-            <Text
-              color="white"
-              fontSize={18}
-              fontWeight="bold"
-              marginBottom={24}
-            >
+          <YStack items="center" justify="center">
+            <Text color="white" fontSize={18} fontWeight="bold" mb={24}>
               Free account
             </Text>
             <Button
-              backgroundColor="#fff"
-              borderRadius={24}
+              bg="#fff"
+              rounded={24}
               height={38}
-              paddingHorizontal={20}
-              paddingVertical={5}
-              marginBottom={32}
+              px={20}
+              py={5}
+              mb={32}
               onPress={() => navigation.navigate("Premium")}
             >
               <Text color="#111" fontSize={12} fontWeight="bold">
@@ -192,14 +180,14 @@ export default function SettingsScreen({
 
           {/* Log out button */}
           <Button
-            backgroundColor="#fff"
-            borderRadius={24}
+            bg="#fff"
+            rounded={24}
             height={38}
-            alignSelf="center"
-            marginTop={24}
-            marginBottom={40}
-            paddingHorizontal={20}
-            paddingVertical={5}
+            self={"center"}
+            mt={24}
+            mb={40}
+            px={20}
+            py={5}
             onPress={() => navigation.navigate("Login")}
           >
             <Text color="#111" fontSize={11} fontWeight="bold">
