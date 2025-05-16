@@ -6,6 +6,7 @@ import { RootState, useAppSelector } from "../store";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { SlpashStackParamList } from "../navigation/SplashNavigator";
 import { Text } from "tamagui";
+import { HomeStackParamList } from "../navigation/HomeNavigator";
 
 const SplashScreen = () => {
   const navigation = useNavigation<NavigationProp<SlpashStackParamList>>();
@@ -14,7 +15,7 @@ const SplashScreen = () => {
   React.useEffect(() => {
     setTimeout(() => {
       if (user) {
-        navigation.navigate("Main");
+        navigation.navigate("Home");
       } else {
         navigation.navigate("Login");
       }

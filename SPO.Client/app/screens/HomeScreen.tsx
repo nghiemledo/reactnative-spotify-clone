@@ -57,7 +57,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const [selectedButton, setSelectedButton] = useState("All");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const user = useAppSelector((state) => state.auth.user);
-
   const sidebarAnim = useRef(
     new Animated.Value(-Dimensions.get("window").width * 0.75)
   ).current;
@@ -88,6 +87,12 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     }).start();
     setIsSidebarOpen(!isSidebarOpen);
   };
+  const hanldeNavigation = <T extends keyof RootStackParamList>(
+    screen: T,
+    params?: RootStackParamList[T]
+  ) => {
+    navigation.navigate({ name: screen as any, params });
+  };
 
   const handleButtonPress = (button: string) => {
     setSelectedButton(button);
@@ -103,7 +108,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
   const renderArtistItem = ({ item }: { item: Artist }) => (
     <YStack mr="$4" width={120} items="center">
-      <SafeImage uri={user?.urlAvatar} width={100} height={100} rounded={50} />
+      <SafeImage uri={item?.urlAvatar} width={100} height={100} rounded={50} />
       <Text color="white" fontWeight="600" mt="$2" numberOfLines={1}>
         {item.name}
       </Text>
@@ -112,7 +117,11 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
   // Render item cho Albums
   const renderAlbumItem = ({ item }: { item: Album }) => (
-    <YStack mr="$4" width={150}>
+    <YStack
+      mr="$4"
+      width={150}
+      onPress={() => hanldeNavigation("Album", { id: item.id })}
+    >
       <SafeImage uri={item.coverImage} width={150} height={150} rounded={8} />
       <Text color="white" fontWeight="600" mt="$2" numberOfLines={1}>
         {item.title}
