@@ -5,11 +5,12 @@ import SplashScreen from "../screens/SplashScreen";
 import EmailLoginScreen from "../screens/auth/login/EmailLoginScreen";
 import RegisterScreen from "../screens/auth/register/RegisterScreen";
 import EmailRegisterScreen from "../screens/auth/register/EmailRegisterScreen";
+import HomeNavigator from "./HomeNavigator";
 
 const Stack = createStackNavigator();
 export type SlpashStackParamList = {
   Splash: undefined;
-  Main: undefined;
+  Home: undefined;
   Login: undefined;
   Register: undefined;
   EmailLogin: undefined;
@@ -24,7 +25,7 @@ export default function SplashNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Main"
+        name="Home"
         component={TabNavigator}
         options={{ headerShown: false, gestureEnabled: false }}
       />

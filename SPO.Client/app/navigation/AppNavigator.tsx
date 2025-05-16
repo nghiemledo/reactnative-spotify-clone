@@ -4,6 +4,7 @@ import * as React from "react";
 import AddSongPlaylistScreen from "../screens/playlists/AddSongPlaylistScreen";
 import UpdateSongPlaylistScreen from "../screens/playlists/UpdateSongPlaylistScreen";
 import SplashNavigator from "./SplashNavigator";
+import AlbumScreen from "../screens/AlbumScreen";
 
 const Stack = createStackNavigator();
 
@@ -11,6 +12,8 @@ export type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Register: undefined;
+  EmailLogin: undefined;
+  EmailRegister: undefined;
   detailPlaylist: undefined;
   addSongPlaylist: undefined;
   updateSongPlaylist: undefined;
@@ -32,6 +35,11 @@ export default function AppNavigator() {
         <Stack.Screen
           name="SplashNavigator"
           component={SplashNavigator}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Album"
+          component={AlbumScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
