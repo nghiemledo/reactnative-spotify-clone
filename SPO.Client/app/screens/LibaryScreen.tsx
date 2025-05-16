@@ -71,7 +71,7 @@ const initialData: Data[] = [
   },
   {
     id: 4,
-    type: "playlist",
+    type: "playlists",
     name: "playlist",
     artists: [
       { id: 1, name: "MANBO" },

@@ -45,7 +45,7 @@ const DataList = ({ data, onItemPress }: DataListProps) => {
                 >
                   {item.type}
                   {item.artists
-                    ? " • " + item.artists.map((artist) => artist.name).join(", ")
+                    ? "•" + item.artists.map((artist) => artist.name).join(", ")
                     : ""}
                 </Text>
               </YStack>

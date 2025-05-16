@@ -90,7 +90,7 @@ const SortBottomSheet: React.FC<SortBottomSheetProps> = ({
           pb="$2"
           borderBottomWidth={1}
         >
-          Sort by
+           Sort by
         </Text>
         <YStack gap="$5" mt="$2" px="$3">
           {options.map((option) => (

@@ -49,20 +49,20 @@ const CreateBottomSheet: React.FC<CreateBottomSheetProps> = ({
 
   const options = [
     {
-      title: "Danh sách phát",
-      subtitle: "Tạo danh sách phát bao gồm ghi chú và tệp",
+      title: "Playlist",
+      subtitle: "Create a playlist including notes and files",
       icon: ListMusic,
       value: "playlist_note",
     },
     {
-      title: "Danh sách phát cộng tác",
-      subtitle: "Mời bạn bè cùng sáng tạo",
+      title: "Collaborative Playlist",
+      subtitle: "Invite friends to create together",
       icon: Users,
       value: "collaborative_note",
     },
     {
-      title: "Giai điệu chung",
-      subtitle: "Giai điệu chung",
+      title: "Shared Melody",
+      subtitle: "Shared melody",
       icon: Music2,
       value: "shared_melody",
     },
