@@ -10,7 +10,7 @@ import HomeNavigator from "./HomeNavigator";
 const Stack = createStackNavigator();
 export type SlpashStackParamList = {
   Splash: undefined;
-  Home: undefined;
+  Main: undefined;
   Login: undefined;
   Register: undefined;
   EmailLogin: undefined;
@@ -25,8 +25,8 @@ export default function SplashNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Home"
-        component={TabNavigator}
+        name="Main"
+        component={HomeNavigator}
         options={{ headerShown: false, gestureEnabled: false }}
       />
       <Stack.Screen

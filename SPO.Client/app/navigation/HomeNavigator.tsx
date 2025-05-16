@@ -1,16 +1,20 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import TabNavigator from "./TabNavigator";
-import LoginScreen from "../screens/auth/login/LoginScreen";
-import SplashScreen from "../screens/SplashScreen";
-import EmailLoginScreen from "../screens/auth/login/EmailLoginScreen";
-import RegisterScreen from "../screens/auth/register/RegisterScreen";
-import EmailRegisterScreen from "../screens/auth/register/EmailRegisterScreen";
 import AlbumScreen from "../screens/AlbumScreen";
+import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
+import ArtistScreen from "../screens/ArtistDetailScreen";
+import SettingsScreen from "../screens/SettingsScreen";
 
 const Stack = createStackNavigator();
 export type HomeStackParamList = {
   Home: undefined;
   Album: { id: string };
+  Playlist: { id: string };
+  Artist: { id: string };
+  Profile: undefined;
+  WhatsNew: undefined;
+  Recents: undefined;
+  Settings: undefined;
 };
 export default function HomeNavigator() {
   return (
@@ -22,7 +26,22 @@ export default function HomeNavigator() {
       />
       <Stack.Screen
         name="Album"
-        componet={AlbumScreen}
+        component={AlbumScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Playlist"
+        component={DetailPlaylistScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Artist"
+        component={ArtistScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Settings"
+        component={SettingsScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
