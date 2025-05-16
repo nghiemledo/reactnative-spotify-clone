@@ -6,11 +6,12 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { useAppSelector } from "../store";
 import { SidebarItem } from "./SidebarItem";
+import { HomeStackParamList } from "../navigation/HomeNavigator";
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  navigation: NativeStackNavigationProp<RootStackParamList, any>;
+  navigation: NativeStackNavigationProp<HomeStackParamList, any>;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navigation }) => {
