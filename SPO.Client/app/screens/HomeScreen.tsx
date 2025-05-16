@@ -22,6 +22,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { Section } from "../types/section";
 import { useAppSelector } from "../store";
+import { AlbumItem } from "../components/AlbumItem";
+import { SongItem } from "../components/SongItem";
+import { ArtistItem } from "../components/ArtistItem";
+import { PodcastItem } from "../components/PodcastItem";
 import { HomeStackParamList } from "../navigation/HomeNavigator";
 
 // Dữ liệu mẫu cho Podcasts
@@ -108,76 +112,25 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   // Render item cho Podcasts
 
   const renderArtistItem = ({ item }: { item: Artist }) => (
-    <YStack mr="$4" width={120} items="center">
-      <SafeImage uri={item?.urlAvatar} width={100} height={100} rounded={50} />
-      <Text color="white" fontWeight="600" mt="$2" numberOfLines={1}>
-        {item.name}
-      </Text>
-    </YStack>
+    <ArtistItem item={item}/>
   );
 
   // Render item cho Albums
   const renderAlbumItem = ({ item }: { item: Album }) => (
-    <YStack
-      mr="$4"
-      width={150}
-      onPress={() => hanldeNavigation("Album", { id: item.id })}
-    >
-      <SafeImage uri={item.coverImage} width={150} height={150} rounded={8} />
-      <Text color="white" fontWeight="600" mt="$2" numberOfLines={1}>
-        {item.title}
-      </Text>
-      <Text color="#666666" fontSize="$3" numberOfLines={1}>
-        {getArtistName(item.artistId)}
-      </Text>
-    </YStack>
+    <AlbumItem
+      hanldeNavigation={hanldeNavigation}
+      item={item}
+      getArtistName={getArtistName}
+    />
   );
 
   // Render item cho Songs
   const renderSongItem = ({ item }: { item: Song }) => (
-    <XStack mr="$4" items="center" space="$3" py="$2">
-      <SafeImage uri={item.coverImage} width={60} height={60} rounded={4} />
-      <YStack flex={1}>
-        <Text color="white" fontWeight="600" numberOfLines={1}>
-          {item.title}
-        </Text>
-        <Text color="#666666" fontSize="$3" numberOfLines={1}>
-          {getArtistName(item.artistId)}
-        </Text>
-      </YStack>
-    </XStack>
+    <SongItem item={item} getArtistName={getArtistName} />
   );
 
   const renderRelaxationItem = ({ item }: { item: any }) => (
-    <XStack mr="$4" space="$3" py="$2" items="flex-start">
-      <SafeImage uri={item.coverImage} width={80} height={80} rounded={8} />
-      <YStack flex={1} space="$1">
-        <Text color="white" fontWeight="600" fontSize="$5" numberOfLines={2}>
-          {item.title}
-        </Text>
-        <Text color="gray" fontSize="$3" numberOfLines={1}>
-          Episode • {item.creator}
-        </Text>
-        {item.type === "podcast" && (
-          <>
-            <XStack items="center" space="$2">
-              <Text color="gray" fontSize="$2">
-                {item.description.split("•")[0]}
-              </Text>
-              <Text color="gray" fontSize="$2">
-                •
-              </Text>
-              <Text color="gray" fontSize="$2">
-                {item.description.split("•")[1]}
-              </Text>
-            </XStack>
-            <Text color="gray" fontSize="$2" numberOfLines={2}>
-              {item.description.split("•").slice(2).join("•")}
-            </Text>
-          </>
-        )}
-      </YStack>
-    </XStack>
+    <PodcastItem item={item}/>
   );
 
   // Tạo sections cho FlatList
