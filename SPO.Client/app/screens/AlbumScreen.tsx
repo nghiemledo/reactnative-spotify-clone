@@ -1,20 +1,8 @@
 import { Animated, Dimensions, StatusBar, View } from "react-native";
-import {
-  YStack,
-  XStack,
-  Text,
-  Image,
-  Button,
-  H3,
-  Avatar,
-  Input,
-} from "tamagui";
+import { YStack, XStack, Text, Image, Button } from "tamagui";
 import { FlatList, ScrollView, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
-import { useDispatch } from "react-redux";
-import { playSong } from "../store/playerSlice";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo, useCallback, useState } from "react";
 import {
   ArrowLeft,
   Globe,
@@ -25,107 +13,160 @@ import {
   Search,
 } from "@tamagui/lucide-icons";
 import { LinearGradient } from "@tamagui/linear-gradient";
+import { RootStackParamList } from "../navigation/AppNavigator";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { useGetAlbumByIdQuery } from "../services/AlbumService";
+import { useGetSongsQuery } from "../services/SongService";
+import { HomeStackParamList } from "../navigation/HomeNavigator";
 
 // Dữ liệu giả lập cho album và danh sách bài hát
 const albumData = {
   id: "1",
   title: "Đánh Đổi",
   releaseDate: "10 Oct 2023",
-  coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+  coverImage:
+    "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
   artistName: "Obito, Shiki",
   totalSongs: 20,
   totalDuration: "56 min",
 };
-
-const songs = [
-  { id: "1", title: "Còn Nợ Ba Mẹ", artist: "Obito, Shiki", duration: "3:15" },
-  { id: "2", title: "Champion", artist: "Obito, Shiki", duration: "4:20" },
-  { id: "3", title: "Chưa Xong", artist: "Obito, Shiki", duration: "2:10" },
-  { id: "4", title: "Chúa Xong", artist: "Obito, Shiki", duration: "5:00" },
-  { id: "5", title: "Tự Sướng", artist: "Obito, Shiki", duration: "3:45" },
-  { id: "6", title: "Outro", artist: "Obito, Shiki", duration: "5:00" },
-  // Thêm các bài hát khác nếu cần để đạt 20 bài
-];
 
 const recommendedAlbums = [
   {
     id: "1",
     title: "Hip-hop Việt",
     artist: "HIEUTHUHAI, Dangrangto, Wxrdie, R...",
-    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
     year: "2023",
   },
   {
     id: 2,
     title: "Best of Hip-hop Việt 2023",
     artist: "HIEUTHUHAI, tlinh, RPT MCK, Andree Right Han...",
-    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
     year: "2023",
   },
   {
     id: "3",
     title: "SOOI",
     artist: "Vũ, DatKaa...",
-    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
     year: "2023",
   },
 ];
 
-type AlbumScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "AlbumScreen"
->;
+type AlbumRouteProp = RouteProp<HomeStackParamList, "Album">;
 
-export default function AlbumScreen({
-  navigation,
-}: {
-  navigation: AlbumScreenNavigationProp;
-}) {
-  const dispatch = useDispatch();
-
+export default function AlbumScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
-
-  const navbarBackground = scrollY.interpolate({
-    inputRange: [190, 220],
-    outputRange: ["rgba(0, 0, 0, 0)", "rgba(51, 51, 51, 1)"],
-    extrapolate: "clamp",
-  });
-  const titleOpacity = scrollY.interpolate({
-    inputRange: [200, 230],
-    outputRange: [0, 1],
-    extrapolate: "clamp",
-  });
-  const searchOpacity = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [1, 0],
-    extrapolate: "clamp",
-  });
-  const screenWidth = Dimensions.get("window").width;
-
-  const imageSize = scrollY.interpolate({
-    inputRange: [0, 150],
-    outputRange: [screenWidth * 0.5, screenWidth * 0.3],
-    extrapolate: "clamp",
-  });
-
-  const opacity = scrollY.interpolate({
-    inputRange: [150, 300],
-    outputRange: [1, 0],
-    extrapolate: "clamp",
-  });
+  const [search, setSearch] = useState("");
+  const navigation =
+    useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
+  const route = useRoute<AlbumRouteProp>();
+  const {
+    data: album,
+    isLoading,
+    error,
+  } = useGetAlbumByIdQuery(route.params.id);
+  const {
+    data: songs,
+    isLoading: songsLoading,
+    error: songsError,
+  } = useGetSongsQuery();
 
   useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
+    songs?.data.filter((item) => {
+      if (item.artistId === album?.data?.artistId) {
+        return item;
+      }
     });
+  }, [songs]);
+
+  // Memoize interpolated values
+  const navbarBackground = useMemo(
+    () =>
+      scrollY.interpolate({
+        inputRange: [190, 220],
+        outputRange: ["rgba(0, 0, 0, 0)", "rgba(51, 51, 51, 1)"],
+        extrapolate: "clamp",
+      }),
+    [scrollY]
+  );
+
+  const titleOpacity = useMemo(
+    () =>
+      scrollY.interpolate({
+        inputRange: [200, 230],
+        outputRange: [0, 1],
+        extrapolate: "clamp",
+      }),
+    [scrollY]
+  );
+
+  const searchOpacity = useMemo(
+    () =>
+      scrollY.interpolate({
+        inputRange: [0, 100],
+        outputRange: [1, 0],
+        extrapolate: "clamp",
+      }),
+    [scrollY]
+  );
+
+  const screenWidth = Dimensions.get("window").width;
+
+  const imageSize = useMemo(
+    () =>
+      scrollY.interpolate({
+        inputRange: [0, 150],
+        outputRange: [screenWidth * 0.5, screenWidth * 0.3],
+        extrapolate: "clamp",
+      }),
+    [scrollY, screenWidth]
+  );
+
+  const opacity = useMemo(
+    () =>
+      scrollY.interpolate({
+        inputRange: [150, 300],
+        outputRange: [1, 0],
+        extrapolate: "clamp",
+      }),
+    [scrollY]
+  );
+
+  // Memoize handlers
+  const handleScroll = useCallback(
+    Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+      useNativeDriver: false,
+    }),
+    [scrollY]
+  );
+
+  const handleGoBack = useCallback(() => {
+    navigation.goBack();
   }, [navigation]);
+
+  useEffect(() => {
+    // navigation.setOptions({
+    //   headerShown: false,
+    // });
+
+    return () => {
+      // Cleanup animations if needed
+      scrollY.stopAnimation();
+    };
+  }, [scrollY]);
 
   return (
     <LinearGradient
-      padding={0}
-      margin={0}
+      p={0}
+      m={0}
       flex={1}
-      colors={["#D9F99D", "#000000"]}
+      colors={["#3a4a5a", "#000000"]}
       start={[0, 0]}
       end={[0, 0.5]}
     >
@@ -141,7 +182,7 @@ export default function AlbumScreen({
           top: 0,
           left: 0,
           right: 0,
-          height: 90,
+          height: 60,
           zIndex: 1000,
           backgroundColor: navbarBackground,
         }}
@@ -149,7 +190,7 @@ export default function AlbumScreen({
         <View
           style={{
             flex: 1,
-            paddingTop: StatusBar.currentHeight || 44,
+            // paddingTop: StatusBar.currentHeight || 44,
             flexDirection: "row",
             alignItems: "center",
             paddingHorizontal: 10,
@@ -157,16 +198,16 @@ export default function AlbumScreen({
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+            <TouchableOpacity onPress={handleGoBack}>
               <Button
                 size="$8"
                 chromeless
                 icon={ArrowLeft}
-                color="white"
-                padding={0}
-                backgroundColor="transparent"
+                color="#fff"
+                p={0}
+                bg="transparent"
                 pressStyle={{
-                  backgroundColor: "transparent",
+                  bg: "transparent",
                   borderBlockColor: "transparent",
                 }}
               />
@@ -180,262 +221,208 @@ export default function AlbumScreen({
                 marginLeft: 8,
               }}
             >
-              {albumData.title}
+              {album?.data?.title}
             </Animated.Text>
           </View>
-          <XStack width={40} />
+          {/* <XStack width={40} /> */}
         </View>
       </Animated.View>
 
-      <ScrollView
-        scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
-      >
-        <YStack flex={1} marginTop="$6" padding="$4">
-          {/* Thanh tìm kiếm */}
-          <Animated.View style={{ opacity: searchOpacity }}>
-            <XStack marginTop="$6" marginBottom="$6">
+      <ScrollView scrollEventThrottle={16} onScroll={handleScroll}>
+        <YStack flex={1} p="$4">
+          {/* Search Bar */}
+          {/* <Animated.View style={{ opacity: searchOpacity }}>
+            <XStack mt={0} mb={20} items="center">
               <Input
+                value={search}
+                onChangeText={setSearch}
                 size="$3.5"
                 borderWidth={0}
-                borderRadius="$2"
-                backgroundColor="rgba(255, 255, 255, 0.2)"
+                rounded={12}
+                bg="#23272b"
                 color="white"
-                placeholder="Tìm trong album này"
-                placeholderTextColor="rgba(255, 255, 255, 0.6)"
+                placeholder="Find in playlist"
+                placeholderTextColor="rgba(255,255,255,0.7)"
                 flex={1}
-                margin="auto"
+                m="auto"
                 style={{
                   fontSize: 15,
                   paddingLeft: 40,
                   fontWeight: "bold",
+                  height: 44,
                 }}
-                focusStyle={{
-                  borderWidth: 0,
-                  backgroundColor: "rgba(255, 255, 255, 0.3)",
-                }}
+                focusStyle={{ borderWidth: 0, bg: "#2d3136" }}
               />
-              <XStack
-                position="absolute"
-                left="$3"
-                top="$2.5"
-                alignItems="center"
-                pointerEvents="none"
+              <View
+                style={{
+                  position: "absolute",
+                  left: 16,
+                  top: 12,
+                  pointerEvents: "none",
+                }}
               >
-                <Search size="$1" color="rgba(255, 255, 255, 0.6)" />
-              </XStack>
+                <Search size={20} color="rgba(255,255,255,0.7)" />
+              </View>
+              <Button bg="#23272b" rounded={12} ml={12} px={18} py={10}>
+                <Text color="white" fontWeight="bold">
+                  Sort
+                </Text>
+              </Button>
             </XStack>
-          </Animated.View>
+          </Animated.View> */}
 
-          {/* Hình ảnh album */}
-          <XStack
-            alignItems="center"
-            flex={1}
-            justifyContent="center"
-            alignSelf="center"
-            marginBottom={0}
-            padding={0}
-          >
-            <Animated.Image
-              source={{ uri: albumData.coverImage }}
+          {/* Album Image */}
+          <XStack items="center" justify="center" mb={16}>
+            <View
               style={{
-                width: imageSize,
-                height: imageSize,
-                opacity,
-                borderRadius: 8,
-                alignSelf: "center",
+                borderRadius: 18,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.3,
+                shadowRadius: 16,
+                elevation: 8,
               }}
-              resizeMode="stretch"
-              onError={(e) =>
-                console.log("Image load error:", e.nativeEvent.error)
-              }
-              defaultSource={{ uri: "https://via.placeholder.com/150" }}
-            />
+            >
+              <Animated.Image
+                source={{ uri: album?.data?.coverImage }}
+                style={{
+                  width: imageSize,
+                  height: imageSize,
+                  borderRadius: 18,
+                  opacity,
+                }}
+                resizeMode="cover"
+              />
+            </View>
           </XStack>
 
-          {/* Thông tin album */}
-          <H3 marginTop={0} marginBottom="$3" color="white" fontWeight="bold">
-            {albumData.title}
-          </H3>
-          <YStack>
-            <XStack alignItems="center" space="$3" marginBottom="$3">
-              <Avatar circular size="$2">
-                <Avatar.Image
-                  accessibilityLabel="Artist Avatar"
-                  src={albumData.coverImage}
-                />
-                <Avatar.Fallback backgroundColor="$blue10" />
-              </Avatar>
-              <YStack alignItems="center">
-                <Text
-                  fontSize={13}
-                  fontWeight="bold"
-                  color="white"
-                  textAlign="center"
-                >
-                  {albumData.artistName}
-                </Text>
-              </YStack>
-            </XStack>
-            <XStack alignItems="center" space="$2" marginBottom="$3">
-              <Globe size={18} color="#fff" />
-              <YStack alignItems="center">
-                <Text
-                  fontSize={13}
-                  fontWeight="bold"
-                  color="white"
-                  textAlign="center"
-                >
-                  {albumData.releaseDate}
-                </Text>
-              </YStack>
-            </XStack>
-          </YStack>
-
-          {/* Tổng số bài hát và thời lượng */}
-          <Text color="white" opacity={0.7} marginBottom="$4">
-            {albumData.totalSongs} songs • {albumData.totalDuration}
+          {/* Title & Info */}
+          <Text
+            fontSize={28}
+            width="90%"
+            fontWeight="bold"
+            color="white"
+            mb={4}
+            numberOfLines={1}
+          >
+            {album?.data?.title}
+          </Text>
+          <Text fontSize={16} color="rgba(255,255,255,0.8)" mb={4}>
+            With {albumData.artistName}
+          </Text>
+          <Text color="rgba(255,255,255,0.7)" fontSize={13} mb={8}>
+            {albumData.totalSongs} saves • {albumData.totalDuration}
           </Text>
 
-          {/* Nút điều khiển */}
-          <XStack space="$4" marginBottom="$4" justifyContent="space-between">
-            <XStack gap="$4">
+          {/* Control Buttons */}
+          <XStack items="center" justify="space-between" mb={12}>
+            <XStack gap={16}>
               <Button
-                disabled
-                backgroundColor="transparent"
-                color="white"
-                margin={0}
-                padding={0}
+                bg="rgba(255,255,255,0.05)"
+                rounded={100}
                 icon={
-                  <Plus size="$2" color="white" strokeWidth={1} />
+                  <Image
+                    source={{ uri: albumData.coverImage }}
+                    width={28}
+                    height={28}
+                    borderRadius={8}
+                  />
                 }
-                hoverStyle={{ backgroundColor: "transparent" }}
-                pressStyle={{
-                  backgroundColor: "transparent",
-                  borderBlockColor: "transparent",
-                }}
               />
               <Button
-                disabled
-                backgroundColor="transparent"
-                color="white"
-                margin={0}
-                padding={0}
-                icon={<ArrowDownCircle size="$2" color="white" strokeWidth={1} />}
-                hoverStyle={{ backgroundColor: "transparent" }}
-                pressStyle={{
-                  backgroundColor: "transparent",
-                  borderBlockColor: "transparent",
-                }}
+                bg="rgba(255,255,255,0.05)"
+                rounded={100}
+                icon={<Plus size={20} color="white" />}
               />
               <Button
-                disabled
-                backgroundColor="transparent"
-                color="white"
-                margin={0}
-                padding={0}
-                icon={<EllipsisVertical size="$2" color="white" strokeWidth={1} />}
-                hoverStyle={{ backgroundColor: "transparent" }}
-                pressStyle={{
-                  backgroundColor: "transparent",
-                  borderBlockColor: "transparent",
-                }}
+                bg="rgba(255,255,255,0.05)"
+                rounded={100}
+                icon={<ArrowDownCircle size={20} color="white" />}
+              />
+              <Button
+                bg="rgba(255,255,255,0.05)"
+                rounded={100}
+                icon={<EllipsisVertical size={20} color="white" />}
               />
             </XStack>
             <Button
-              backgroundColor="#1DB954"
-              margin={0}
-              padding={0}
-              borderRadius={100}
-              width="$4"
-              height="$4"
-              icon={
-                <Play size="$2" color="black" fill="black" strokeWidth={1} />
-              }
+              bg="#1DB954"
+              rounded={100}
+              width={56}
+              height={56}
+              icon={<Play size={28} color="black" fill="black" />}
             />
           </XStack>
 
-          {/* Danh sách bài hát */}
-          <FlatList
-            data={songs}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  dispatch(playSong(item.title));
-                  navigation.navigate("PlayerModal");
-                }}
+          {/* Song List */}
+          <YStack mt={8}>
+            {songs?.data?.map((item) => (
+              <XStack
+                key={item.id}
+                items="center"
+                justify="space-between"
+                py={10}
               >
-                <XStack
-                  alignItems="center"
-                  justifyContent="space-between"
-                  paddingVertical="$2"
-                >
-                  <XStack alignItems="center" gap="$3" flex={1}>
-                    <Text fontSize={15} fontWeight="300" color="white">
+                <XStack items="center" gap={12} flex={1}>
+                  <Image
+                    source={{ uri: item.coverImage }}
+                    width={48}
+                    height={48}
+                    borderRadius={8}
+                  />
+                  <YStack flex={1}>
+                    <Text fontSize={16} fontWeight="bold" color="white">
                       {item.title}
                     </Text>
-                    <YStack flex={1}>
-                      <Text fontSize={13} color="white" opacity={0.7}>
-                        {item.artist}
-                      </Text>
-                      <Text fontSize={12} color="white" opacity={0.5}>
-                        {item.duration}
-                      </Text>
-                    </YStack>
-                  </XStack>
-                  <Button
-                    backgroundColor="transparent"
-                    padding={0}
-                    icon={
-                      <EllipsisVertical
-                        size="$2"
-                        color="white"
-                        strokeWidth={1}
-                      />
-                    }
-                    pressStyle={{
-                      backgroundColor: "transparent",
-                      borderBlockColor: "transparent",
-                    }}
-                  />
+                    <Text fontSize={13} color="rgba(255,255,255,0.7)">
+                      {item?.artist || "Obito, Shiki"}
+                    </Text>
+                  </YStack>
                 </XStack>
-              </TouchableOpacity>
-            )}
-          />
+                <Text color="rgba(255,255,255,0.7)" fontSize={13} mr={12}>
+                  {item.duration}
+                </Text>
+                <Button
+                  bg="transparent"
+                  p={0}
+                  icon={<EllipsisVertical size={20} color="white" />}
+                  pressStyle={{
+                    bg: "transparent",
+                    borderBlockColor: "transparent",
+                  }}
+                />
+              </XStack>
+            ))}
+          </YStack>
 
-          {/* Phần "You may also like" */}
-          <H3 marginTop="$6" marginBottom="$3" color="white">
-            You may also like
-          </H3>
+          {/* You might also like */}
+          <Text fontSize={20} fontWeight="bold" color="white" mt={32} mb={12}>
+            You might also like
+          </Text>
           <FlatList
             data={recommendedAlbums}
             horizontal
             showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity>
-                <YStack width={120} marginRight="$4">
+                <YStack width={160} mr={16}>
                   <Image
                     source={{ uri: item.coverImage }}
-                    width={120}
-                    height={180}
-                    borderRadius="$2"
+                    width={160}
+                    height={160}
+                    borderRadius={14}
                   />
-                  <Text color="white" fontWeight="bold" marginTop="$2">
+                  <Text color="white" fontWeight="bold" mr={8} fontSize={16}>
                     {item.title}
                   </Text>
-                  <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
+                  <Text color="rgba(255,255,255,0.7)" fontSize={13}>
                     {item.artist} {item.year && `• ${item.year}`}
                   </Text>
                 </YStack>
               </TouchableOpacity>
             )}
-            scrollEnabled={false}
+            scrollEnabled={true}
           />
         </YStack>
       </ScrollView>

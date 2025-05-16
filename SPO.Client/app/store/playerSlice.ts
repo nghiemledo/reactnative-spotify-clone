@@ -1,13 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-interface Track {
-  id: string;
-  url: string;
-  title?: string;
-  artist?: string;
-  artwork?: string;
-}
-
+import { Track } from "../types/track";
 interface PlayerState {
   isPlaying: boolean;
   playbackState: string | null;
@@ -16,8 +8,7 @@ interface PlayerState {
   duration: number;
   queue: Track[];
   shuffle: boolean; // Trạng thái shuffle
-  loop: "off" | "track" | "queue"; // Chế độ loop: tắt, lặp track, lặp queue
-  volume: number; // Mức âm lượng (0.0 đến 1.0)
+  loop: "off" | "track" | "queue"; // Trạng thái lặp lại
 }
 
 const initialState: PlayerState = {
@@ -29,7 +20,6 @@ const initialState: PlayerState = {
   queue: [],
   shuffle: false,
   loop: "off",
-  volume: 1.0, // Mặc định âm lượng tối đa
 };
 
 const playerSlice = createSlice({
@@ -44,6 +34,7 @@ const playerSlice = createSlice({
     },
     setCurrentTrack(state, action: PayloadAction<Track | null>) {
       state.currentTrack = action.payload;
+      console.log("setCurrentTrack state", action.payload);
     },
     setPosition(state, action: PayloadAction<number>) {
       state.position = action.payload;
@@ -72,9 +63,6 @@ const playerSlice = createSlice({
     setLoop(state, action: PayloadAction<"off" | "track" | "queue">) {
       state.loop = action.payload;
     },
-    setVolume(state, action: PayloadAction<number>) {
-      state.volume = Math.max(0, Math.min(1, action.payload)); // Giới hạn volume từ 0.0 đến 1.0
-    },
   },
 });
 
@@ -91,6 +79,5 @@ export const {
   togglePlay,
   setShuffle,
   setLoop,
-  setVolume,
 } = playerSlice.actions;
 export default playerSlice.reducer;

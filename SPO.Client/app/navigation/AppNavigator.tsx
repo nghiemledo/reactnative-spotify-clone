@@ -1,15 +1,40 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as React from "react";
-import TabNavigator from "./TabNavigator";
+import SplashNavigator from "./SplashNavigator";
 
 const Stack = createStackNavigator();
+
+export type RootStackParamList = {
+  Home: undefined;
+  Login: undefined;
+  Register: undefined;
+  EmailLogin: undefined;
+  EmailRegister: undefined;
+  detailPlaylist: undefined;
+  addSongPlaylist: undefined;
+  updateSongPlaylist: undefined;
+  PlayerModal: undefined;
+  Profile: undefined;
+  Search: undefined;
+  WhatsNew: undefined;
+  Recents: undefined;
+  Settings: undefined;
+  Album: { id: string };
+  Artist: { id: string };
+  Podcast: { id: string };
+  Library: undefined;
+};
 
 export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Main" component={TabNavigator} />
+        <Stack.Screen
+          name="SplashNavigator"
+          component={SplashNavigator}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

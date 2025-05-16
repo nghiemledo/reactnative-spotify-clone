@@ -1,617 +1,295 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   FlatList,
-  ScrollView,
   TouchableOpacity,
   Animated,
   StatusBar,
+  Dimensions,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
-import { YStack, XStack, Text, Image, H3, Button, Avatar } from "tamagui";
-import { Play } from "@tamagui/lucide-icons";
+import { YStack, XStack, Text, Button, Avatar } from "tamagui";
+import { useGetSongsQuery } from "../services/SongService";
+import { useGetAlbumsQuery } from "../services/AlbumService";
+import { useGetArtistsQuery } from "../services/ArtistService";
+import { Album } from "../types/album";
+import { Artist } from "../types/artist";
+import { Song } from "../types/song";
+import Sidebar from "../components/Sidebar";
+import { SectionHelper } from "../components/SectionHelper";
+import SafeImage from "../components/SafeImage";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../navigation/AppNavigator";
+import { Section } from "../types/section";
+import { useAppSelector } from "../store";
+import { AlbumItem } from "../components/AlbumItem";
+import { SongItem } from "../components/SongItem";
+import { ArtistItem } from "../components/ArtistItem";
+import { PodcastItem } from "../components/PodcastItem";
+import { HomeStackParamList } from "../navigation/HomeNavigator";
 
-const chartItems = [
-  {
-    id: "1",
-    title: "HOT",
-    artists: "SOOBIN, buitruonglinh",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "Top 50 Vietnam",
-    artists: "Your daily update",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
-
-const albumItems = [
-  {
-    id: "1",
-    title: "THE WXRDIES",
-    artists: "Wxrdie",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "Đánh Đổi",
-    artists: "Obito, Shiki",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
-
-const artistItems = [
-  {
-    id: "1",
-    title: "Sơn Tùng M-TP",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "tlinh",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
-
-const recentItems = [
-  {
-    id: "1",
-    title: "STARBOY",
-    artists: "The Weeknd, Daft Punk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "People",
-    artists: "Libianca",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "3",
-    title: "Đừng Làm Trái Tim Anh Đau",
-    artists: "Sơn Tùng M-TP",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
-
+// Dữ liệu mẫu cho Podcasts
 const relaxationItems = [
   {
     id: "1",
-    title: "Êm Đêm",
-    artists: "Thư giãn cùng nhịp giai điệu du em",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "Lofi Chill Điệu Thu Giãn",
-    artists: "Slacker Jack’s, cakofonic, CHU VAN CONG",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "3",
-    title: "Thoải",
-    artists: "Kend Eilish",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
-
-const newReleasesItems = [
-  {
-    id: "1",
-    title: "Priceless (feat. LISA)",
-    artists: "Maroon 5, LISA",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "I Said I Love You First...",
-    artists: "Selena Gomez, benny blanco",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "3",
-    title: "Lose",
-    artists: "Don Toliver, The A",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
-
-const uniquelyYoursItems = [
-  {
-    id: "1",
-    title: "daylist",
-    artists: "Your day in a playlist.",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-  {
-    id: "2",
-    title: "On Repeat",
-    artists: "Songs you love right now",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  },
-];
-
-const podcastItems = [
-  {
-    id: "1",
-    title: "Những trang thư có lửa về hào khí dân tộc Việt Nam | Podcast...",
-    artists: "Episode · Vì sao thế nhỉ!",
-    date: "Apr 27 · 17min",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    title: "#28 - người lớn và áp lực 'xây dựng hình ảnh'",
+    creator: "Giang cơ Radio",
     description:
-      "Thư ra tiền tuyến, thư về hậu phương. Từng dòng từng câu khắc khoải đôi bờ đã vượt qua khoảng cách, thời gian, và cả sự sống và cái chết...",
+      "Dec 1, 2023 • 15min • Minh là Giang, mình là người lớn và mình muốn nói về áp lực 'xây dựng hình ảnh'.",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2023-12-01T00:00:00Z",
+    type: "podcast",
   },
   {
     id: "2",
-    title: "Mặt nạ đau khổ - Tri Kỷ Cảm Xúc #377",
-    artists: "Episode · Tri Kỷ Cảm Xúc",
-    date: "Apr 28 · 20min",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    description:
-      'Một tập podcast đầy cảm xúc với những suy tư và sự đồng cảm với những người đang đeo "mặt nạ" để che giấu tổn thương.',
+    title: "'Dùng đốt, ở trong đó đã có lửa' - P8/ NHẬT KÝ ĐĂNG TH...",
+    creator: "Nằm nghe đọc truyện - Hathaya",
+    description: "Episode về hành trình vượt khó.",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2023-12-02T00:00:00Z",
+    type: "podcast",
   },
 ];
 
-export default function HomeScreen() {
-  const scrollY = React.useRef(new Animated.Value(0)).current;
+interface HomeScreenProps {
+  navigation: NativeStackNavigationProp<HomeStackParamList>;
+}
 
-  const [selectedButton, setSelectedButton] = useState("All"); // Trạng thái nút được chọn, mặc định là "All"
+export default function HomeScreen({ navigation }: HomeScreenProps) {
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const [selectedButton, setSelectedButton] = useState("All");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const user = useAppSelector((state) => state.auth.user);
+  const sidebarAnim = useRef(
+    new Animated.Value(-Dimensions.get("window").width * 0.75)
+  ).current;
 
-  const handleButtonPress = (buttonName: string) => {
-    setSelectedButton(buttonName);
+  const {
+    data: albums,
+    isLoading: isAlbumsLoading,
+    error: albumsError,
+  } = useGetAlbumsQuery();
+
+  const {
+    data: artists,
+    isLoading: isArtistsLoading,
+    error: artistsError,
+  } = useGetArtistsQuery();
+
+  const {
+    data: songs,
+    isLoading: isSongsLoading,
+    error: songsError,
+  } = useGetSongsQuery();
+
+  const toggleSidebar = () => {
+    Animated.timing(sidebarAnim, {
+      toValue: isSidebarOpen ? -Dimensions.get("window").width * 0.75 : 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+  const hanldeNavigation = <T extends keyof HomeStackParamList>(
+    screen: T,
+    params?: HomeStackParamList[T]
+  ) => {
+    navigation.navigate({ name: screen as any, params });
   };
 
+  const handleButtonPress = (button: string) => {
+    setSelectedButton(button);
+  };
+
+  const getArtistName = (artistId: string | undefined) => {
+    if (!artistId) return "Unknown Artist";
+    const artist = artists?.data?.find((a: Artist) => a.id === artistId);
+    return artist?.name || "Unknown Artist";
+  };
+
+  // Render item cho Podcasts
+
+  const renderArtistItem = ({ item }: { item: Artist }) => (
+    <ArtistItem item={item}/>
+  );
+
+  // Render item cho Albums
+  const renderAlbumItem = ({ item }: { item: Album }) => (
+    <AlbumItem
+      hanldeNavigation={hanldeNavigation}
+      item={item}
+      getArtistName={getArtistName}
+    />
+  );
+
+  // Render item cho Songs
+  const renderSongItem = ({ item }: { item: Song }) => (
+    <SongItem item={item} getArtistName={getArtistName} />
+  );
+
+  const renderRelaxationItem = ({ item }: { item: any }) => (
+    <PodcastItem item={item}/>
+  );
+
+  // Tạo sections cho FlatList
+  const sections: Section[] = [
+    {
+      id: "artists",
+      type: "horizontal",
+      title: "Popular Artists",
+      data: artists?.data,
+      loading: isArtistsLoading,
+      error: artistsError ? "Error loading artists" : null,
+      renderItem: renderArtistItem,
+    },
+    {
+      id: "albums",
+      type: "horizontal",
+      title: "New Albums",
+      data: albums?.data,
+      loading: isAlbumsLoading,
+      error: albumsError ? "Error loading albums" : null,
+      renderItem: renderAlbumItem,
+    },
+    {
+      id: "songs",
+      type: "vertical",
+      title: "Trending Songs",
+      data: songs?.data,
+      loading: isSongsLoading,
+      error: songsError ? "Error loading songs" : null,
+      renderItem: renderSongItem,
+    },
+    {
+      id: "relaxation",
+      type: "vertical",
+      title: "Podcasts",
+      data: relaxationItems,
+      renderItem: renderRelaxationItem,
+    },
+  ];
+
+  const filteredSections = sections.filter((section) => {
+    if (selectedButton === "All") return true;
+    if (selectedButton === "Music" && section.id !== "relaxation") return true;
+    if (selectedButton === "Podcasts" && section.id === "relaxation")
+      return true;
+    return false;
+  });
+
   return (
-    <YStack flex={1} backgroundColor="#000000">
-      <StatusBar
-        translucent
-        backgroundColor="transparent"
-        barStyle="light-content"
-      />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
+    <YStack flex={1} bg="rgb(25, 27, 31)" pl={20}>
+      {/* Sidebar */}
+      <Animated.View
+        style={{
+          width: Dimensions.get("window").width * 0.75,
+          transform: [{ translateX: sidebarAnim }],
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          zIndex: 10,
+        }}
       >
-        <YStack
-          flex={1}
-          backgroundColor="transparent"
-          padding="$4"
-          marginTop={StatusBar.currentHeight || 0}
-        >
-          {/* Header with Avatar and Buttons */}
-          <XStack alignItems="center" space="$2" marginBottom="$4">
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={toggleSidebar}
+          navigation={navigation}
+        />
+      </Animated.View>
+
+      {/* Nội dung chính */}
+      <Animated.View
+        style={{
+          flex: 1,
+          transform: [
+            {
+              translateX: sidebarAnim.interpolate({
+                inputRange: [-Dimensions.get("window").width * 0.75, 0],
+                outputRange: [0, Dimensions.get("window").width * 0.75],
+              }),
+            },
+          ],
+        }}
+      >
+        {/* Header */}
+        <XStack items="center" py={10} mt={StatusBar.currentHeight || 0} z={1}>
+          <TouchableOpacity onPress={toggleSidebar}>
             <Avatar circular size="$4">
               <Avatar.Image
                 accessibilityLabel="User Avatar"
-                src="https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg"
+                src={user?.urlAvatar}
               />
-              <Avatar.Fallback backgroundColor="$blue10" />
+              <Avatar.Fallback>
+                <Text fontWeight="bold" color="white" fontSize="$8">
+                  {user?.fullName?.charAt(0).toUpperCase()}
+                </Text>
+              </Avatar.Fallback>
             </Avatar>
+          </TouchableOpacity>
+
+          {["All", "Music", "Podcasts"].map((button) => (
             <Button
+              ml={7}
+              key={button}
               size="$3"
-              backgroundColor={
-                selectedButton === "All"
+              bg={
+                selectedButton === button
                   ? "#1DB954"
                   : "rgba(255, 255, 255, 0.2)"
               }
-              borderRadius={50}
-              borderColor="$text"
-              onPress={() => handleButtonPress("All")}
+              rounded={50}
+              onPress={() => handleButtonPress(button)}
             >
-              <Text color={selectedButton === "All" ? "black" : "white"}>
-                All
+              <Text color={selectedButton === button ? "black" : "white"}>
+                {button}
               </Text>
             </Button>
-            <Button
-              size="$3"
-              backgroundColor={
-                selectedButton === "Music"
-                  ? "#1DB954"
-                  : "rgba(255, 255, 255, 0.2)"
-              }
-              borderRadius={50}
-              borderColor="$text"
-              onPress={() => handleButtonPress("Music")}
-            >
-              <Text color={selectedButton === "Music" ? "black" : "white"}>
-                Music
-              </Text>
-            </Button>
-            <Button
-              size="$3"
-              backgroundColor={
-                selectedButton === "Podcasts"
-                  ? "#1DB954"
-                  : "rgba(255, 255, 255, 0.2)"
-              }
-              borderRadius={50}
-              borderColor="$text"
-              onPress={() => handleButtonPress("Podcasts")}
-            >
-              <Text color={selectedButton === "Podcasts" ? "black" : "white"}>
-                Podcasts
-              </Text>
-            </Button>
-          </XStack>
+          ))}
+        </XStack>
 
-          {/* Popular Radio Section */}
-          <H3 color="white" marginBottom="$3">
-            Popular radio
-          </H3>
+        {/* Danh sách nội dung */}
+        <Animated.View
+          style={{
+            flex: 1,
+            opacity: sidebarAnim.interpolate({
+              inputRange: [-Dimensions.get("window").width * 0.75, 0],
+              outputRange: [1, 0.5],
+            }),
+          }}
+        >
           <FlatList
-            data={radioItems}
-            horizontal
-            showsHorizontalScrollIndicator={false}
+            data={filteredSections}
+            renderItem={({ item }) => <SectionHelper item={item} />}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <YStack width={150} marginRight="$4">
-                  <Image
-                    source={{ uri: item.image }}
-                    width={150}
-                    height={150}
-                    borderRadius={2}
-                  />
-                  <Text color="white" fontWeight="bold" marginTop="$2">
-                    {item.title}
-                  </Text>
-                  <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                    {item.artists}
-                  </Text>
-                </YStack>
-              </TouchableOpacity>
+            showsVerticalScrollIndicator={false}
+            scrollEventThrottle={16}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+              { useNativeDriver: false }
             )}
-            scrollEnabled={false}
+            pointerEvents={isSidebarOpen ? "none" : "auto"}
+            contentContainerStyle={{ paddingBottom: 80 }}
           />
+        </Animated.View>
 
-          {/* Charts Section */}
-          <H3 color="white" marginTop="$6" marginBottom="$3">
-            Charts
-          </H3>
-          <FlatList
-            data={chartItems}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <YStack width={120} marginRight="$4">
-                  <Image
-                    source={{ uri: item.image }}
-                    width={120}
-                    height={180}
-                    borderRadius={2}
-                  />
-                  <Text color="white" fontWeight="bold" marginTop="$2">
-                    {item.title}
-                  </Text>
-                  <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                    {item.artists}
-                  </Text>
-                </YStack>
-              </TouchableOpacity>
-            )}
-            scrollEnabled={false}
-          />
-
-          {/* Popular Albums Section */}
-          <H3 color="white" marginTop="$6" marginBottom="$3">
-            Popular albums
-          </H3>
-          <FlatList
-            data={albumItems}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <YStack width={120} marginRight="$4">
-                  <Image
-                    source={{ uri: item.image }}
-                    width={120}
-                    height={120}
-                    borderRadius={2}
-                  />
-                  <Text color="white" fontWeight="bold" marginTop="$2">
-                    {item.title}
-                  </Text>
-                  <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                    {item.artists}
-                  </Text>
-                </YStack>
-              </TouchableOpacity>
-            )}
-            scrollEnabled={false}
-          />
-
-          {/* Popular Artists Section */}
-          <H3 color="white" marginTop="$6" marginBottom="$3">
-            Popular artists
-          </H3>
-          <FlatList
-            data={artistItems}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <YStack width={100} marginRight="$4" alignItems="center">
-                  <Image
-                    source={{ uri: item.image }}
-                    width={100}
-                    height={100}
-                    borderRadius={50}
-                  />
-                  <Text
-                    color="white"
-                    fontWeight="bold"
-                    marginTop="$2"
-                    textAlign="center"
-                  >
-                    {item.title}
-                  </Text>
-                </YStack>
-              </TouchableOpacity>
-            )}
-            scrollEnabled={false}
-          />
-
-          {/* Recent Rotation Section */}
-          <H3 color="white" marginTop="$6" marginBottom="$3">
-            Your recent rotation
-          </H3>
-          <FlatList
-            data={recentItems}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <XStack alignItems="center" paddingVertical="$2">
-                  <Image
-                    source={{ uri: item.image }}
-                    width={50}
-                    height={50}
-                    borderRadius={2}
-                  />
-                  <YStack marginLeft="$3" flex={1}>
-                    <Text color="white" fontWeight="bold">
-                      {item.title}
-                    </Text>
-                    <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                      {item.artists}
-                    </Text>
-                  </YStack>
-                  <Button
-                    backgroundColor="white"
-                    borderRadius={100}
-                    width="$3"
-                    height="$3"
-                    padding={0}
-                    icon={<Play size="$1" color="black" fill="black" />}
-                  />
-                </XStack>
-              </TouchableOpacity>
-            )}
-            scrollEnabled={false}
-          />
-
-          {/* Relaxation Section */}
-          <H3 color="white" marginTop="$6" marginBottom="$3">
-            Không báo thức + deadline, chỉ có nhạc và giường êm
-          </H3>
-          <FlatList
-            data={relaxationItems}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <YStack width={120} marginRight="$4">
-                  <Image
-                    source={{ uri: item.image }}
-                    width={120}
-                    height={180}
-                    borderRadius={2}
-                  />
-                  <Text color="white" fontWeight="bold" marginTop="$2">
-                    {item.title}
-                  </Text>
-                  <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                    {item.artists}
-                  </Text>
-                </YStack>
-              </TouchableOpacity>
-            )}
-            scrollEnabled={false}
-          />
-
-          {/* New Releases Section */}
-          <H3 color="white" marginTop="$6" marginBottom="$3">
-            New releases for you
-          </H3>
-          <FlatList
-            data={newReleasesItems}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <YStack width={120} marginRight="$4">
-                  <Image
-                    source={{ uri: item.image }}
-                    width={120}
-                    height={180}
-                    borderRadius={2}
-                  />
-                  <Text color="white" fontWeight="bold" marginTop="$2">
-                    {item.title}
-                  </Text>
-                  <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                    {item.artists}
-                  </Text>
-                </YStack>
-              </TouchableOpacity>
-            )}
-            scrollEnabled={false}
-          />
-
-          {/* Find Your Next Favorite Song Section */}
-          <H3 color="white" marginTop="$6" marginBottom="$3">
-            Find your next favorite song
-          </H3>
-          <FlatList
-            data={newReleasesItems.slice(0, 3)}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <YStack width={120} marginRight="$4">
-                  <Image
-                    source={{ uri: item.image }}
-                    width={120}
-                    height={180}
-                    borderRadius={2}
-                  />
-                  <Text color="white" fontWeight="bold" marginTop="$2">
-                    Similar to {item.title}
-                  </Text>
-                  <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                    {item.artists}
-                  </Text>
-                </YStack>
-              </TouchableOpacity>
-            )}
-            scrollEnabled={false}
-          />
-
-          {/* Uniquely Yours Section */}
-          <H3 color="white" marginTop="$6" marginBottom="$3">
-            Uniquely yours
-          </H3>
-          <FlatList
-            data={uniquelyYoursItems}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <YStack width={120} marginRight="$4">
-                  <Image
-                    source={{ uri: item.image }}
-                    width={120}
-                    height={180}
-                    borderRadius={2}
-                  />
-                  <Text color="white" fontWeight="bold" marginTop="$2">
-                    {item.title}
-                  </Text>
-                  <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                    {item.artists}
-                  </Text>
-                </YStack>
-              </TouchableOpacity>
-            )}
-            scrollEnabled={false}
-          />
-          {/* Podcast Section */}
-          <H3 color="white" marginTop="$6" marginBottom="$3">
-            Podcasts
-          </H3>
-          <FlatList
-            data={podcastItems}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <YStack
-                  backgroundColor="#1E1E1E"
-                  padding="$4"
-                  borderRadius="$4"
-                  marginBottom="$5"
-                  alignItems="center"
-                >
-                  <Image
-                    source={{ uri: item.image }}
-                    width={180}
-                    height={180}
-                    borderRadius={4}
-                  />
-
-                  <Text
-                    color="white"
-                    fontSize="$5"
-                    fontWeight="bold"
-                    textAlign="center"
-                    marginTop="$3"
-                    numberOfLines={2}
-                  >
-                    {item.title}
-                  </Text>
-
-                  <Text
-                    color="rgba(255,255,255,0.6)"
-                    fontSize="$3"
-                    marginTop="$1"
-                    textAlign="center"
-                  >
-                    {item.artists}
-                  </Text>
-
-                  <Text
-                    color="rgba(255,255,255,0.6)"
-                    fontSize="$2"
-                    marginTop="$1"
-                    textAlign="center"
-                  >
-                    {item.date}
-                  </Text>
-
-                  <Text
-                    color="rgba(255,255,255,0.7)"
-                    fontSize="$2"
-                    marginTop="$3"
-                    numberOfLines={3}
-                    textAlign="center"
-                  >
-                    {item.description}
-                  </Text>
-
-                  <XStack
-                    marginTop="$4"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    width="100%"
-                  >
-                    <Button
-                      backgroundColor="#333"
-                      borderRadius={2}
-                      paddingHorizontal="$3"
-                    >
-                      <Text color="white" fontSize="$2">
-                        Preview episode
-                      </Text>
-                    </Button>
-                    <XStack alignItems="center" space="$2">
-                      <Text color="rgba(255,255,255,0.6)" fontSize="$2">
-                        0:00
-                      </Text>
-                      <Text color="rgba(255,255,255,0.6)" fontSize="$2">
-                        ──────
-                      </Text>
-                      <Text color="rgba(255,255,255,0.6)" fontSize="$2">
-                        {item.date.split("·")[1]?.trim()}
-                      </Text>
-                    </XStack>
-                  </XStack>
-                </YStack>
-              </TouchableOpacity>
-            )}
-            scrollEnabled={false}
-          />
-        </YStack>
-      </ScrollView>
+        {/* Overlay khi sidebar mở */}
+        {isSidebarOpen && (
+          <TouchableWithoutFeedback onPress={toggleSidebar}>
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+              }}
+            />
+          </TouchableWithoutFeedback>
+        )}
+      </Animated.View>
     </YStack>
   );
 }
