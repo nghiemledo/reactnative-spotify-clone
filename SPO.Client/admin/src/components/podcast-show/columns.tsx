@@ -45,9 +45,9 @@ export const columns: ColumnDef<PodcastShow>[] = [
         accessorKey: "categoryId",
         header: "Category",
         cell: ({ row }) => {
-            const { userData } = useAppSelector((state: RootState) => state.user);
-            const user = userData.find((g) => g.id === row.original.categoryId);
-            return <>{user?.fullName || "Unknown Category"}</>;
+            const { podcastCategoryData } = useAppSelector((state: RootState) => state.podcastCategory);
+            const podCate = podcastCategoryData.find((g) => g.id === row.original.categoryId);
+            return <>{podCate?.name || "Unknown Category"}</>;
         },
     },
     {
