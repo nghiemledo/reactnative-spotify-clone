@@ -1,14 +1,13 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import TabNavigator from "./TabNavigator";
 import AlbumScreen from "../screens/AlbumScreen";
 import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
 import ArtistScreen from "../screens/ArtistDetailScreen";
 import SettingsScreen from "../screens/SettingsScreen";
-import LoginScreen from "../screens/auth/login/LoginScreen";
+import HomeScreen from "../screens/HomeScreen";
 
 const Stack = createStackNavigator();
+
 export type HomeStackParamList = {
-  Login: undefined;
   Home: undefined;
   Album: { id: string };
   Playlist: { id: string };
@@ -28,12 +27,13 @@ export type HomeStackParamList = {
   About: undefined;
   Premium: undefined;
 };
+
 export default function HomeNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
         name="Home"
-        component={TabNavigator}
+        component={HomeScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -49,16 +49,6 @@ export default function HomeNavigator() {
       <Stack.Screen
         name="Artist"
         component={ArtistScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Login"
-        component={LoginScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
