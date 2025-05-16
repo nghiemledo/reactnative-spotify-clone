@@ -117,8 +117,8 @@ const ManageAddPodcastShow: React.FC = () => {
                             </div>
                             <Input
                                 id="creator"
-                                placeholder="Enter creator"
-                                {...register("title", {
+                                placeholder="Enter creator name"
+                                {...register("creator", {
                                     required: "Creator is required",
                                     minLength: {
                                         value: 2,
@@ -129,7 +129,7 @@ const ManageAddPodcastShow: React.FC = () => {
                                         message: "Creator must not exceed 50 characters",
                                     },
                                 })}
-                                className={errors.title ? "border-destructive" : ""}
+                                className={errors.creator ? "border-destructive" : ""}
                             />
                             <p className="text-sm text-muted-foreground">The creator the podcast show that will be displayed to users.</p>
                         </div>
@@ -150,12 +150,7 @@ const ManageAddPodcastShow: React.FC = () => {
                                 id="bio"
                                 placeholder="Enter genre description (optional)"
                                 className={`resize-none min-h-[120px] ${errors.description ? "border-destructive" : ""}`}
-                                {...register("description", {
-                                    maxLength: {
-                                        value: 500,
-                                        message: "Description must not exceed 500 characters",
-                                    },
-                                })}
+                                {...register("description")}
                             />
                             <p className="text-sm text-muted-foreground">A brief bio of the playlist. This is optional.</p>
                         </div>
