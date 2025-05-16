@@ -26,6 +26,7 @@ export type RootStackParamList = {
   Album: { id: string };
   Artist: { id: string };
   Podcast: { id: string };
+  Library: undefined;
 };
 
 export default function AppNavigator() {
