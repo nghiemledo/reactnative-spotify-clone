@@ -71,7 +71,7 @@ const initialData: Data[] = [
   },
   {
     id: 4,
-    type: "playlists",
+    type: "playlist",
     name: "playlist",
     artists: [
       { id: 1, name: "MANBO" },
@@ -88,7 +88,7 @@ const initialData: Data[] = [
 
 type LibraryScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "library"
+  "Library"
 >;
 
 export default function LibraryScreen({
@@ -105,7 +105,7 @@ export default function LibraryScreen({
   const [isGrid, setIsGrid] = useState(true);
 
   const toggleIcon = () => {
-    setIsGrid((prev) => !prev); 
+    setIsGrid((prev) => !prev);
   };
 
   const handleItemPress = (item: (typeof initialData)[number]) => {

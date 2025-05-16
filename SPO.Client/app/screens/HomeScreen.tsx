@@ -26,6 +26,7 @@ import { AlbumItem } from "../components/AlbumItem";
 import { SongItem } from "../components/SongItem";
 import { ArtistItem } from "../components/ArtistItem";
 import { PodcastItem } from "../components/PodcastItem";
+import { HomeStackParamList } from "../navigation/HomeNavigator";
 
 // Dữ liệu mẫu cho Podcasts
 const relaxationItems = [
@@ -53,7 +54,7 @@ const relaxationItems = [
 ];
 
 interface HomeScreenProps {
-  navigation: NativeStackNavigationProp<RootStackParamList>;
+  navigation: NativeStackNavigationProp<HomeStackParamList>;
 }
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
@@ -91,9 +92,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     }).start();
     setIsSidebarOpen(!isSidebarOpen);
   };
-  const hanldeNavigation = <T extends keyof RootStackParamList>(
+  const hanldeNavigation = <T extends keyof HomeStackParamList>(
     screen: T,
-    params?: RootStackParamList[T]
+    params?: HomeStackParamList[T]
   ) => {
     navigation.navigate({ name: screen as any, params });
   };
@@ -180,12 +181,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
   return (
     <YStack flex={1} bg="rgb(25, 27, 31)" pl={20}>
-      <StatusBar
-        translucent
-        backgroundColor="transparent"
-        barStyle="light-content"
-      />
-
       {/* Sidebar */}
       <Animated.View
         style={{
@@ -219,20 +214,18 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         }}
       >
         {/* Header */}
-        <XStack
-          items="center"
-          space="$2"
-          py={10}
-          mt={StatusBar.currentHeight || 0}
-          z={1}
-        >
+        <XStack items="center" py={10} mt={StatusBar.currentHeight || 0} z={1}>
           <TouchableOpacity onPress={toggleSidebar}>
             <Avatar circular size="$4">
               <Avatar.Image
                 accessibilityLabel="User Avatar"
-                src="https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg"
+                src={user?.urlAvatar}
               />
-              <Avatar.Fallback />
+              <Avatar.Fallback>
+                <Text fontWeight="bold" color="white" fontSize="$8">
+                  {user?.fullName?.charAt(0).toUpperCase()}
+                </Text>
+              </Avatar.Fallback>
             </Avatar>
           </TouchableOpacity>
 

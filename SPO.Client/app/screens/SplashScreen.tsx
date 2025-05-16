@@ -15,7 +15,7 @@ const SplashScreen = () => {
   React.useEffect(() => {
     setTimeout(() => {
       if (user) {
-        navigation.navigate("Home");
+        navigation.navigate("Main");
       } else {
         navigation.navigate("Login");
       }
