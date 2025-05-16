@@ -3,7 +3,12 @@ import HomeScreen from "../screens/HomeScreen";
 import PlayingScreen from "../screens/PlayingScreen";
 import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
 import SearchScreen from "../screens/search/SearchScreen";
-import { Home, Search } from "@tamagui/lucide-icons";
+import { Home, Library, Plus, Search } from "@tamagui/lucide-icons";
+import LibraryScreen from "../screens/LibaryScreen";
+import CreateBottomSheet from "../components/library/CreateBottomSheet";
+import React from "react";
+import HomeNavigator from "./HomeNavigator";
+import SearchNavigator from "./SearchNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -26,7 +31,7 @@ export default function TabNavigator() {
     >
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={HomeNavigator}
         options={{
           headerShown: false,
           tabBarLabel: "Home",
@@ -35,7 +40,7 @@ export default function TabNavigator() {
       />
       <Tab.Screen
         name="Search"
-        component={SearchScreen}
+        component={SearchNavigator}
         options={{
           headerShown: false,
           tabBarLabel: "Search",
@@ -43,12 +48,38 @@ export default function TabNavigator() {
         }}
       />
       <Tab.Screen
+        name="Library"
+        component={LibraryScreen}
+        options={{
+          headerShown: false,
+          tabBarLabel: "Library",
+          tabBarIcon: ({ color }) => <Library color={color as any} size={24} />,
+        }}
+      />
+      <Tab.Screen
+        name="CreatePlaylist"
+        component={() => (
+          <CreateBottomSheet
+            isOpen={true}
+            onClose={() => {}}
+            onSelectOption={() => {}}
+          />
+        )}
+        options={{
+          headerShown: false,
+          tabBarLabel: "CreatePlaylist",
+          tabBarIcon: ({ color }) => <Plus color={color as any} size={24} />,
+        }}
+      />
+
+      <Tab.Screen
         name="Playing"
         component={PlayingScreen}
         options={{
           headerShown: false,
         }}
       />
+
       {/* <Tab.Screen name="Detail" component={DetailPlaylistScreen}  /> */}
     </Tab.Navigator>
   );
