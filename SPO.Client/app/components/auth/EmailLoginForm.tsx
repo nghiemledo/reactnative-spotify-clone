@@ -1,16 +1,21 @@
 import React, { useState, useCallback } from "react";
-import { YStack, XStack, Text, Button, Input, AnimatePresence, View } from "tamagui";
+import {
+  YStack,
+  XStack,
+  Text,
+  Button,
+  Input,
+  AnimatePresence,
+  View,
+} from "tamagui";
 import { TouchableOpacity } from "react-native";
 import { Eye, EyeOff } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../navigation/AppNavigator";
-import { useDispatch, useSelector } from "react-redux";
-import { login, setError } from "../store/authSlice";
-import { RootState, AppDispatch } from "../store";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SlpashStackParamList } from "../../navigation/SplashNavigator";
+import { useLoginMutation } from "../../services/AuthService";
 
 type EmailLoginScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+  SlpashStackParamList,
   "EmailLogin"
 >;
 
@@ -19,22 +24,21 @@ interface EmailLoginFormProps {
 }
 
 const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ navigation }) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { loading, error: apiError } = useSelector((state: RootState) => state.auth);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [localError, setLocalError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [login] = useLoginMutation();
 
   const validateInputs = useCallback(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setLocalError("Vui lòng nhập địa chỉ email hợp lệ");
+      setLocalError("Please enter a valid email address");
       return false;
     }
     if (password.length < 6) {
-      setLocalError("Mật khẩu phải có ít nhất 6 ký tự");
+      setLocalError("Password must be at least 6 characters long");
       return false;
     }
     return true;
@@ -45,31 +49,33 @@ const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ navigation }) => {
     if (!validateInputs()) return;
 
     try {
-      const result = await dispatch(login({ email, password })).unwrap(); 
-      await AsyncStorage.setItem("authToken", result.token);
-      await AsyncStorage.setItem("refreshToken", result.refreshToken);
-      alert("Đăng nhập thành công!.");
-      navigation.navigate("Home");
+      setLoading(true);
+      try {
+        const response = await login({ email, password }).unwrap();
+        if ((response as any).error) {
+          setLocalError((response as any).error);
+        } else {
+          setLoading(false);
+          navigation.navigate("Main");
+        }
+      } catch (error: any) {
+        setLocalError(error?.data?.message || error?.message || "Login failed");
+      } finally {
+        setLoading(false);
+      }
     } catch (err) {
-      // Error is handled by Redux state, no need to set local error
+      const errorMessage = (err as any)?.message || "Login failed";
+      setLocalError(errorMessage);
+    } finally {
+      setLoading(false);
     }
-  }, [validateInputs, email, password, dispatch, navigation]);
+  }, [validateInputs, email, password, navigation]);
 
   const toggleShowPassword = useCallback(() => {
     setShowPassword((prev) => !prev);
   }, []);
 
-  // Combine local and API errors for display
-  const displayError = localError || apiError;
-
-  // Clear API error when component unmounts or user retries
-  React.useEffect(() => {
-    return () => {
-      if (apiError) {
-        dispatch(setError(null));
-      }
-    };
-  }, [apiError, dispatch]);
+  const displayError = localError;
 
   return (
     <YStack flex={1} pb={32} px={16} bg="#000" pt={60}>
@@ -92,7 +98,7 @@ const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ navigation }) => {
         {/* Email Input */}
         <YStack mb={32}>
           <Text color="white" fontSize={20} fontWeight="bold" mb={16}>
-            Email hoặc tên người dùng
+            Email
           </Text>
           <Input
             value={email}
@@ -113,7 +119,7 @@ const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ navigation }) => {
         {/* Password Input */}
         <YStack>
           <Text color="white" fontSize={20} fontWeight="bold" mb={16}>
-            Mật khẩu
+            Password
           </Text>
           <XStack items="center" bg="#444" rounded={7}>
             <Input
@@ -128,7 +134,10 @@ const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ navigation }) => {
               secureTextEntry={!showPassword}
               autoCapitalize="none"
             />
-            <TouchableOpacity onPress={toggleShowPassword} style={{ padding: 10 }}>
+            <TouchableOpacity
+              onPress={toggleShowPassword}
+              style={{ padding: 10 }}
+            >
               {showPassword ? (
                 <EyeOff size="$2" color="white" />
               ) : (
@@ -151,11 +160,11 @@ const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ navigation }) => {
         >
           {loading ? (
             <Text color="#fff" fontWeight="bold" fontSize={16}>
-              Đang tải...
+              Loading...
             </Text>
           ) : (
             <Text color="#fff" fontWeight="bold" fontSize={16}>
-              Đăng nhập
+              Login
             </Text>
           )}
         </Button>

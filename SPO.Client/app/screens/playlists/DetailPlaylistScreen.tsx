@@ -11,7 +11,7 @@ import {
 } from "tamagui";
 import { FlatList, ScrollView, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../navigation/AppNavigator"; 
+import { RootStackParamList } from "../../navigation/AppNavigator";
 import { useDispatch } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -398,7 +398,11 @@ export default function DetailPlaylistScreen({
               rounded={50}
               onPress={() => console.log("Thêm bài hát")}
             >
-              <XStack items="center" space="$1" onPress={() => navigation.navigate("addSongPlaylist")}>
+              <XStack
+                items="center"
+                space="$1"
+                onPress={() => navigation.navigate("addSongPlaylist")}
+              >
                 <Plus color="white" size="$1" />
                 <Text color="white" fontWeight="bold" fontSize="$3">
                   Thêm
@@ -444,11 +448,7 @@ export default function DetailPlaylistScreen({
                   navigation.navigate("PlayerModal");
                 }}
               >
-                <XStack
-                  items="center"
-                  justify="space-between"
-                  py="$2"
-                >
+                <XStack items="center" justify="space-between" py="$2">
                   <XStack items="center" gap="$3" flex={1}>
                     <Image
                       source={{ uri: item.image }}
@@ -467,7 +467,6 @@ export default function DetailPlaylistScreen({
                   </XStack>
                   <Button
                     bg="transparent"
-                    
                     p={0}
                     icon={
                       <EllipsisVertical

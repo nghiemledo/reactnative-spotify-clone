@@ -2,11 +2,11 @@ import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { YStack, View, Image } from "tamagui";
 import { MotiView } from "moti";
-import { Svg, Circle, Path } from "react-native-svg";
 import { RootState, useAppSelector } from "../store";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { SlpashStackParamList } from "../navigation/SplashNavigator";
 import { Text } from "tamagui";
+import { HomeStackParamList } from "../navigation/HomeNavigator";
 
 const SplashScreen = () => {
   const navigation = useNavigation<NavigationProp<SlpashStackParamList>>();

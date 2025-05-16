@@ -4,33 +4,18 @@ import { User, Volume2, BarChart2, Info } from "@tamagui/lucide-icons";
 import { StatusBar, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
-
-const SidebarItem = ({
-  icon,
-  title,
-  onPress,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  onPress: () => void;
-}) => (
-  <TouchableOpacity onPress={onPress}>
-    <XStack items="center" gap={12} py={12} px={16}>
-      {icon}
-      <Text color="white" fontSize={16}>
-        {title}
-      </Text>
-    </XStack>
-  </TouchableOpacity>
-);
+import { useAppSelector } from "../store";
+import { SidebarItem } from "./SidebarItem";
+import { HomeStackParamList } from "../navigation/HomeNavigator";
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  navigation: NativeStackNavigationProp<RootStackParamList, any>;
+  navigation: NativeStackNavigationProp<HomeStackParamList, any>;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navigation }) => {
+  const user = useAppSelector((state) => state.auth.user);
   return (
     <YStack
       pt={StatusBar.currentHeight}
@@ -51,13 +36,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navigation }) => {
           <Avatar circular size="$5">
             <Avatar.Image
               accessibilityLabel="User Avatar"
-              src="https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg"
+              src={user?.urlAvatar}
+              alt="User Avatar"
             />
             <Avatar.Fallback backgroundColor="$blue10" />
           </Avatar>
           <YStack ml={12}>
             <Text color="white" fontSize={16} fontWeight="bold">
-              Trần Nguyễn Văn Nhựt
+              {user?.fullName}
             </Text>
             <Text color="#bbb" fontSize={14}>
               View profile
