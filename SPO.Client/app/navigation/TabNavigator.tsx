@@ -3,7 +3,8 @@ import HomeScreen from "../screens/HomeScreen";
 import PlayingScreen from "../screens/PlayingScreen";
 import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
 import SearchScreen from "../screens/search/SearchScreen";
-import { Home, Search } from "@tamagui/lucide-icons";
+import { Home, Library, Search } from "@tamagui/lucide-icons";
+import LibraryScreen from "../screens/LibaryScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -43,12 +44,22 @@ export default function TabNavigator() {
         }}
       />
       <Tab.Screen
+        name="Library"
+        component={LibraryScreen}
+        options={{
+          headerShown: false,
+          tabBarLabel: "Library",
+          tabBarIcon: ({ color }) => <Library color={color as any} size={24} />,
+        }}
+      />
+      <Tab.Screen
         name="Playing"
         component={PlayingScreen}
         options={{
           headerShown: false,
         }}
       />
+
       {/* <Tab.Screen name="Detail" component={DetailPlaylistScreen}  /> */}
     </Tab.Navigator>
   );
