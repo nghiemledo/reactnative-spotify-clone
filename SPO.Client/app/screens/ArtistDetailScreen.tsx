@@ -12,33 +12,33 @@ import { YStack, XStack, Text, Image, H3, Button, Spinner } from "tamagui";
 import { ArrowLeft, Play } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
-import {
-  useGetSongsQuery,
-  useGetAlbumsQuery,
-  useGetArtistByIdQuery,
-} from "../services/api";
+import { useGetAlbumsQuery } from "../services/AlbumService";
 import { LinearGradient } from "@tamagui/linear-gradient";
+import { useGetArtistByIdQuery } from "../services/ArtistService";
+import { useGetSongsQuery } from "../services/SongService";
+import { Album } from "../types/album";
+import { Song } from "../types/song";
 
 type ArtistScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "ArtistScreen"
+  "Artist"
 >;
 
-export default function ArtistScreen({
+export default function ArtistDetailScreen({
   navigation,
   route,
 }: {
   navigation: ArtistScreenNavigationProp;
-  route: { params: { artistId: string } };
+  route: { params: { id: string } };
 }) {
   const scrollY = React.useRef(new Animated.Value(0)).current;
   const {
-    data: songs = [],
+    data: songs,
     isLoading: isSongsLoading,
     error: songsError,
   } = useGetSongsQuery();
   const {
-    data: albums = [],
+    data: albums,
     isLoading: isAlbumsLoading,
     error: albumsError,
   } = useGetAlbumsQuery();
@@ -46,7 +46,7 @@ export default function ArtistScreen({
     data: artist,
     isLoading: isArtistLoading,
     error: artistError,
-  } = useGetArtistByIdQuery(route.params.artistId);
+  } = useGetArtistByIdQuery(route.params?.id);
 
   const navbarBackground = scrollY.interpolate({
     inputRange: [190, 220],
@@ -89,24 +89,16 @@ export default function ArtistScreen({
   }
 
   // Kiểm tra và lọc dữ liệu an toàn
-  const artistSongs = songs
+  const artistSongs = songs?.data
     .filter(
-      (song): song is NonNullable<typeof song> =>
-        song !== undefined && song !== null
-    ) // Loại bỏ undefined/null
-    .filter(
-      (song) =>
-        song.artistId !== undefined && song.artistId === route.params.artistId
+      (song: Song) =>
+        song.artistId !== undefined && song.artistId === route.params.id
     ); // Đảm bảo artistId tồn tại và khớp
 
-  const artistAlbums = albums
+  const artistAlbums = albums?.data
     .filter(
-      (album): album is NonNullable<typeof album> =>
-        album !== undefined && album !== null
-    ) // Loại bỏ undefined/null
-    .filter(
-      (album) =>
-        album.artistId !== undefined && album.artistId === route.params.artistId
+      (album: Album) =>
+        album.artistId !== undefined && album.artistId === route.params.id
     ); // Đảm bảo artistId tồn tại và khớp
 
   return (
@@ -164,7 +156,7 @@ export default function ArtistScreen({
                 marginLeft: 8,
               }}
             >
-              {artist?.name || "Unknown Artist"}
+              {artist?.data?.name || "Unknown Artist"}
             </Animated.Text>
           </View>
         </View>
@@ -181,17 +173,17 @@ export default function ArtistScreen({
           <YStack items="center" mb="$6">
             <Image
               source={{
-                uri: artist?.urlAvatar || "https://via.placeholder.com/200",
+                uri: artist?.data.urlAvatar || "https://via.placeholder.com/200",
               }}
               width={200}
               height={200}
               borderRadius={100}
             />
             <H3 color="white" mt="$4">
-              {artist?.name || "Unknown Artist"}
+              {artist?.data?.name || "Unknown Artist"}
             </H3>
             <Text color="white" opacity={0.7} mt="$2">
-              {artist?.bio || "No bio avitemslable"}
+              {artist?.data?.bio || "No bio avitemslable"}
             </Text>
           </YStack>
 
@@ -259,7 +251,7 @@ export default function ArtistScreen({
             renderItem={({ item }) => (
               <TouchableOpacity
                 onPress={() =>
-                  navigation.navigate("AlbumScreen", { albumId: item.id })
+                  navigation.navigate("Album", { id: item.id })
                 }
               >
                 <YStack width={120} mr="$4">
