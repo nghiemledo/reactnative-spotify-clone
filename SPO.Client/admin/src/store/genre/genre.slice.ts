@@ -33,7 +33,7 @@ const genreSlice = createSlice({
                 state.genreDetail = action.payload;
                 const id = action.payload.id;
                 console.log('Id from index', id);
-                
+
                 const existingGenre = state.genreData.find((item) => item.id === id);
                 if (existingGenre) {
                     const index = state.genreData.indexOf(existingGenre);
