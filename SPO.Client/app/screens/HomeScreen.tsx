@@ -22,6 +22,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { Section } from "../types/section";
 import { useAppSelector } from "../store";
+import { HomeStackParamList } from "../navigation/HomeNavigator";
 
 // Dữ liệu mẫu cho Podcasts
 const relaxationItems = [
@@ -49,7 +50,7 @@ const relaxationItems = [
 ];
 
 interface HomeScreenProps {
-  navigation: NativeStackNavigationProp<RootStackParamList>;
+  navigation: NativeStackNavigationProp<HomeStackParamList>;
 }
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
@@ -87,9 +88,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     }).start();
     setIsSidebarOpen(!isSidebarOpen);
   };
-  const hanldeNavigation = <T extends keyof RootStackParamList>(
+  const hanldeNavigation = <T extends keyof HomeStackParamList>(
     screen: T,
-    params?: RootStackParamList[T]
+    params?: HomeStackParamList[T]
   ) => {
     navigation.navigate({ name: screen as any, params });
   };
