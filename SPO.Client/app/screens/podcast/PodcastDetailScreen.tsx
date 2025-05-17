@@ -10,8 +10,8 @@ import {
   Input,
 } from "tamagui";
 import { FlatList, ScrollView, TouchableOpacity } from "react-native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
+import { NativeStackNavigationProp} from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/AppNavigator";
 import { useEffect, useRef, useMemo, useCallback, useState } from "react";
 import {
   ArrowLeft,
@@ -21,6 +21,8 @@ import {
   Plus,
 } from "@tamagui/lucide-icons";
 import { LinearGradient } from "@tamagui/linear-gradient";
+import { HomeStackParamList } from "../../navigation/HomeNavigator";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 
 // Dữ liệu giả lập dựa trên schema database
 const podcastEpisodeData = {
@@ -66,16 +68,12 @@ const comments = [
   },
 ];
 
-type PodcastDetailScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "PodcastDetailScreen"
->;
+type PodcastRouteProp = RouteProp<HomeStackParamList, "Podcast">;
 
-export default function PodcastDetailScreen({
-  navigation,
-}: {
-  navigation: PodcastDetailScreenNavigationProp;
-}) {
+export default function PodcastDetailScreen() {
+   const navigation =
+      useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
+    const route = useRoute<PodcastRouteProp>();
   const scrollY = useRef(new Animated.Value(0)).current;
 
   // Memoize interpolated values
@@ -361,13 +359,13 @@ export default function PodcastDetailScreen({
             <Input
               size="$3.5"
               borderWidth={0}
-              borderRadius="$2"
-              backgroundColor="rgba(255, 255, 255, 0.2)"
+              rounded="$2"
+              bg="rgba(255, 255, 255, 0.2)"
               color="white"
               placeholder="Leave a comment..."
               placeholderTextColor="rgba(255, 255, 255, 0.6)"
               flex={1}
-              margin="auto"
+              m="auto"
               style={{
                 fontSize: 15,
                 paddingLeft: 10,
