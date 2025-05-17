@@ -10,13 +10,13 @@ import { Play, PlusCircle } from "@tamagui/lucide-icons";
 
 interface PodcastItemProps {
   item: Podcast;
-  handleNavigation: <T extends keyof HomeStackParamList>(
+  hanldeNavigation: <T extends keyof HomeStackParamList>(
     screen: T,
     params?: HomeStackParamList[T]
   ) => void;
 }
 
-export const PodcastItem = ({ item, handleNavigation }: PodcastItemProps) => {
+export const PodcastItem = ({ item, hanldeNavigation }: PodcastItemProps) => {
   return (
     <YStack
       mr={20}
@@ -27,7 +27,7 @@ export const PodcastItem = ({ item, handleNavigation }: PodcastItemProps) => {
       rounded={10}
       onPress={() => {
         console.log("Navigating to Podcast with id:", item.id);
-        handleNavigation("Podcast", { id: item.id.toString() });
+        hanldeNavigation("Podcast", { id: item.id.toString() });
       }}
     >
       <XStack justify="space-between">
