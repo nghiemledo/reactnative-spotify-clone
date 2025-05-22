@@ -32,88 +32,78 @@ import { LinearGradient } from "@tamagui/linear-gradient";
 import SortBottomSheet from "../../components/library/SortBottomSheet";
 import SongOptionsBottomSheet from "../../components/search/SongOptionsBottomSheet";
 import PlaylistOptionsBottomSheet from "../../components/playlist/PlaylistOptionsBottomSheet";
+import { Song } from "../../types/song";
 
-// Mock data for queue with addedAt field for sorting by "Recently Added"
-const queueItems = [
+const songs: Song[] = [
   {
     id: "1",
     title: "Song breakdown: I WANT YOU",
     artist: "The Interstellar Tennis Podcast",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    addedAt: "2025-05-20T10:00:00Z",
-    order: 1,
+    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-20T10:00:00Z",
   },
   {
     id: "2",
     title: "Accepting the song that blew you up",
     artist: "RAW talk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    addedAt: "2025-05-19T12:00:00Z",
-    order: 2,
+    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-19T12:00:00Z",
   },
   {
     id: "3",
     title: "Song breakdown: I WANT YOU",
     artist: "The Interstellar Tennis Podcast",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    addedAt: "2025-05-18T15:00:00Z",
-    order: 3,
+    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-18T15:00:00Z",
   },
   {
     id: "4",
     title: "Accepting the song that blew you up",
     artist: "RAW talk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    addedAt: "2025-05-17T09:00:00Z",
-    order: 4,
+    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-17T09:00:00Z",
   },
   {
     id: "5",
     title: "Song breakdown: I WANT YOU111",
     artist: "The Interstellar Tennis Podcast",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    addedAt: "2025-05-16T14:00:00Z",
-    order: 5,
+    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-16T14:00:00Z",
   },
   {
     id: "6",
     title: "Accepting the song that blew you up",
     artist: "RAW talk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    addedAt: "2025-05-15T11:00:00Z",
-    order: 6,
+    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-15T11:00:00Z",
   },
   {
     id: "7",
     title: "Song breakdown: I WANT YOU",
     artist: "The Interstellar Tennis Podcast",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    addedAt: "2025-05-14T16:00:00Z",
-    order: 7,
+    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-14T16:00:00Z",
   },
   {
     id: "8",
     title: "Accepting the song that blew you up",
     artist: "RAW talk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    addedAt: "2025-05-13T08:00:00Z",
-    order: 8,
+    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-13T08:00:00Z",
   },
   {
     id: "9",
     title: "Accepting the song that blew you up",
     artist: "RAW talk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    addedAt: "2025-05-12T10:00:00Z",
-    order: 9,
+    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-12T10:00:00Z",
   },
   {
     id: "10",
     title: "Accepting the song that blew you up",
     artist: "RAW talk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    addedAt: "2025-05-11T13:00:00Z",
-    order: 10,
+    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-11T13:00:00Z",
   },
 ];
 
@@ -131,9 +121,9 @@ export default function DetailPlaylistScreen({
   const scrollY = useRef(new Animated.Value(0)).current;
   const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
   const [selectedSortOption, setSelectedSortOption] = useState("customerOrder");
-  const [sortedItems, setSortedItems] = useState(queueItems);
+  const [sortedItems, setSortedItems] = useState(songs);
   const [isSongOptionsOpen, setIsSongOptionsOpen] = useState(false);
-  const [selectedSong, setSelectedSong] = useState<(typeof queueItems)[0] | null>(null);
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [isPlaylistOptionsOpen, setIsPlaylistOptionsOpen] = useState(false);
 
   const navbarBackground = scrollY.interpolate({
@@ -173,19 +163,20 @@ export default function DetailPlaylistScreen({
 
   // Sorting logic
   useEffect(() => {
-    let sorted = [...queueItems];
+    let sorted = [...songs];
     switch (selectedSortOption) {
       case "customerOrder":
-        sorted.sort((a, b) => a.order - b.order);
+        // Since `order` is removed, default to createdAt or another field if needed
+        sorted.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
         break;
       case "title":
-        sorted.sort((a, b) => a.title.localeCompare(b.title));
+        sorted.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
         break;
       case "artist":
-        sorted.sort((a, b) => a.artist.localeCompare(b.artist));
+        sorted.sort((a, b) => (a.artist || "").localeCompare(b.artist || ""));
         break;
       case "recentlyAdded":
-        sorted.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
+        sorted.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
         break;
       default:
         break;
@@ -203,7 +194,6 @@ export default function DetailPlaylistScreen({
     switch (option) {
       case "addToOtherPlaylist":
         console.log(`Add ${selectedSong.title} to another playlist`);
-        // Implement navigation or logic to add to another playlist
         break;
       case "removeFromThisPlaylist":
         setSortedItems(sortedItems.filter((item) => item.id !== selectedSong.id));
@@ -211,27 +201,21 @@ export default function DetailPlaylistScreen({
         break;
       case "goToAlbum":
         console.log(`Navigate to album for ${selectedSong.title}`);
-        // Implement navigation to album
         break;
       case "goToArtist":
         console.log(`Navigate to artist ${selectedSong.artist}`);
-        // Implement navigation to artist
         break;
       case "share":
         console.log(`Share ${selectedSong.title}`);
-        // Implement share functionality
         break;
       case "goToSongRadio":
         console.log(`Go to song radio for ${selectedSong.title}`);
-        // Implement navigation to song radio
         break;
       case "viewSongCredits":
         console.log(`View credits for ${selectedSong.title}`);
-        // Implement navigation to song credits
         break;
       case "showSpotifyCode":
         console.log(`Show Spotify code for ${selectedSong.title}`);
-        // Implement Spotify code display
         break;
       default:
         break;
@@ -252,15 +236,12 @@ export default function DetailPlaylistScreen({
         break;
       case "deletePlaylist":
         console.log("Delete this playlist");
-        // Implement delete logic (e.g., API call, update state)
         break;
       case "share":
         console.log("Share this playlist");
-        // Implement share functionality
         break;
       case "showSpotifyCode":
         console.log("Show Spotify code for this playlist");
-        // Implement Spotify code display
         break;
       default:
         break;
@@ -342,7 +323,6 @@ export default function DetailPlaylistScreen({
         )}
       >
         <YStack flex={1} mt="$0" p="$4">
-          {/* Search bar */}
           <Animated.View style={{ opacity: searchOpacity }}>
             <XStack mt="$6" mb="$6">
               <Input
@@ -364,6 +344,7 @@ export default function DetailPlaylistScreen({
                   borderWidth: 0,
                   bg: "rgba(255, 255, 255, 0.3)",
                 }}
+                onFocus={() => navigation.navigate("SearchInPlaylist", { queueItems: songs })}
               />
               <XStack
                 position="absolute"
@@ -385,7 +366,7 @@ export default function DetailPlaylistScreen({
             p={0}
           >
             <Animated.Image
-              source={{ uri: queueItems[0].image }}
+              source={{ uri: songs[0]?.coverImage || "https://via.placeholder.com/150" }}
               style={{
                 width: imageSize,
                 height: imageSize,
@@ -410,7 +391,7 @@ export default function DetailPlaylistScreen({
               <Avatar circular size="$2">
                 <Avatar.Image
                   accessibilityLabel="Cam"
-                  src={queueItems[0].image}
+                  src={songs[0]?.coverImage || "https://via.placeholder.com/150"}
                 />
                 <Avatar.Fallback backgroundColor="$blue10" />
               </Avatar>
@@ -574,10 +555,9 @@ export default function DetailPlaylistScreen({
             </Button>
           </XStack>
 
-          {/* List of songs/podcasts */}
           <FlatList
             data={sortedItems}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.id || ""}
             scrollEnabled={false}
             renderItem={({ item }) => (
               <TouchableOpacity
@@ -588,7 +568,7 @@ export default function DetailPlaylistScreen({
                 <XStack items="center" justify="space-between" py="$2">
                   <XStack items="center" gap="$3" flex={1}>
                     <Image
-                      source={{ uri: item.image }}
+                      source={{ uri: item.coverImage || "https://via.placeholder.com/150" }}
                       width={50}
                       height={50}
                       borderRadius={8}
@@ -628,7 +608,6 @@ export default function DetailPlaylistScreen({
         </YStack>
       </ScrollView>
 
-      {/* Sort Bottom Sheet */}
       <SortBottomSheet
         isOpen={isSortSheetOpen}
         onClose={() => setIsSortSheetOpen(false)}
@@ -637,7 +616,6 @@ export default function DetailPlaylistScreen({
         context="detailPlaylist"
       />
 
-      {/* Song Options Bottom Sheet */}
       {selectedSong && (
         <View
           style={{
@@ -656,16 +634,15 @@ export default function DetailPlaylistScreen({
               setSelectedSong(null);
             }}
             onSelectOption={handleSelectSongOption}
-            songName={selectedSong.title}
-            urlAvatar={selectedSong.image}
+            songName={selectedSong.title || ""}
+            urlAvatar={selectedSong.coverImage || "https://via.placeholder.com/150"}
             type="Song"
-            artists={[{ id: parseInt(selectedSong.id), name: selectedSong.artist }]}
+            artists={[{ id: parseInt(selectedSong.id || "0"), name: selectedSong.artist || "" }]}
             context="detailPlaylist"
           />
         </View>
       )}
 
-      {/* Playlist Options Bottom Sheet */}
       {isPlaylistOptionsOpen && (
         <View
           style={{
@@ -682,7 +659,7 @@ export default function DetailPlaylistScreen({
             onClose={() => setIsPlaylistOptionsOpen(false)}
             onSelectOption={handleSelectPlaylistOption}
             playlistName="My Playlist"
-            urlAvatar={queueItems[0]?.image || "https://via.placeholder.com/150"}
+            urlAvatar={songs[0]?.coverImage || "https://via.placeholder.com/150"}
             creator="Long"
           />
         </View>
