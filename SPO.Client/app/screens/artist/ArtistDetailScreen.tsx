@@ -3,7 +3,7 @@ import { FlatList, ScrollView, Animated, View, StatusBar } from "react-native";
 import { YStack, XStack, Text, Image, H3, Button, Spinner } from "tamagui";
 import { ArrowLeft, Play, MoreVertical } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../navigation/AppNavigator";
+import { RootStackParamList } from "../../navigation/AppNavigator"; // Import RootStackParamList
 import { useGetAlbumsQuery } from "../../services/AlbumService";
 import { LinearGradient } from "@tamagui/linear-gradient";
 import {
@@ -20,11 +20,10 @@ import { ArtistItem } from "../../components/ArtistItem";
 import { AlbumItem } from "../../components/AlbumItem";
 import { SongItem } from "../../components/SongItem";
 import SongBottomSheet from "../../components/SongBottomSheet";
+import { playSong } from "../../services/playerService";
 
-type ArtistScreenNavigationProp = NativeStackNavigationProp<
-  HomeStackParamList,
-  "Artist"
->;
+// Định nghĩa type cho navigation với RootStackParamList
+type ArtistScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function ArtistDetailScreen({
   navigation,
@@ -124,7 +123,7 @@ export default function ArtistDetailScreen({
     <AlbumItem
       album={item}
       showDate={true}
-      onPress={() => navigation.navigate("Album", { id: item.id })}
+      onPress={() => (navigation as any).navigate("Album", { id: item.id })}
     />
   );
 
@@ -331,9 +330,14 @@ export default function ArtistDetailScreen({
                   showArtistName={false}
                   imageSize={48}
                   onMorePress={handleMorePress}
-                  onSongPress={(song) => {
-                    // navigation.navigate("Playing")
-                    console.log("Song pressed:", song.title);
+                  onSongPress={async (song) => {
+                    try {
+                      await playSong(song);
+                      navigation.navigate("Playing"); // Điều hướng đến Playing
+                      console.log("Song pressed and playing:", song.title);
+                    } catch (error) {
+                      console.error("Error playing song:", error);
+                    }
                   }}
                 />
               )}
@@ -364,21 +368,21 @@ export default function ArtistDetailScreen({
             Fan also Like
           </H3>
           {isArtistsLoading ? (
-              <Spinner size="large" color="$green10" />
-            ) : artistsError ? (
-              <Text color="white">Error loading artists</Text>
-            ) : !filteredArtists || filteredArtists.length === 0 ? (
-              <Text color="rgba(255,255,255,0.7)">No other artists found</Text>
-            ) : (
-              <FlatList
-                data={filteredArtists}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                keyExtractor={(item) => item.id}
-                renderItem={renderArtistItem}
-                contentContainerStyle={{ paddingRight: 16 }}
-              />
-            )}
+            <Spinner size="large" color="$green10" />
+          ) : artistsError ? (
+            <Text color="white">Error loading artists</Text>
+          ) : !filteredArtists || filteredArtists.length === 0 ? (
+            <Text color="rgba(255,255,255,0.7)">No other artists found</Text>
+          ) : (
+            <FlatList
+              data={filteredArtists}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item) => item.id}
+              renderItem={renderArtistItem}
+              contentContainerStyle={{ paddingRight: 16 }}
+            />
+          )}
         </LinearGradient>
       </ScrollView>
       <SongBottomSheet
@@ -388,10 +392,10 @@ export default function ArtistDetailScreen({
           setSelectedSong(null);
         }}
         selectedSong={selectedSong}
-        navigation={navigation}
+        navigation={navigation as any}
         screenType="artist"
         onAddToOtherPlaylist={() => {
-          handleNavigation("AddSongPlaylists", undefined);
+          navigation.navigate("AddSongPlaylists");
         }}
         onAddToQueue={() => {
           console.log("Add to queue");
@@ -401,7 +405,7 @@ export default function ArtistDetailScreen({
         }}
         onGoToAlbum={() => {
           if (selectedSong?.albumId) {
-            handleNavigation("Album", { id: selectedSong.albumId });
+            (navigation as any).navigate("Album", { id: selectedSong.albumId });
           } else {
             Toast.show({
               type: "error",

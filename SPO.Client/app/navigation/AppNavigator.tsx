@@ -4,6 +4,7 @@ import * as React from "react";
 import SplashNavigator from "./SplashNavigator";
 import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
 import PlayingScreen from "../screens/PlayingScreen";
+import { AddSongPlaylistsScreen } from "../screens/artist/AddSongPlayListsScreen";
 
 const Stack = createStackNavigator();
 
@@ -11,6 +12,7 @@ export type RootStackParamList = {
   SplashNavigator: undefined;
   Playing: undefined;
   AddToPlaylist: undefined;
+  AddSongPlaylists: undefined;
 };
 
 export default function AppNavigator() {
@@ -30,6 +32,11 @@ export default function AppNavigator() {
         <Stack.Screen
           name="AddToPlaylist"
           component={AddToPlaylistScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddSongPlaylists"
+          component={AddSongPlaylistsScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

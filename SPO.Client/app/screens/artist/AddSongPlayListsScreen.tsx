@@ -8,7 +8,7 @@ import { Animated } from "react-native";
 import { HomeStackParamList } from "../../navigation/HomeNavigator";
 
 type AddSongPlaylistsScreenNavigationProp = NativeStackNavigationProp<
-  HomeStackParamList,
+  RootStackParamList,
   "AddSongPlaylists"
 >;
 export const AddSongPlaylistsScreen = ({
