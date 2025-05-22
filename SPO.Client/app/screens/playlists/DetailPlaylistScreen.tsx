@@ -29,56 +29,89 @@ import {
   Search,
 } from "@tamagui/lucide-icons";
 import { LinearGradient } from "@tamagui/linear-gradient";
+import SortBottomSheet from "../../components/library/SortBottomSheet";
 
-// Dữ liệu giả lập cho queue
+// Mock data for queue with addedAt field for sorting by "Recently Added"
 const queueItems = [
   {
     id: "1",
     title: "Song breakdown: I WANT YOU",
-    description: "The Interstellar Tennis Podcast",
+    artist: "The Interstellar Tennis Podcast",
     image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    addedAt: "2025-05-20T10:00:00Z",
+    order: 1,
   },
   {
     id: "2",
     title: "Accepting the song that blew you up",
-    description: "RAW talk",
+    artist: "RAW talk",
     image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    addedAt: "2025-05-19T12:00:00Z",
+    order: 2,
   },
   {
     id: "3",
     title: "Song breakdown: I WANT YOU",
-    description: "The Interstellar Tennis Podcast",
+    artist: "The Interstellar Tennis Podcast",
     image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    addedAt: "2025-05-18T15:00:00Z",
+    order: 3,
   },
   {
     id: "4",
     title: "Accepting the song that blew you up",
-    description: "RAW talk",
+    artist: "RAW talk",
     image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    addedAt: "2025-05-17T09:00:00Z",
+    order: 4,
   },
   {
     id: "5",
-    title: "Song breakdown: I WANT YOU",
-    description: "The Interstellar Tennis Podcast",
+    title: "Song breakdown: I WANT YOU111",
+    artist: "The Interstellar Tennis Podcast",
     image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    addedAt: "2025-05-16T14:00:00Z",
+    order: 5,
   },
   {
     id: "6",
     title: "Accepting the song that blew you up",
-    description: "RAW talk",
+    artist: "RAW talk",
     image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    addedAt: "2025-05-15T11:00:00Z",
+    order: 6,
   },
   {
     id: "7",
     title: "Song breakdown: I WANT YOU",
-    description: "The Interstellar Tennis Podcast",
+    artist: "The Interstellar Tennis Podcast",
     image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    addedAt: "2025-05-14T16:00:00Z",
+    order: 7,
   },
   {
     id: "8",
     title: "Accepting the song that blew you up",
-    description: "RAW talk",
+    artist: "RAW talk",
     image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    addedAt: "2025-05-13T08:00:00Z",
+    order: 8,
+  },
+  {
+    id: "9",
+    title: "Accepting the song that blew you up",
+    artist: "RAW talk",
+    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    addedAt: "2025-05-12T10:00:00Z",
+    order: 9,
+  },
+  {
+    id: "10",
+    title: "Accepting the song that blew you up",
+    artist: "RAW talk",
+    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    addedAt: "2025-05-11T13:00:00Z",
+    order: 10,
   },
 ];
 
@@ -93,8 +126,10 @@ export default function DetailPlaylistScreen({
   navigation: QueueScreenNavigationProp;
 }) {
   const dispatch = useDispatch();
-
   const scrollY = useRef(new Animated.Value(0)).current;
+  const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
+  const [selectedSortOption, setSelectedSortOption] = useState("customerOrder");
+  const [sortedItems, setSortedItems] = useState(queueItems);
 
   const navbarBackground = scrollY.interpolate({
     inputRange: [190, 220],
@@ -131,6 +166,33 @@ export default function DetailPlaylistScreen({
     });
   }, [navigation]);
 
+  // Sorting logic
+  useEffect(() => {
+    let sorted = [...queueItems];
+    switch (selectedSortOption) {
+      case "customerOrder":
+        sorted.sort((a, b) => a.order - b.order);
+        break;
+      case "title":
+        sorted.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case "artist":
+        sorted.sort((a, b) => a.artist.localeCompare(b.artist));
+        break;
+      case "recentlyAdded":
+        sorted.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
+        break;
+      default:
+        break;
+    }
+    setSortedItems(sorted);
+  }, [selectedSortOption]);
+
+  const handleSelectSortOption = (option: string) => {
+    setSelectedSortOption(option);
+    setIsSortSheetOpen(false);
+  };
+
   return (
     <LinearGradient
       p={0}
@@ -149,7 +211,7 @@ export default function DetailPlaylistScreen({
       <Animated.View
         style={{
           position: "absolute",
-          top: 0,
+          top: -35,
           left: 0,
           right: 0,
           height: 90,
@@ -191,7 +253,7 @@ export default function DetailPlaylistScreen({
                 marginLeft: 8,
               }}
             >
-              Danh sách phát của tôi
+              My Playlist
             </Animated.Text>
           </View>
           <XStack width={40} />
@@ -204,8 +266,8 @@ export default function DetailPlaylistScreen({
           { useNativeDriver: false }
         )}
       >
-        <YStack flex={1} mt="$6" p="$4">
-          {/* Thanh tìm kiếm */}
+        <YStack flex={1} mt="$0" p="$4">
+          {/* Search bar */}
           <Animated.View style={{ opacity: searchOpacity }}>
             <XStack mt="$6" mb="$6">
               <Input
@@ -214,7 +276,7 @@ export default function DetailPlaylistScreen({
                 rounded="$2"
                 bg="rgba(255, 255, 255, 0.2)"
                 color="white"
-                placeholder="Tìm trong danh sách phát"
+                placeholder="Search in playlist"
                 placeholderTextColor="rgba(255, 255, 255, 0.6)"
                 flex={1}
                 m="auto"
@@ -265,7 +327,7 @@ export default function DetailPlaylistScreen({
           </XStack>
 
           <H3 mt={0} mb="$3" color="white" fontWeight="bold">
-            Danh sách phát của tôi
+            My Playlist
           </H3>
 
           <YStack>
@@ -284,7 +346,7 @@ export default function DetailPlaylistScreen({
                   color="white"
                   text="center"
                 >
-                  Lương Hoàng Hải
+                  Hoàng Hải Lương
                 </Text>
               </YStack>
             </XStack>
@@ -297,7 +359,7 @@ export default function DetailPlaylistScreen({
                   color="white"
                   text="center"
                 >
-                  47 ph
+                  47 min
                 </Text>
               </YStack>
             </XStack>
@@ -396,7 +458,7 @@ export default function DetailPlaylistScreen({
               size="$3"
               bg="rgba(255, 255, 255, 0.2)"
               rounded={50}
-              onPress={() => console.log("Thêm bài hát")}
+              onPress={() => console.log("Add song")}
             >
               <XStack
                 items="center"
@@ -405,7 +467,7 @@ export default function DetailPlaylistScreen({
               >
                 <Plus color="white" size="$1" />
                 <Text color="white" fontWeight="bold" fontSize="$3">
-                  Thêm
+                  Add
                 </Text>
               </XStack>
             </Button>
@@ -413,12 +475,12 @@ export default function DetailPlaylistScreen({
               size="$3"
               bg="rgba(255, 255, 255, 0.2)"
               rounded={50}
-              onPress={() => console.log("Sắp xếp")}
+              onPress={() => setIsSortSheetOpen(true)} // Open SortBottomSheet
             >
               <XStack items="center" space="$1">
                 <ChevronsUpDown color="white" size="$1" />
                 <Text fontWeight="bold" color="white" fontSize="$3">
-                  Sắp xếp
+                  Sort
                 </Text>
               </XStack>
             </Button>
@@ -431,15 +493,15 @@ export default function DetailPlaylistScreen({
               <XStack items="center" space="$1">
                 <Pen color="white" size="$1" />
                 <Text fontWeight="bold" color="white" fontSize="$3">
-                  Chỉnh sửa
+                  Edit
                 </Text>
               </XStack>
             </Button>
           </XStack>
 
-          {/* Danh sách bài hát/podcast */}
+          {/* List of songs/podcasts */}
           <FlatList
-            data={queueItems}
+            data={sortedItems}
             keyExtractor={(item) => item.id}
             scrollEnabled={false}
             renderItem={({ item }) => (
@@ -461,7 +523,7 @@ export default function DetailPlaylistScreen({
                         {item.title}
                       </Text>
                       <Text fontSize={13} color="white" opacity={0.7}>
-                        {item.description}
+                        {item.artist}
                       </Text>
                     </YStack>
                   </XStack>
@@ -486,6 +548,15 @@ export default function DetailPlaylistScreen({
           />
         </YStack>
       </ScrollView>
+
+      {/* Sort Bottom Sheet */}
+      <SortBottomSheet
+        isOpen={isSortSheetOpen}
+        onClose={() => setIsSortSheetOpen(false)}
+        onSelectOption={handleSelectSortOption}
+        selectedOption={selectedSortOption}
+        context="detailPlaylist"
+      />
     </LinearGradient>
   );
 }
