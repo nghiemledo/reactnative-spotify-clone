@@ -19,7 +19,7 @@ import {
   useGetAlbumsQuery,
 } from "../services/AlbumService";
 import { useGetSongsQuery } from "../services/SongService";
-import { HomeStackParamList } from "../navigation/HomeNavigator";
+import { RootStackParamList } from "../navigation/AppNavigator"; // Import RootStackParamList
 import { Album } from "../types/album";
 import { useGetArtistsQuery } from "../services/ArtistService";
 import { Artist } from "../types/artist";
@@ -28,16 +28,20 @@ import { Song } from "../types/song";
 import { SongItem } from "../components/SongItem";
 import { AlbumItem } from "../components/AlbumItem";
 import SongBottomSheet from "../components/SongBottomSheet";
+import { playSong } from "../services/playerService";
+import { HomeStackParamList } from "../navigation/HomeNavigator";
 
 type AlbumRouteProp = RouteProp<HomeStackParamList, "Album">;
+
+// Cập nhật type của navigation để sử dụng RootStackParamList
+type AlbumScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function AlbumScreen() {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
   const [isAdded, setIsAdded] = useState(false);
-  const navigation =
-    useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
+  const navigation = useNavigation<AlbumScreenNavigationProp>();
   const route = useRoute<AlbumRouteProp>();
   const albumId = route.params?.id;
 
@@ -391,8 +395,20 @@ export default function AlbumScreen() {
             imageSize={48}
             getArtistName={getArtistName}
             onMorePress={handleMorePress}
-            onSongPress={(song) => {
-              console.log("Song pressed:", song.title);
+            onSongPress={async (song) => {
+              try {
+                await playSong(song);
+                navigation.navigate("Playing"); // Điều hướng đến Playing
+                console.log("Song pressed:", song.title);
+              } catch (error) {
+                console.error("Error playing song:", error);
+                Toast.show({
+                  type: "error",
+                  text1: "Không thể phát bài hát",
+                  position: "bottom",
+                  visibilityTime: 2000,
+                });
+              }
             }}
           />
         )}
@@ -407,8 +423,8 @@ export default function AlbumScreen() {
           ) : (
             <Text color="rgba(255,255,255,0.7)">
               {songsLoading
-                ? "Loading songs..."
-                : "No songs found for this album"}
+                ? "Đang tải bài hát..."
+                : "Không tìm thấy bài hát cho album này"}
             </Text>
           )
         }
@@ -423,10 +439,10 @@ export default function AlbumScreen() {
           setSelectedSong(null);
         }}
         selectedSong={selectedSong}
-        navigation={navigation}
+        navigation={navigation as any}
         screenType="album"
         onAddToOtherPlaylist={() => {
-          // handleNavigation("AddToPlaylist", undefined);
+          navigation.navigate("AddToPlaylist");
         }}
         onAddToQueue={() => {
           console.log("Add to queue");
@@ -441,7 +457,7 @@ export default function AlbumScreen() {
           } else {
             Toast.show({
               type: "error",
-              text1: "No artist found for this song",
+              text1: "Không tìm thấy nghệ sĩ cho bài hát này",
               position: "bottom",
               visibilityTime: 2000,
             });

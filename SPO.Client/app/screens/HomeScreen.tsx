@@ -279,7 +279,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
                         onSongPress={async (song) => {
                           try {
                             await playSong(song);
-                            navigation.navigate("Playing");
+                            handleNavigation(
+                              "Playing" as keyof HomeStackParamList
+                            );
                             console.log(
                               "Song pressed and playing:",
                               song.title
