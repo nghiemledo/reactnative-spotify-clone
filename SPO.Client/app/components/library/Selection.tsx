@@ -12,13 +12,14 @@ import { Search } from "@tamagui/lucide-icons";
 import { GreatPicks } from "./GreatPicks";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
-import { RootStackParamList } from "../../navigation/AppNavigator";
+import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
+import { SearchStackParamList } from "../../navigation/SearchNavigator";
 
 type SelectionProps<T> = {
   data: T[];
   title: string;
-  navigation: NativeStackNavigationProp<RootStackParamList>;
-  route: RouteProp<RootStackParamList, "ArtistSelection" | "PodcastSelection">;
+  navigation: NativeStackNavigationProp<SearchStackParamList>;
+  route: RouteProp<LibraryStackParamList, "ArtistSelection" | "PodcastSelection">;
   renderItem: (
     item: T,
     index: number,
@@ -80,7 +81,7 @@ export const Selection = <T extends { id: string }>({
   }, [route.params?.selectedIds]);
 
   const handleSearch = () => {
-    navigation.navigate("SearchScreen", { type, selectedIds: selectedItems });
+    navigation.navigate("SearchLibaryScreen", { type, selectedIds: selectedItems });
   };
 
   if (showGreatPicks) {
