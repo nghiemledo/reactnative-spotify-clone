@@ -17,6 +17,8 @@ import {
   removeTrackFromQueue,
   setShuffle,
   setLoop,
+  setSleepTimer,
+  clearSleepTimer,
 } from "../store/playerSlice";
 import { Track } from "../types/track";
 import { Song } from "../types/song";
@@ -48,7 +50,52 @@ const tracks: Track[] = [
     artwork: "https://thantrieu.com/resources/arts/1130295694.webp",
   },
 ];
+let sleepTimerTimeout: ReturnType<typeof setTimeout> | null = null;
+// Hàm thiết lập hẹn giờ
+export const setSleepTimerAsync = async (minutes: number) => {
+  try {
+    // Tính thời gian kết thúc (timestamp)
+    const endTime = Date.now() + minutes * 60 * 1000;
+    store.dispatch(setSleepTimer(endTime));
 
+    // Hủy timeout cũ nếu có
+    if (sleepTimerTimeout) {
+      clearTimeout(sleepTimerTimeout);
+    }
+
+    // Thiết lập timeout mới
+    const timeLeft = endTime - Date.now();
+    sleepTimerTimeout = setTimeout(async () => {
+      try {
+        // Tạm dừng phát nhạc
+        await TrackPlayer.pause();
+        store.dispatch(setPlaying(false));
+        store.dispatch(clearSleepTimer());
+        console.log("Sleep timer ended, playback paused");
+      } catch (error) {
+        console.error("Sleep Timer Pause Error:", error);
+      }
+    }, timeLeft);
+
+    console.log(`Sleep timer set for ${minutes} minutes`);
+  } catch (error) {
+    console.error("Set Sleep Timer Error:", error);
+  }
+};
+
+// Hàm hủy hẹn giờ
+export const cancelSleepTimer = async () => {
+  try {
+    if (sleepTimerTimeout) {
+      clearTimeout(sleepTimerTimeout);
+      sleepTimerTimeout = null;
+    }
+    store.dispatch(clearSleepTimer());
+    console.log("Sleep timer cancelled");
+  } catch (error) {
+    console.error("Cancel Sleep Timer Error:", error);
+  }
+};
 // Hàm chọn track ngẫu nhiên cho chế độ shuffle
 const getRandomTrackIndex = (
   queue: Track[],
@@ -525,6 +572,7 @@ export const clearQueue = async () => {
     store.dispatch(setQueue([]));
     store.dispatch(setCurrentTrack(null));
     store.dispatch(setPlaying(false));
+    await cancelSleepTimer();
     console.log("Queue cleared");
   } catch (error) {
     console.error("Clear Queue Error:", error);

@@ -292,7 +292,7 @@ const PlayingScreen = () => {
         isOpen={isPlayingSheetOpen}
         onClose={() => setIsPlayingSheetOpen(false)}
         onAddToPlaylist={() => console.log("Add to playlist")}
-        onSleepTimer={() => console.log("Set sleep timer")}
+        onSleepTimer={() => {}}
         onShowSpotifyCode={() => console.log("Show Spotify code")}
       />
     </ImageBackground>
