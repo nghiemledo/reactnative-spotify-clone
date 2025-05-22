@@ -31,6 +31,7 @@ import {
 import { LinearGradient } from "@tamagui/linear-gradient";
 import SortBottomSheet from "../../components/library/SortBottomSheet";
 import SongOptionsBottomSheet from "../../components/search/SongOptionsBottomSheet";
+import PlaylistOptionsBottomSheet from "../../components/playlist/PlaylistOptionsBottomSheet";
 
 // Mock data for queue with addedAt field for sorting by "Recently Added"
 const queueItems = [
@@ -133,6 +134,7 @@ export default function DetailPlaylistScreen({
   const [sortedItems, setSortedItems] = useState(queueItems);
   const [isSongOptionsOpen, setIsSongOptionsOpen] = useState(false);
   const [selectedSong, setSelectedSong] = useState<(typeof queueItems)[0] | null>(null);
+  const [isPlaylistOptionsOpen, setIsPlaylistOptionsOpen] = useState(false);
 
   const navbarBackground = scrollY.interpolate({
     inputRange: [190, 220],
@@ -236,6 +238,34 @@ export default function DetailPlaylistScreen({
     }
     setIsSongOptionsOpen(false);
     setSelectedSong(null);
+  };
+
+  const handleSelectPlaylistOption = (option: string) => {
+    switch (option) {
+      case "addToThisPlaylist":
+        console.log("Navigate to add songs to this playlist");
+        navigation.navigate("addSongPlaylist");
+        break;
+      case "editPlaylist":
+        console.log("Navigate to edit playlist");
+        navigation.navigate("updateSongPlaylist");
+        break;
+      case "deletePlaylist":
+        console.log("Delete this playlist");
+        // Implement delete logic (e.g., API call, update state)
+        break;
+      case "share":
+        console.log("Share this playlist");
+        // Implement share functionality
+        break;
+      case "showSpotifyCode":
+        console.log("Show Spotify code for this playlist");
+        // Implement Spotify code display
+        break;
+      default:
+        break;
+    }
+    setIsPlaylistOptionsOpen(false);
   };
 
   return (
@@ -454,11 +484,11 @@ export default function DetailPlaylistScreen({
                 }}
               />
               <Button
-                disabled
                 bg="transparent"
                 color="white"
                 m={0}
                 p={0}
+                onPress={() => setIsPlaylistOptionsOpen(true)}
                 icon={
                   <EllipsisVertical size="$2" color="white" strokeWidth={1} />
                 }
@@ -609,19 +639,53 @@ export default function DetailPlaylistScreen({
 
       {/* Song Options Bottom Sheet */}
       {selectedSong && (
-        <SongOptionsBottomSheet
-          isOpen={isSongOptionsOpen}
-          onClose={() => {
-            setIsSongOptionsOpen(false);
-            setSelectedSong(null);
+        <View
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9999,
+            height: "100%",
           }}
-          onSelectOption={handleSelectSongOption}
-          songName={selectedSong.title}
-          urlAvatar={selectedSong.image}
-          type="Song"
-          artists={[{ id: parseInt(selectedSong.id), name: selectedSong.artist }]}
-          context="detailPlaylist"
-        />
+        >
+          <SongOptionsBottomSheet
+            isOpen={isSongOptionsOpen}
+            onClose={() => {
+              setIsSongOptionsOpen(false);
+              setSelectedSong(null);
+            }}
+            onSelectOption={handleSelectSongOption}
+            songName={selectedSong.title}
+            urlAvatar={selectedSong.image}
+            type="Song"
+            artists={[{ id: parseInt(selectedSong.id), name: selectedSong.artist }]}
+            context="detailPlaylist"
+          />
+        </View>
+      )}
+
+      {/* Playlist Options Bottom Sheet */}
+      {isPlaylistOptionsOpen && (
+        <View
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9999,
+            height: "100%",
+          }}
+        >
+          <PlaylistOptionsBottomSheet
+            isOpen={isPlaylistOptionsOpen}
+            onClose={() => setIsPlaylistOptionsOpen(false)}
+            onSelectOption={handleSelectPlaylistOption}
+            playlistName="My Playlist"
+            urlAvatar={queueItems[0]?.image || "https://via.placeholder.com/150"}
+            creator="Long"
+          />
+        </View>
       )}
     </LinearGradient>
   );
