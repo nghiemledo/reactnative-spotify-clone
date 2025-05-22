@@ -1,25 +1,21 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import TabNavigator from "./TabNavigator";
-import AlbumScreen from "../screens/AlbumScreen";
-import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
-import ArtistScreen from "../screens/artist/ArtistDetailScreen";
-import SettingsScreen from "../screens/SettingsScreen";
 import SearchScreen from "../screens/search/SearchScreen";
 import SearchResultScreen from "../screens/search/SearchResultScreen";
 import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
-import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
 const Stack = createStackNavigator();
+
 export type SearchStackParamList = {
-  Search: undefined;
+  SearchScreen: undefined;
   SearchResult: { toastMessages?: string[] };
-  // AddToPlaylist: { songId: number };
+  AddToPlaylist: undefined;
 };
+
 export default function SearchNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Search"
+        name="SearchScreen" // Đổi tên
         component={SearchScreen}
         options={{ headerShown: false }}
       />
@@ -28,7 +24,11 @@ export default function SearchNavigator() {
         component={SearchResultScreen}
         options={{ headerShown: false }}
       />
-      
+      <Stack.Screen
+        name="AddToPlaylist"
+        component={AddToPlaylistScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }

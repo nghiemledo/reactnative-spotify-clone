@@ -7,8 +7,8 @@ import PodcastSelectionScreen from "../screens/library/PodcastSelectionScreen";
 const Stack = createStackNavigator();
 
 export type LibraryStackParamList = {
-  Library: undefined;
-  SearchLibaryScreen: undefined;
+  LibraryScreen: undefined;
+  SearchLibraryScreen: undefined;
   ArtistSelection: { selectedIds: string[] };
   PodcastSelection: { selectedIds: string[] };
 };
@@ -17,7 +17,7 @@ export default function LibraryNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Library"
+        name="LibraryScreen" // Đổi tên
         component={LibraryScreen}
         options={{ headerShown: false }}
       />
@@ -27,7 +27,7 @@ export default function LibraryNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="SearchLibaryScreen"
+        name="SearchLibraryScreen"
         component={SearchLibraryScreen}
         options={{ headerShown: false }}
       />

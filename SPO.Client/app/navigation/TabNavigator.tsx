@@ -1,15 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import PlayingScreen from "../screens/PlayingScreen";
-import {
-  Home,
-  Library,
-  Plus,
-  Search,
-  PlayCircle,
-  Snowflake,
-  House,
-  Slack,
-} from "@tamagui/lucide-icons";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
+import { Home, Library, Plus, Search, Slack } from "@tamagui/lucide-icons";
 import CreateBottomSheet from "../components/library/CreateBottomSheet";
 import React, { useState } from "react";
 import SearchNavigator from "./SearchNavigator";
@@ -25,7 +16,7 @@ export default function TabNavigator() {
   return (
     <>
       <Tab.Navigator
-        screenOptions={{
+        screenOptions={({ route }) => ({
           tabBarActiveTintColor: "white",
           tabBarInactiveTintColor: "#B3B3B3",
           tabBarStyle: {
@@ -37,8 +28,13 @@ export default function TabNavigator() {
             right: 0,
             height: 60,
             elevation: 0,
+            // Ẩn bottom tab khi ở PlayingScreen
+            display:
+              getFocusedRouteNameFromRoute(route) === "Playing"
+                ? "none"
+                : "flex",
           },
-        }}
+        })}
       >
         <Tab.Screen
           name="HomeTab"
@@ -46,7 +42,7 @@ export default function TabNavigator() {
           options={{
             headerShown: false,
             tabBarLabel: "Home",
-            tabBarIcon: ({ color }) => <House color={color as any} size={24} />,
+            tabBarIcon: ({ color }) => <Home color={color as any} size={24} />,
           }}
         />
         <Tab.Screen
@@ -72,40 +68,12 @@ export default function TabNavigator() {
           }}
         />
         <Tab.Screen
-          name="Preminum"
+          name="Premium"
           component={PremiumNavigator}
           options={{
             headerShown: false,
             tabBarLabel: "Premium",
             tabBarIcon: ({ color }) => <Slack color={color as any} size={24} />,
-          }}
-        />
-        {/* <Tab.Screen
-          name="CreatePlaylist"
-          component={HomeScreen}
-          options={{
-            headerShown: false,
-            tabBarLabel: "Create",
-            tabBarIcon: ({ color }) => (
-              <Plus color={color as any} size={24} />
-            ),
-            tabBarButton: (props) => (
-              <TouchableOpacity
-                {...props}
-                onPress={() => setIsBottomSheetOpen(true)}
-              />
-            ),
-          }}
-        /> */}
-        <Tab.Screen
-          name="Playing"
-          component={PlayingScreen}
-          options={{
-            headerShown: false,
-            tabBarLabel: "Playing",
-            tabBarIcon: ({ color }) => (
-              <PlayCircle color={color as any} size={24} />
-            ),
           }}
         />
       </Tab.Navigator>
