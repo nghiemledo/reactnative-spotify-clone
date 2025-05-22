@@ -1,4 +1,7 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import {
+  BottomTabBar,
+  createBottomTabNavigator,
+} from "@react-navigation/bottom-tabs";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { Home, Library, Plus, Search, Slack } from "@tamagui/lucide-icons";
 import CreateBottomSheet from "../components/library/CreateBottomSheet";
@@ -7,6 +10,7 @@ import SearchNavigator from "./SearchNavigator";
 import HomeNavigator from "./HomeNavigator";
 import LibraryNavigator from "./LibraryNavigator";
 import PremiumNavigator from "./PremiumNavigator";
+import MiniPlayer from "../components/MiniPlayer";
 
 const Tab = createBottomTabNavigator();
 
@@ -35,6 +39,12 @@ export default function TabNavigator() {
                 : "flex",
           },
         })}
+        tabBar={(props) => (
+          <>
+            <MiniPlayer />
+            <BottomTabBar {...props} />
+          </>
+        )}
       >
         <Tab.Screen
           name="HomeTab"
