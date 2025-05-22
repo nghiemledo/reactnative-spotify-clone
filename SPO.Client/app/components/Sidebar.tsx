@@ -1,6 +1,6 @@
 import React from "react";
 import { YStack, XStack, Text, Avatar } from "tamagui";
-import { User, Volume2, BarChart2, Info } from "@tamagui/lucide-icons";
+import { User, Volume2, BarChart2, Info, Settings } from "@tamagui/lucide-icons";
 import { StatusBar, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -24,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navigation }) => {
       <TouchableOpacity
         onPress={() => {
           onClose();
-          navigation.navigate("Profile");
+          // navigation.navigate("Profile");
         }}
       >
         <XStack
@@ -57,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navigation }) => {
         title="What's new"
         onPress={() => {
           onClose();
-          navigation.navigate("WhatsNew");
+          // navigation.navigate("WhatsNew");
         }}
       />
       <SidebarItem
@@ -65,11 +65,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navigation }) => {
         title="Recents"
         onPress={() => {
           onClose();
-          navigation.navigate("Recents");
+          // navigation.navigate("Recents");
         }}
       />
       <SidebarItem
-        icon={<User color="#fff" size={24} />}
+        icon={<Settings color="#fff" size={24} />}
         title="Settings and privacy"
         onPress={() => {
           onClose();

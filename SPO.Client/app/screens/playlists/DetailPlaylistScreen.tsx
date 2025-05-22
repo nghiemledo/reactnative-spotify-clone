@@ -33,6 +33,7 @@ import SortBottomSheet from "../../components/library/SortBottomSheet";
 import SongOptionsBottomSheet from "../../components/search/SongOptionsBottomSheet";
 import PlaylistOptionsBottomSheet from "../../components/playlist/PlaylistOptionsBottomSheet";
 import { Song } from "../../types/song";
+import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 
 const songs: Song[] = [
   {
@@ -108,7 +109,7 @@ const songs: Song[] = [
 ];
 
 type QueueScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+  LibraryStackParamList,
   "detailPlaylist"
 >;
 
@@ -228,7 +229,7 @@ export default function DetailPlaylistScreen({
     switch (option) {
       case "addToThisPlaylist":
         console.log("Navigate to add songs to this playlist");
-        navigation.navigate("addSongPlaylist");
+        navigation.navigate("AddSongPlaylist");
         break;
       case "editPlaylist":
         console.log("Navigate to edit playlist");
@@ -344,7 +345,7 @@ export default function DetailPlaylistScreen({
                   borderWidth: 0,
                   bg: "rgba(255, 255, 255, 0.3)",
                 }}
-                onFocus={() => navigation.navigate("SearchInPlaylist", { queueItems: songs })}
+                onFocus={() => navigation.navigate("SearchInPlaylist", { Items: songs })}
               />
               <XStack
                 position="absolute"
@@ -519,7 +520,7 @@ export default function DetailPlaylistScreen({
               <XStack
                 items="center"
                 space="$1"
-                onPress={() => navigation.navigate("addSongPlaylist")}
+                onPress={() => navigation.navigate("AddSongPlaylist")}
               >
                 <Plus color="white" size="$1" />
                 <Text color="white" fontWeight="bold" fontSize="$3">
@@ -561,9 +562,9 @@ export default function DetailPlaylistScreen({
             scrollEnabled={false}
             renderItem={({ item }) => (
               <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("PlayerModal");
-                }}
+                // onPress={() => {
+                //   navigation.navigate("PlayerModal");
+                // }}
               >
                 <XStack items="center" justify="space-between" py="$2">
                   <XStack items="center" gap="$3" flex={1}>

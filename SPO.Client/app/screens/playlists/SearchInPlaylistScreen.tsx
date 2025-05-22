@@ -6,9 +6,10 @@ import { ArrowLeft, X, EllipsisVertical } from "@tamagui/lucide-icons";
 import { Dimensions, FlatList, ScrollView, TouchableOpacity } from "react-native";
 import SongOptionsBottomSheet from "../../components/search/SongOptionsBottomSheet";
 import { Song } from "../../types/song"; 
+import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 
 type SearchInPlaylistScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+  LibraryStackParamList,
   "SearchInPlaylist"
 >;
 
@@ -144,9 +145,9 @@ export default function SearchInPlaylistScreen({ navigation, route }: SearchInPl
               scrollEnabled={false}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("PlayerModal");
-                  }}
+                //   onPress={() => {
+                //     navigation.navigate("PlayerModal");
+                //   }}
                 >
                   <XStack items="center" justify="space-between" py="$2">
                     <XStack items="center" gap="$3" flex={1}>

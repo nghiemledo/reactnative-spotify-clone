@@ -17,6 +17,7 @@ import Toast, { BaseToastProps } from "react-native-toast-message";
 import DraggableFlatList, {
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
+import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 
 const songs = [
   {
@@ -116,7 +117,7 @@ const songs = [
 ];
 
 type updateSongPlaylistNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+  LibraryStackParamList,
   "updateSongPlaylist"
 >;
 

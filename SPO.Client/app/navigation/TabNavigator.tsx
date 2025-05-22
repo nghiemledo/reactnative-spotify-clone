@@ -1,13 +1,21 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "../screens/HomeScreen";
 import PlayingScreen from "../screens/PlayingScreen";
-import SearchScreen from "../screens/search/SearchScreen";
-import { Home, Library, Plus, Search, PlayCircle } from "@tamagui/lucide-icons";
-import LibraryScreen from "../screens/LibaryScreen";
+import {
+  Home,
+  Library,
+  Plus,
+  Search,
+  PlayCircle,
+  Snowflake,
+  House,
+  Slack,
+} from "@tamagui/lucide-icons";
 import CreateBottomSheet from "../components/library/CreateBottomSheet";
 import React, { useState } from "react";
-import { TouchableOpacity } from "react-native";
 import SearchNavigator from "./SearchNavigator";
+import HomeNavigator from "./HomeNavigator";
+import LibraryNavigator from "./LibraryNavigator";
+import PremiumNavigator from "./PremiumNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -18,26 +26,27 @@ export default function TabNavigator() {
     <>
       <Tab.Navigator
         screenOptions={{
-          tabBarActiveTintColor: "#1DB954",
+          tabBarActiveTintColor: "white",
           tabBarInactiveTintColor: "#B3B3B3",
           tabBarStyle: {
-            backgroundColor: "#191414",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
             borderTopWidth: 0,
             position: "absolute",
             bottom: 0,
             left: 0,
             right: 0,
             height: 60,
+            elevation: 0,
           },
         }}
       >
         <Tab.Screen
-          name="Home"
-          component={HomeScreen}
+          name="HomeTab"
+          component={HomeNavigator}
           options={{
             headerShown: false,
             tabBarLabel: "Home",
-            tabBarIcon: ({ color }) => <Home color={color as any} size={24} />,
+            tabBarIcon: ({ color }) => <House color={color as any} size={24} />,
           }}
         />
         <Tab.Screen
@@ -53,13 +62,22 @@ export default function TabNavigator() {
         />
         <Tab.Screen
           name="Library"
-          component={LibraryScreen}
+          component={LibraryNavigator}
           options={{
             headerShown: false,
             tabBarLabel: "Library",
             tabBarIcon: ({ color }) => (
               <Library color={color as any} size={24} />
             ),
+          }}
+        />
+        <Tab.Screen
+          name="Preminum"
+          component={PremiumNavigator}
+          options={{
+            headerShown: false,
+            tabBarLabel: "Premium",
+            tabBarIcon: ({ color }) => <Slack color={color as any} size={24} />,
           }}
         />
         {/* <Tab.Screen

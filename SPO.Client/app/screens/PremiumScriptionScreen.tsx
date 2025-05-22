@@ -25,11 +25,11 @@ import {
   Star,
 } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { HomeStackParamList } from "../navigation/HomeNavigator";
 import { LinearGradient } from "@tamagui/linear-gradient";
+import { PremiumStackParamList } from "../navigation/PremiumNavigator";
 
 type PremiumSubscriptionScreenNavigationProp = NativeStackNavigationProp<
-  HomeStackParamList,
+  PremiumStackParamList,
   "Premium"
 >;
 
@@ -46,7 +46,7 @@ export default function PremiumSubscriptionScreen({
   }, [navigation]);
 
   return (
-    <YStack flex={1} bg="#121212">
+    <YStack flex={1} bg="#121212" pb={35}>
       <Animated.Image
         source={{
           uri: "https://cdn.pixabay.com/photo/2019/02/08/17/57/cubes-3983666_1280.jpg",
@@ -77,7 +77,7 @@ export default function PremiumSubscriptionScreen({
         >
           <YStack>
             <XStack items="center">
-                <Star size={30} color="#fff" />
+                <Star size={30} color="yellow" fontWeight="bold"/>
                 <Text ml={7} color="#fff" fontSize={30} fontWeight="bold">
                   Premium
                 </Text>
@@ -295,7 +295,7 @@ export default function PremiumSubscriptionScreen({
               mx={20}
               height={55}
               onPress={() =>
-                console.log("You bought Spotify Premium Individual. Thank You!")
+                console.log("You bought Spotify Premium Student. Thank You!")
               }
             >
               <Text fontWeight="bold" fontSize={18}>

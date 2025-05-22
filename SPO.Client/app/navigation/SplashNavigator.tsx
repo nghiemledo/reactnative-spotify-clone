@@ -5,6 +5,7 @@ import EmailLoginScreen from "../screens/auth/login/EmailLoginScreen";
 import RegisterScreen from "../screens/auth/register/RegisterScreen";
 import EmailRegisterScreen from "../screens/auth/register/EmailRegisterScreen";
 import HomeNavigator from "./HomeNavigator";
+import TabNavigator from "./TabNavigator";
 
 const Stack = createStackNavigator();
 
@@ -27,7 +28,7 @@ export default function SplashNavigator() {
       />
       <Stack.Screen
         name="Main"
-        component={HomeNavigator}
+        component={TabNavigator}
         options={{ headerShown: false, gestureEnabled: false }}
       />
       <Stack.Screen

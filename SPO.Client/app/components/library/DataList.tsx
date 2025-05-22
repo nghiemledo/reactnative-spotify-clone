@@ -13,17 +13,17 @@ type Data = {
 
 type DataListProps = {
   data: Data[];
-  onItemPress?: (item: Data) => void; 
+  onItems?: (type: string) => void;
 };
 
-const DataList = ({ data, onItemPress }: DataListProps) => {
+const DataList = ({ data, onItems }: DataListProps) => {
   return (
     <FlatList
       data={data}
       scrollEnabled={false}
       keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => (
-        <TouchableOpacity onPress={() => onItemPress?.(item)}>
+        <TouchableOpacity onPress={() => onItems && onItems(item.type)}>
           <XStack items="center" justify="space-between" py="$2">
             <XStack items="center" gap="$3" flex={1} pr="$2">
               <Image

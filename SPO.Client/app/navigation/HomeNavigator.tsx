@@ -1,11 +1,13 @@
 import { createStackNavigator } from "@react-navigation/stack";
+import HomeScreen from "../screens/HomeScreen";
 import AlbumScreen from "../screens/AlbumScreen";
 import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
-import ArtistScreen from "../screens/ArtistDetailScreen";
-import SettingsScreen from "../screens/SettingsScreen";
-import HomeScreen from "../screens/HomeScreen";
 import PodcastDetailScreen from "../screens/podcast/PodcastDetailScreen";
-import PremiumSubscriptionScreen from "../screens/PremiumSubscriptionScreen";
+import SettingsScreen from "../screens/SettingsScreen";
+import { AddSongPlaylistsScreen } from "../screens/artist/AddSongPlayListsScreen";
+import ArtistDetailScreen from "../screens/artist/ArtistDetailScreen";
+import PlayingScreen from "../screens/PlayingScreen";
+// import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
 
 const Stack = createStackNavigator();
 
@@ -14,26 +16,16 @@ export type HomeStackParamList = {
   Album: { id: string };
   Playlist: { id: string };
   Artist: { id: string };
-  Profile: undefined;
-  WhatsNew: undefined;
-  Recents: undefined;
-  Settings: undefined;
-  ContentAndDisplay: undefined;
-  Playback: undefined;
-  PrivacyAndSocial: undefined;
-  Notifications: undefined;
-  AppsAndDevices: undefined;
-  DataSaving: undefined;
-  MediaQuality: undefined;
-  Advertisements: undefined;
-  About: undefined;
-  Premium: undefined;
   Podcast: { id: string };
+  AddSongPlaylists: undefined;
+  Settings: undefined;
+  Playing: undefined
+  // AddToPlaylist: undefined
 };
 
 export default function HomeNavigator() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="Home">
       <Stack.Screen
         name="Home"
         component={HomeScreen}
@@ -51,18 +43,34 @@ export default function HomeNavigator() {
       />
       <Stack.Screen
         name="Artist"
-        component={ArtistScreen}
+        component={ArtistDetailScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Podcast"
         component={PodcastDetailScreen}
-        options={{ headerShown: false }}/>
-        <Stack.screen
-        name="Premium"
-        component={PremiumSubscriptionScreen}
         options={{ headerShown: false }}
-        />
-    </Stack.Navigator>  
+      />
+      <Stack.Screen
+        name="AddSongPlaylists"
+        component={AddSongPlaylistsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Playing"
+        component={PlayingScreen}
+        options={{ headerShown: false }}
+      />
+      {/* <Stack.Screen
+        name="AddToPlaylist"
+        component={AddToPlaylistScreen}
+        options={{ headerShown: false }}
+      /> */}
+    </Stack.Navigator>
   );
-} 
+}

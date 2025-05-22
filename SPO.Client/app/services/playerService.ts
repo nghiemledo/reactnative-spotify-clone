@@ -19,6 +19,7 @@ import {
   setLoop,
 } from "../store/playerSlice";
 import { Track } from "../types/track";
+import { Song } from "../types/song";
 
 // Định nghĩa interface Track
 
@@ -201,6 +202,64 @@ export async function playbackService() {
   }
 }
 
+export const playSong = async (song: Song) => {
+  try {
+    // Kiểm tra dữ liệu bài hát
+    if (!song.audioUrl) {
+      throw new Error("Invalid song URL");
+    }
+    if (!song.title) {
+      throw new Error("Song title is missing");
+    }
+
+    // Chuyển đổi Song thành Track
+    const track: Track = {
+      id: song.id || `song-${song.title}`,
+      url: song.audioUrl,
+      title: song.title,
+      artist: song.artistId || "Unknown Artist",
+      artwork: song.coverImage || "https://via.placeholder.com/300?text=No+Image",
+      duration: song.duration || 0,
+    };
+
+    // Lấy hàng đợi hiện tại
+    const currentQueue = await TrackPlayer.getQueue();
+    const mappedQueue = currentQueue.map((t) => ({
+      id: t.id || "",
+      url: String(t.url || ""),
+      title: t.title,
+      artist: t.artist,
+      artwork: t.artwork,
+      duration: t.duration,
+    }));
+
+    // Kiểm tra xem bài hát đã có trong hàng đợi chưa
+    const trackIndex = mappedQueue.findIndex((t) => t.id === track.id);
+
+    if (trackIndex === -1) {
+      // Thêm vào cuối hàng đợi
+      await TrackPlayer.add([track]);
+      store.dispatch(addTrackToQueue(track));
+      const updatedQueue = await TrackPlayer.getQueue();
+      await TrackPlayer.skip(updatedQueue.length - 1);
+    } else {
+      // Chuyển đến bài hát trong hàng đợi
+      await TrackPlayer.skip(trackIndex);
+    }
+
+    // Cập nhật Redux store
+    store.dispatch(setCurrentTrack(track));
+    store.dispatch(setPosition(0));
+
+    // Phát bài hát
+    await TrackPlayer.play();
+    store.dispatch(setPlaying(true));
+    console.log("Playing song:", track.title);
+  } catch (error) {
+    console.error("Play Song Error:", error);
+    throw error; // Ném lỗi để xử lý ở nơi gọi
+  }
+};
 // Hàm điều khiển playback
 export const togglePlayback = async () => {
   try {
@@ -220,6 +279,7 @@ export const togglePlayback = async () => {
 };
 
 // Hàm hỗ trợ shuffle
+// Hàm hỗ trợ shuffle
 const getRandomTrackIndex = (
   queue: Track[],
   currentTrack: Track | null
@@ -235,23 +295,58 @@ const getRandomTrackIndex = (
 export const skipToNext = async () => {
   try {
     const state = store.getState().player;
+    const queue = await TrackPlayer.getQueue();
+
+    if (!queue.length) {
+      console.warn("Queue is empty");
+      store.dispatch(setPlaying(false));
+      store.dispatch(setCurrentTrack(null));
+      return;
+    }
+
+    let nextTrackIndex: number;
     if (state.shuffle) {
-      const queue = await TrackPlayer.getQueue();
       const mappedQueue = queue.map((track) => ({
         id: track.id || "",
         url: String(track.url || ""),
         title: track.title,
         artist: track.artist,
+        artwork: track.artwork ? String(track.artwork) : undefined,
+        duration: track.duration,
       }));
-      const randomIndex = getRandomTrackIndex(mappedQueue, state.currentTrack);
-      if (randomIndex !== -1) {
-        await TrackPlayer.skip(randomIndex);
-        console.log("Skipped to random track");
+      nextTrackIndex = getRandomTrackIndex(mappedQueue, state.currentTrack);
+    } else {
+      const currentIndex = await TrackPlayer.getCurrentTrack();
+      nextTrackIndex = currentIndex !== null ? currentIndex + 1 : 0;
+      if (nextTrackIndex >= queue.length && state.loop === "queue") {
+        nextTrackIndex = 0; // Quay lại bài đầu nếu loop queue
+      }
+    }
+
+    if (nextTrackIndex >= 0 && nextTrackIndex < queue.length) {
+      await TrackPlayer.skip(nextTrackIndex);
+      const nextTrack = await TrackPlayer.getTrack(nextTrackIndex);
+      if (nextTrack) {
+        store.dispatch(
+          setCurrentTrack({
+            id: nextTrack.id ?? "",
+            url: String(nextTrack.url ?? ""),
+            position: nextTrack.position || 0,
+            duration: nextTrack.duration,
+            title: nextTrack.title,
+            artist: nextTrack.artist,
+            artwork:
+              nextTrack.artwork !== undefined ? String(nextTrack.artwork) : undefined,
+          })
+        );
+        await TrackPlayer.play();
+        store.dispatch(setPlaying(true));
+        console.log("Skipped to next track:", nextTrack.title);
       }
     } else {
-      await TrackPlayer.skipToNext();
-      store.dispatch(setPlaying(true));
-      console.log("Skipped to next track");
+      console.warn("No next track available");
+      store.dispatch(setPlaying(false));
+      store.dispatch(setCurrentTrack(null));
     }
   } catch (error) {
     console.error("Skip To Next Error:", error);
@@ -261,23 +356,58 @@ export const skipToNext = async () => {
 export const skipToPrevious = async () => {
   try {
     const state = store.getState().player;
+    const queue = await TrackPlayer.getQueue();
+
+    if (!queue.length) {
+      console.warn("Queue is empty");
+      store.dispatch(setPlaying(false));
+      store.dispatch(setCurrentTrack(null));
+      return;
+    }
+
+    let prevTrackIndex: number;
     if (state.shuffle) {
-      const queue = await TrackPlayer.getQueue();
       const mappedQueue = queue.map((track) => ({
         id: track.id || "",
         url: String(track.url || ""),
         title: track.title,
         artist: track.artist,
+        artwork: track.artwork ? String(track.artwork) : undefined,
+        duration: track.duration,
       }));
-      const randomIndex = getRandomTrackIndex(mappedQueue, state.currentTrack);
-      if (randomIndex !== -1) {
-        await TrackPlayer.skip(randomIndex);
-        console.log("Skipped to random track");
+      prevTrackIndex = getRandomTrackIndex(mappedQueue, state.currentTrack);
+    } else {
+      const currentIndex = await TrackPlayer.getCurrentTrack();
+      prevTrackIndex = currentIndex !== null ? currentIndex - 1 : 0;
+      if (prevTrackIndex < 0 && state.loop === "queue") {
+        prevTrackIndex = queue.length - 1; // Quay lại bài cuối nếu loop queue
+      }
+    }
+
+    if (prevTrackIndex >= 0 && prevTrackIndex < queue.length) {
+      await TrackPlayer.skip(prevTrackIndex);
+      const prevTrack = await TrackPlayer.getTrack(prevTrackIndex);
+      if (prevTrack) {
+        store.dispatch(
+          setCurrentTrack({
+            id: prevTrack.id ?? "",
+            url: String(prevTrack.url ?? ""),
+            position: prevTrack.position || 0,
+            duration: prevTrack.duration,
+            title: prevTrack.title,
+            artist: prevTrack.artist,
+            artwork:
+              prevTrack.artwork !== undefined ? String(prevTrack.artwork) : undefined,
+          })
+        );
+        await TrackPlayer.play();
+        store.dispatch(setPlaying(true));
+        console.log("Skipped to previous track:", prevTrack.title);
       }
     } else {
-      await TrackPlayer.skipToPrevious();
-      store.dispatch(setPlaying(true));
-      console.log("Skipped to next track");
+      console.warn("No previous track available");
+      store.dispatch(setPlaying(false));
+      store.dispatch(setCurrentTrack(null));
     }
   } catch (error) {
     console.error("Skip To Previous Error:", error);

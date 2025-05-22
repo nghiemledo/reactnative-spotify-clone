@@ -11,10 +11,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const App = () => {
-  useEffect(() => {
-    setupPlayer();
-    // playbackService();
-  }, []);
+  // useEffect(() => {
+  //   setupPlayer();
+  //   // playbackService();
+  // }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={store}>

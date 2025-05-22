@@ -25,6 +25,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import Toast, { BaseToastProps } from "react-native-toast-message";
 import { H6 } from "tamagui";
+import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 
 const songs = [
   {
@@ -45,8 +46,8 @@ const songs = [
 ];
 
 type AddSongPlaylistScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "addSongPlaylist"
+  LibraryStackParamList,
+  "AddSongPlaylist"
 >;
 
 const toastConfig = {

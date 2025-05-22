@@ -2,38 +2,22 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as React from "react";
 import SplashNavigator from "./SplashNavigator";
-import AlbumScreen from "../screens/AlbumScreen";
-import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
-import ArtistScreen from "../screens/ArtistDetailScreen";
-import AddSongPlaylistScreen from "../screens/playlists/AddSongPlaylistScreen";
-import UpdateSongPlaylistScreen from "../screens/playlists/UpdateSongPlaylistScreen";
-import SearchScreen from "../screens/search/SearchScreen";
-import SettingsScreen from "../screens/SettingsScreen";
+import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
 import { Song } from "../types/song";
-import SearchInPlaylistScreen from "../screens/playlists/SearchInPlaylistScreen";
+import PlaylistNavigator from "./PlaylistNavigator";
+import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
 
 const Stack = createStackNavigator();
 
 export type RootStackParamList = {
-  Home: undefined;
-  Login: undefined;
-  Register: undefined;
-  EmailLogin: undefined;
-  EmailRegister: undefined;
-  detailPlaylist: undefined;
-  addSongPlaylist: undefined;
-  updateSongPlaylist: undefined;
-  PlayerModal: undefined;
-  Profile: undefined;
-  Search: undefined;
-  WhatsNew: undefined;
-  Recents: undefined;
-  Settings: undefined;
-  Album: { id: string };
-  Artist: { id: string };
-  Podcast: { id: string };
-  Library: undefined;
-  SearchInPlaylist: { Items: Song[] };
+  SplashNavigator: undefined;
+  // Album: { id: string };
+  // detailPlaylist: undefined;
+  // Artist: { id: string };
+  // addSongPlaylists: undefined;
+  // Search: undefined;
+  // Settings: undefined;
+
 };
 
 export default function AppNavigator() {
@@ -45,7 +29,7 @@ export default function AppNavigator() {
           component={SplashNavigator}
           options={{ headerShown: false }}
         />
-        <Stack.Screen
+        {/* <Stack.Screen
           name="Album"
           component={AlbumScreen}
           options={{ headerShown: false }}
@@ -66,6 +50,11 @@ export default function AppNavigator() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="AddSongPlaylists"
+          component={AddSongPlaylistsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="updateSongPlaylist"
           component={UpdateSongPlaylistScreen}
           options={{ headerShown: false }}
@@ -79,11 +68,14 @@ export default function AppNavigator() {
           name="Settings"
           component={SettingsScreen}
           options={{ headerShown: false }}
-        />
+        /> */}
+       
         <Stack.Screen
-          name="SearchInPlaylist"
-          component={SearchInPlaylistScreen}
-          options={{ headerShown: false }}
+          name="AddToPlaylist"
+          component={AddToPlaylistScreen}
+          options={{
+            headerShown: false,
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>
