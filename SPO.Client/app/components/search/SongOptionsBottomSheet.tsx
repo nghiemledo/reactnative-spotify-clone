@@ -1,5 +1,5 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useEffect } from "react";
 import { TouchableOpacity } from "react-native";
 import { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -14,6 +14,8 @@ import {
   Radio,
   ListMusic,
   Barcode,
+  FolderPlus,
+  Trash2,
 } from "@tamagui/lucide-icons";
 
 interface Artist {
@@ -29,6 +31,7 @@ interface SongOptionsBottomSheetProps {
   urlAvatar: string;
   type: string;
   artists: Artist[];
+  context?: string; // Added context prop
 }
 
 const SongOptionsBottomSheet: React.FC<SongOptionsBottomSheetProps> = ({
@@ -39,6 +42,7 @@ const SongOptionsBottomSheet: React.FC<SongOptionsBottomSheetProps> = ({
   urlAvatar,
   type,
   artists,
+  context,
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = ["50%", "100%"];
@@ -57,6 +61,14 @@ const SongOptionsBottomSheet: React.FC<SongOptionsBottomSheetProps> = ({
     ),
     [onClose]
   );
+
+  useEffect(() => {
+    if (isOpen) {
+      bottomSheetRef.current?.expand();
+    } else {
+      bottomSheetRef.current?.close();
+    }
+  }, [isOpen]);
 
   return (
     <BottomSheet
@@ -110,37 +122,54 @@ const SongOptionsBottomSheet: React.FC<SongOptionsBottomSheetProps> = ({
           </XStack>
         </XStack>
         <YStack flex={1} gap="$2" mt="$2" px="$3" pb="$4">
-          <TouchableOpacity onPress={() => onSelectOption("addToLikedSongs")}>
-            <XStack items="center" gap="$3" py="$2">
-              <Heart size="$1" color="white" />
-              <Text color="gray" fontSize={16}>
-                Add to Liked Songs
-              </Text>
-            </XStack>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => onSelectOption("addToPlaylist")}>
-            <XStack items="center" gap="$3" py="$2">
-              <CirclePlus size="$1" color="white" />
-              <Text color="gray" fontSize={16}>
-                Add to Playlist
-              </Text>
-            </XStack>
-          </TouchableOpacity>
-          {/* <TouchableOpacity onPress={() => onSelectOption("listenAdFree")}>
-            <XStack items="center" gap="$3" py="$2">
-              <Text color="gray" fontSize={16}>
-                Listen to music ad-free
-              </Text>
-            </XStack>
-          </TouchableOpacity> */}
-          <TouchableOpacity onPress={() => onSelectOption("addToQueue")}>
-            <XStack items="center" gap="$3" py="$2">
-              <Blinds size="$1" color="white" />
-              <Text color="gray" fontSize={16}>
-                Add to Queue
-              </Text>
-            </XStack>
-          </TouchableOpacity>
+          {context !== "detailPlaylist" && (
+            <>
+              <TouchableOpacity onPress={() => onSelectOption("addToLikedSongs")}>
+                <XStack items="center" gap="$3" py="$2">
+                  <Heart size="$1" color="white" />
+                  <Text color="gray" fontSize={16}>
+                    Add to Liked Songs
+                  </Text>
+                </XStack>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => onSelectOption("addToPlaylist")}>
+                <XStack items="center" gap="$3" py="$2">
+                  <CirclePlus size="$1" color="white" />
+                  <Text color="gray" fontSize={16}>
+                    Add to Playlist
+                  </Text>
+                </XStack>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => onSelectOption("addToQueue")}>
+                <XStack items="center" gap="$3" py="$2">
+                  <Blinds size="$1" color="white" />
+                  <Text color="gray" fontSize={16}>
+                    Add to Queue
+                  </Text>
+                </XStack>
+              </TouchableOpacity>
+            </>
+          )}
+          {context === "detailPlaylist" && (
+            <>
+              <TouchableOpacity onPress={() => onSelectOption("addToOtherPlaylist")}>
+                <XStack items="center" gap="$3" py="$2">
+                  <FolderPlus size="$1" color="white" />
+                  <Text color="gray" fontSize={16}>
+                    Add to Other Playlist
+                  </Text>
+                </XStack>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => onSelectOption("removeFromThisPlaylist")}>
+                <XStack items="center" gap="$3" py="$2">
+                  <Trash2 size="$1" color="white" />
+                  <Text color="gray" fontSize={16}>
+                    Remove from This Playlist
+                  </Text>
+                </XStack>
+              </TouchableOpacity>
+            </>
+          )}
           <TouchableOpacity onPress={() => onSelectOption("goToAlbum")}>
             <XStack items="center" gap="$3" py="$2">
               <Target size="$1" color="white" />

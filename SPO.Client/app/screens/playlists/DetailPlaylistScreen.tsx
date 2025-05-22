@@ -30,6 +30,7 @@ import {
 } from "@tamagui/lucide-icons";
 import { LinearGradient } from "@tamagui/linear-gradient";
 import SortBottomSheet from "../../components/library/SortBottomSheet";
+import SongOptionsBottomSheet from "../../components/search/SongOptionsBottomSheet";
 
 // Mock data for queue with addedAt field for sorting by "Recently Added"
 const queueItems = [
@@ -130,6 +131,8 @@ export default function DetailPlaylistScreen({
   const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
   const [selectedSortOption, setSelectedSortOption] = useState("customerOrder");
   const [sortedItems, setSortedItems] = useState(queueItems);
+  const [isSongOptionsOpen, setIsSongOptionsOpen] = useState(false);
+  const [selectedSong, setSelectedSong] = useState<(typeof queueItems)[0] | null>(null);
 
   const navbarBackground = scrollY.interpolate({
     inputRange: [190, 220],
@@ -191,6 +194,48 @@ export default function DetailPlaylistScreen({
   const handleSelectSortOption = (option: string) => {
     setSelectedSortOption(option);
     setIsSortSheetOpen(false);
+  };
+
+  const handleSelectSongOption = (option: string) => {
+    if (!selectedSong) return;
+    switch (option) {
+      case "addToOtherPlaylist":
+        console.log(`Add ${selectedSong.title} to another playlist`);
+        // Implement navigation or logic to add to another playlist
+        break;
+      case "removeFromThisPlaylist":
+        setSortedItems(sortedItems.filter((item) => item.id !== selectedSong.id));
+        console.log(`Remove ${selectedSong.title} from this playlist`);
+        break;
+      case "goToAlbum":
+        console.log(`Navigate to album for ${selectedSong.title}`);
+        // Implement navigation to album
+        break;
+      case "goToArtist":
+        console.log(`Navigate to artist ${selectedSong.artist}`);
+        // Implement navigation to artist
+        break;
+      case "share":
+        console.log(`Share ${selectedSong.title}`);
+        // Implement share functionality
+        break;
+      case "goToSongRadio":
+        console.log(`Go to song radio for ${selectedSong.title}`);
+        // Implement navigation to song radio
+        break;
+      case "viewSongCredits":
+        console.log(`View credits for ${selectedSong.title}`);
+        // Implement navigation to song credits
+        break;
+      case "showSpotifyCode":
+        console.log(`Show Spotify code for ${selectedSong.title}`);
+        // Implement Spotify code display
+        break;
+      default:
+        break;
+    }
+    setIsSongOptionsOpen(false);
+    setSelectedSong(null);
   };
 
   return (
@@ -475,7 +520,7 @@ export default function DetailPlaylistScreen({
               size="$3"
               bg="rgba(255, 255, 255, 0.2)"
               rounded={50}
-              onPress={() => setIsSortSheetOpen(true)} // Open SortBottomSheet
+              onPress={() => setIsSortSheetOpen(true)}
             >
               <XStack items="center" space="$1">
                 <ChevronsUpDown color="white" size="$1" />
@@ -530,6 +575,10 @@ export default function DetailPlaylistScreen({
                   <Button
                     bg="transparent"
                     p={0}
+                    onPress={() => {
+                      setSelectedSong(item);
+                      setIsSongOptionsOpen(true);
+                    }}
                     icon={
                       <EllipsisVertical
                         size="$2"
@@ -557,6 +606,23 @@ export default function DetailPlaylistScreen({
         selectedOption={selectedSortOption}
         context="detailPlaylist"
       />
+
+      {/* Song Options Bottom Sheet */}
+      {selectedSong && (
+        <SongOptionsBottomSheet
+          isOpen={isSongOptionsOpen}
+          onClose={() => {
+            setIsSongOptionsOpen(false);
+            setSelectedSong(null);
+          }}
+          onSelectOption={handleSelectSongOption}
+          songName={selectedSong.title}
+          urlAvatar={selectedSong.image}
+          type="Song"
+          artists={[{ id: parseInt(selectedSong.id), name: selectedSong.artist }]}
+          context="detailPlaylist"
+        />
+      )}
     </LinearGradient>
   );
 }
