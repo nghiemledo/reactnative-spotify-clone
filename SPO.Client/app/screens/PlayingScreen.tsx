@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ImageBackground, Image } from "react-native";
 import { YStack, XStack, Text, Button } from "tamagui";
 import { useNavigation } from "@react-navigation/native";
@@ -26,93 +26,34 @@ import {
 import { formatTime } from "../utils/timeUtils";
 import { Slider } from "tamagui";
 import PlayingBottomSheet from "../components/PlayingBottomSheet";
-import TrackPlayer, { Event } from "react-native-track-player";
+import TrackPlayer, { useProgress } from "react-native-track-player";
 import { useGetArtistsQuery } from "../services/ArtistService";
 import { Artist } from "../types/artist";
+
 const PlayingScreen = () => {
   const navigation = useNavigation();
-  const dispatch = useAppDispatch();
-  const { isPlaying, currentTrack, queue, shuffle, loop } = useAppSelector(
+  const { isPlaying, currentTrack, shuffle, loop } = useAppSelector(
     (state) => state.player
   );
   const [isHovered, setIsHovered] = useState(false);
-  const [sliderPosition, setSliderPosition] = useState(0);
-  const [isSeeking, setIsSeeking] = useState(false);
-  const [currentPosition, setCurrentPosition] = useState(0);
-  const [previousTrackId, setPreviousTrackId] = useState<string | null>(null);
   const [isPlayingSheetOpen, setIsPlayingSheetOpen] = useState(false);
-
+  const { position, duration } = useProgress(1000);
   const {
     data: artists,
     isLoading: isArtistsLoading,
     error: artistsError,
   } = useGetArtistsQuery();
+
   const getArtistName = (artistId: string | undefined) => {
     if (!artistId) return "Unknown Artist";
     const artist = artists?.data?.find((a: Artist) => a.id === artistId);
     return artist?.name || "Unknown Artist";
   };
 
-  // Đồng bộ vị trí phát với TrackPlayer
-  useEffect(() => {
-    if (currentTrack && currentTrack.id !== previousTrackId) {
-      setSliderPosition(0);
-      setCurrentPosition(0);
-      setPreviousTrackId(currentTrack.id);
-    }
-      console.log(currentTrack?.position);
-      console.log(currentTrack);
-      
-
-    if (currentTrack?.position !== undefined) {
-      console.log(currentTrack.position);
-      setSliderPosition(currentTrack.position);
-      
-      setCurrentPosition(currentTrack.position);
-    }
-  }, [currentTrack?.position]);
-
-  // Lắng nghe sự kiện PlaybackProgressUpdated từ TrackPlayer
-  useEffect(() => {
-    if (isPlaying && !isSeeking && currentTrack) {
-      const listener = TrackPlayer.addEventListener(
-        Event.PlaybackProgressUpdated,
-        ({ position }) => {
-          setCurrentPosition(position);
-          setSliderPosition(position);
-        }
-      );
-      return () => listener.remove();
-    }
-  }, [isPlaying, isSeeking, currentTrack]);
-
-  // Xử lý khi người dùng bắt đầu kéo slider
-  const handleSliderStart = () => {
-    setIsSeeking(true);
-  };
-
-  // Xử lý khi người dùng thay đổi vị trí slider
-  const handleSliderChange = (values: number[]) => {
-    console.log(values);
-    
-    setSliderPosition(values[0]);
-    seekTo(values[0])
-  };
-
-  // Xử lý khi người dùng thả slider
-  const handleSliderComplete = async (values: number[]) => {
-    try {
-      const newPosition = values[0];
-      setCurrentPosition(newPosition);
-      if (currentTrack) {
-        await seekTo(newPosition);
-      }
-    } catch (error) {
-      console.error("Seek Error:", error);
-      // Hiển thị thông báo lỗi (ví dụ: Toast)
-    } finally {
-      setIsSeeking(false);
-    }
+  // Xử lý khi giá trị slider thay đổi
+  const handleSliderChange = async (value: number[]) => {
+    const seekPosition = value[0]; // Lấy giá trị đầu tiên từ mảng
+    await TrackPlayer.seekTo(seekPosition);
   };
 
   // Xử lý nút Next và Previous
@@ -132,6 +73,7 @@ const PlayingScreen = () => {
     }
   };
 
+  // Xử lý chế độ lặp
   const handleToggleLoop = async () => {
     try {
       await setLoopMode(
@@ -197,6 +139,7 @@ const PlayingScreen = () => {
             chromeless
           />
         </XStack>
+
         {/* Artwork Section */}
         <YStack items="center" justify="center" flex={1}>
           <MotiView
@@ -246,14 +189,14 @@ const PlayingScreen = () => {
               fontSize="$9"
               fontWeight="600"
               color="#fff"
-              text="center"
+              style={{ textAlign: "center" }}
               numberOfLines={1}
             >
               {currentTrack.title ?? "Unknown Title"}
             </Text>
           </YStack>
           <Text fontSize="$5" color="#fff" opacity={0.7}>
-            {getArtistName(currentTrack.artist) ?? "Unknown Title"}
+            {getArtistName(currentTrack.artist) ?? "Unknown Artist"}
           </Text>
         </YStack>
 
@@ -261,22 +204,20 @@ const PlayingScreen = () => {
         <YStack>
           <XStack justify="space-between" px="$2">
             <Text fontSize="$4" color="#fff" fontWeight="500">
-              {formatTime(sliderPosition)}
+              {formatTime(position)}
             </Text>
             <Text fontSize="$4" color="#fff" fontWeight="500">
-              {formatTime(currentTrack.duration ?? 0)}
+              {formatTime(duration ?? 0)}
             </Text>
           </XStack>
           <Slider
             size="$2"
             my="$3"
             width="100%"
-            value={[sliderPosition]}
-            max={currentTrack.duration || 100}
+            value={[position]}
+            max={duration || 100}
             step={1}
             onValueChange={handleSliderChange}
-            onSlideStart={handleSliderStart}
-            onSlidingComplete={handleSliderComplete}
           >
             <Slider.Track>
               <Slider.TrackActive bg="$green9" />
@@ -345,13 +286,14 @@ const PlayingScreen = () => {
           />
         </XStack>
       </YStack>
+
       {/* PlayingBottomSheet */}
       <PlayingBottomSheet
         isOpen={isPlayingSheetOpen}
         onClose={() => setIsPlayingSheetOpen(false)}
-        onAddToPlaylist={() => console.log("Add to playlist")} // Triển khai sau
-        onSleepTimer={() => console.log("Set sleep timer")} // Triển khai sau
-        onShowSpotifyCode={() => console.log("Show Spotify code")} // Triển khai sau
+        onAddToPlaylist={() => console.log("Add to playlist")}
+        onSleepTimer={() => console.log("Set sleep timer")}
+        onShowSpotifyCode={() => console.log("Show Spotify code")}
       />
     </ImageBackground>
   );
