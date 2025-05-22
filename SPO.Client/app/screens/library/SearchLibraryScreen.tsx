@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../navigation/AppNavigator";
 import { useGetArtistsQuery } from "../../services/ArtistService";
 import { Artist } from "../../types/artist";
 import { Image, Input, Text, View, XStack, YStack } from "tamagui";
 import { ArrowLeft, X } from "@tamagui/lucide-icons";
 import { Dimensions, FlatList, ScrollView, TouchableOpacity, Keyboard, ActivityIndicator } from "react-native";
+import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 
 type Podcast = {
   id: string;
@@ -67,8 +67,8 @@ const initialPodcasts: Podcast[] = [
 ];
 
 type SearchLibraryScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "SearchScreen"
+  LibraryStackParamList,
+  "SearchLibaryScreen"
 >;
 
 interface SearchLibraryScreenProps {

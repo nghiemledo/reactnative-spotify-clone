@@ -1,6 +1,6 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useRef, useState, useEffect } from "react";
-import { RootStackParamList } from "../../navigation/AppNavigator";
+import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 import {
   Avatar,
   AvatarFallback,
@@ -24,6 +24,7 @@ import DataList from "../../components/library/DataList";
 import CreateBottomSheet from "../../components/library/CreateBottomSheet";
 import SortBottomSheet from "../../components/library/SortBottomSheet";
 import { MotiView } from "moti";
+import { SearchStackParamList } from "../../navigation/SearchNavigator";
 
 type Data = {
   id: number;
@@ -96,7 +97,7 @@ const tabTypes = [
 ];
 
 type LibraryScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+  LibraryStackParamList & SearchStackParamList,
   "Library"
 >;
 
@@ -310,7 +311,7 @@ export default function LibraryScreen({
 
           <YStack gap="$3" mt="$2">
             <TouchableOpacity
-              onPress={() => navigation.navigate({ name: "ArtistSelection", params: {} })}
+              onPress={() => navigation.navigate({ name: "ArtistSelection", params: { selectedIds: [] } })}
             >
               <XStack items="center" gap="$2">
                 <Button
@@ -328,7 +329,7 @@ export default function LibraryScreen({
               </XStack>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => navigation.navigate({ name: "PodcastSelection", params: {} })}
+              onPress={() => navigation.navigate({ name: "PodcastSelection", params: { selectedIds: [] }})}
             >
               <XStack items="center" gap="$2">
                 <Button

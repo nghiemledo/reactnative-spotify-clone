@@ -4,6 +4,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Button, YStack, XStack, Text, Image } from "tamagui";
 import { ArrowLeft, Check, Heart, Menu } from "@tamagui/lucide-icons";
 import { SearchStackParamList } from "../../navigation/SearchNavigator";
+import { RootStackParamList } from "../../navigation/AppNavigator";
 
 const { width, height } = Dimensions.get("window");
 
@@ -15,7 +16,7 @@ interface Playlist {
 }
 
 type AddToPlaylistScreenNavigationProp = NativeStackNavigationProp<
-  SearchStackParamList,
+  SearchStackParamList & RootStackParamList,
   "AddToPlaylist"
 >;
 

@@ -7,13 +7,14 @@ import { SelectionCard } from "../../components/library/SelectionCard";
 import { useGetArtistsQuery } from "../../services/ArtistService";
 import { Artist } from "../../types/artist";
 import { Text } from "tamagui";
+import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 
 type ArtistScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+  LibraryStackParamList,
   "ArtistSelection"
 >;
 
-type ArtistScreenRouteProp = RouteProp<RootStackParamList, "ArtistSelection">;
+type ArtistScreenRouteProp = RouteProp<LibraryStackParamList, "ArtistSelection">;
 
 interface ArtistSelectionScreenProps {
   navigation: ArtistScreenNavigationProp;

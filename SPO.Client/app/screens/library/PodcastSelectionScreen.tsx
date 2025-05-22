@@ -1,9 +1,9 @@
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
-import { RootStackParamList } from "../../navigation/AppNavigator";
 import { Selection } from "../../components/library/Selection";
 import { SelectionCard } from "../../components/library/SelectionCard";
+import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 
 type Podcast = {
   id: string;
@@ -16,11 +16,11 @@ type Podcast = {
 };
 
 type PodcastSelectionScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+  LibraryStackParamList,
   "PodcastSelection"
 >;
 
-type PodcastSelectionScreenRouteProp = RouteProp<RootStackParamList, "PodcastSelection">;
+type PodcastSelectionScreenRouteProp = RouteProp<LibraryStackParamList, "PodcastSelection">;
 
 interface PodcastSelectionScreenProps {
   navigation: PodcastSelectionScreenNavigationProp;

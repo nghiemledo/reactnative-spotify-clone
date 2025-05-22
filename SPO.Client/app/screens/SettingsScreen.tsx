@@ -4,8 +4,6 @@ import { TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {
   ArrowLeft,
-  Search,
-  User,
   Music,
   Volume2,
   Lock,
@@ -14,10 +12,8 @@ import {
   Download,
   BarChart2,
   Info,
-  LogOut,
+  Loader,
 } from "@tamagui/lucide-icons";
-import { StatusBar } from "react-native";
-import { RootStackParamList } from "../navigation/AppNavigator";
 import { HomeStackParamList } from "../navigation/HomeNavigator";
 import { useAppDispatch } from "../store";
 import { logout } from "../store/authSlice";
@@ -65,77 +61,70 @@ export default function SettingsScreen({
       icon: <Music color="#fff" size={24} />,
       title: "Content and display",
       subtitle: "Canvas • Allow explicit content",
-      onPress: () => navigation.navigate("ContentAndDisplay"),
+      // onPress: () => navigation.navigate("ContentAndDisplay"),
     },
     {
       icon: <Volume2 color="#fff" size={24} />,
       title: "Playback",
       subtitle: "Gapless playback • Autoplay",
-      onPress: () => navigation.navigate("Playback"),
+      // onPress: () => navigation.navigate("Playback"),
     },
     {
       icon: <Lock color="#fff" size={24} />,
       title: "Privacy and social",
       subtitle: "Recently played artists • Followers and following",
-      onPress: () => navigation.navigate("PrivacyAndSocial"),
+      // onPress: () => navigation.navigate("PrivacyAndSocial"),
     },
     {
       icon: <Bell color="#fff" size={24} />,
       title: "Notifications",
       subtitle: "Push • Email",
-      onPress: () => navigation.navigate("Notifications"),
+      // onPress: () => navigation.navigate("Notifications"),
     },
     {
       icon: <Smartphone color="#fff" size={24} />,
       title: "Apps and devices",
       subtitle: "Google Maps • Spotify Connect control",
-      onPress: () => navigation.navigate("AppsAndDevices"),
+      // onPress: () => navigation.navigate("AppsAndDevices"),
     },
     {
       icon: <Download color="#fff" size={24} />,
       title: "Data-saving and offline",
       subtitle: "Data saver • Downloads over cellular",
-      onPress: () => navigation.navigate("DataSaving"),
+      // onPress: () => navigation.navigate("DataSaving"),
     },
     {
       icon: <BarChart2 color="#fff" size={24} />,
       title: "Media quality",
       subtitle: "Wi-Fi streaming quality • Cellular streaming quality",
-      onPress: () => navigation.navigate("MediaQuality"),
+      // onPress: () => navigation.navigate("MediaQuality"),
     },
     {
-      icon: <Info color="#fff" size={24} />,
+      icon: <Loader color="#fff" size={24} />,
       title: "Advertisements",
-      subtitle: "Tailored ads",
-      onPress: () => navigation.navigate("Advertisements"),
+      subtitle: "Tailored ads",  
+      // onPress: () => navigation.navigate("Advertisements"),
     },
     {
       icon: <Info color="#fff" size={24} />,
       title: "About",
       subtitle: "Version • Privacy Policy",
-      onPress: () => navigation.navigate("About"),
-    },
-    {
-      icon: <LogOut color="#fff" size={24} />,
-      title: "Logout",
-      subtitle: "",
-      onPress: () => {
-        dispatch(logout());
-        navigation.navigate("Login");
-      },
+      // onPress: () => navigation.navigate("About"),
     },
   ];
 
   return (
-    <YStack flex={1} bg="#111" pt={StatusBar.currentHeight}>
+    <YStack flex={1} bg="black">
       {/* Header */}
       <XStack
-        items="center"
-        justify="space-between"
+        items="center" // Căn giữa theo chiều dọc
+        justify="center" // Căn giữa theo chiều ngang
         px={16}
         height={60}
         bg="#222"
+        position="relative" // Cần thiết nếu dùng Button absolute
       >
+        {/* Nút Back (cố định bên trái) */}
         <Button
           chromeless
           icon={<ArrowLeft size={24} />}
@@ -143,8 +132,12 @@ export default function SettingsScreen({
           color="white"
           bg="transparent"
           p={0}
+          position="absolute" // Đặt vị trí tuyệt đối
+          l={16} // Cách lề trái 16px
           onPress={() => navigation.goBack()}
         />
+
+        {/* Tiêu đề căn giữa */}
         <Text color="white" fontSize={20} fontWeight="bold">
           Settings
         </Text>
@@ -163,7 +156,6 @@ export default function SettingsScreen({
               px={20}
               py={5}
               mb={32}
-              onPress={() => navigation.navigate("Premium")}
             >
               <Text color="#111" fontSize={12} fontWeight="bold">
                 Go Premium
@@ -174,7 +166,13 @@ export default function SettingsScreen({
           {/* Settings List */}
           <YStack gap={28}>
             {settingsOptions.map((option, index) => (
-              <SettingsItem key={index} {...option} />
+              <SettingsItem
+                onPress={function (): void {
+                  throw new Error("Function not implemented.");
+                }}
+                key={index}
+                {...option}
+              />
             ))}
           </YStack>
 
@@ -188,7 +186,10 @@ export default function SettingsScreen({
             mb={40}
             px={20}
             py={5}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => {
+              dispatch(logout());
+              navigation.navigate("Login");
+            }}
           >
             <Text color="#111" fontSize={11} fontWeight="bold">
               Log out
