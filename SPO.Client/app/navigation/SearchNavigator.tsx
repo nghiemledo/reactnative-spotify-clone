@@ -2,18 +2,18 @@ import { createStackNavigator } from "@react-navigation/stack";
 import TabNavigator from "./TabNavigator";
 import AlbumScreen from "../screens/AlbumScreen";
 import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
-import ArtistScreen from "../screens/ArtistDetailScreen";
+import ArtistScreen from "../screens/artist/ArtistDetailScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import SearchScreen from "../screens/search/SearchScreen";
 import SearchResultScreen from "../screens/search/SearchResultScreen";
 import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
 const Stack = createStackNavigator();
 export type SearchStackParamList = {
   Search: undefined;
   SearchResult: { toastMessages?: string[] };
-  AddToPlaylist: { songId: number };
-
+  // AddToPlaylist: { songId: number };
 };
 export default function SearchNavigator() {
   return (
@@ -28,12 +28,7 @@ export default function SearchNavigator() {
         component={SearchResultScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="AddToPlaylist"
-        component={AddToPlaylistScreen}
-        options={{ headerShown: false }}
-      />
-    
+      
     </Stack.Navigator>
   );
 }
