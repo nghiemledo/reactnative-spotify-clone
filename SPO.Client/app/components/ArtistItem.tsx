@@ -1,27 +1,28 @@
 import React from "react";
-import { Text, YStack } from "tamagui";
+import { YStack, Text } from "tamagui";
 import SafeImage from "./SafeImage";
 import { Artist } from "../types/artist";
-import { HomeStackParamList } from "../navigation/HomeNavigator";
+import { TouchableOpacity } from "react-native";
+
 interface ArtistItemProps {
-  item: Artist;
-  hanldeNavigation: <T extends keyof HomeStackParamList>(
-    screen: T,
-    params?: HomeStackParamList[T]
-  ) => void;
+  artist: Artist;
+  onPress?: (artist: Artist) => void;
 }
-export const ArtistItem = ({ item, hanldeNavigation }: ArtistItemProps) => {
+
+export const ArtistItem = ({ artist, onPress }: ArtistItemProps) => {
   return (
-    <YStack
-      mr="$4"
-      width={120}
-      items="center"
-      onPress={() => hanldeNavigation("Artist", { id: item.id })}
-    >
-      <SafeImage uri={item?.urlAvatar} width={100} height={100} rounded={50} />
-      <Text color="white" fontWeight="600" mt="$2" numberOfLines={1}>
-        {item.name}
-      </Text>
-    </YStack>
+    <TouchableOpacity onPress={() => onPress?.(artist)}>
+      <YStack mr="$2" width={120} items="center">
+        <SafeImage
+          uri={artist?.urlAvatar}
+          width={100}
+          height={100}
+          rounded={50}
+        />
+        <Text color="white" fontWeight="600" mt="$2" numberOfLines={1}>
+          {artist.name || "Unknown Artist"}
+        </Text>
+      </YStack>
+    </TouchableOpacity>
   );
 };
