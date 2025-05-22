@@ -604,3 +604,20 @@ export const setLoopMode = async (mode: "off" | "track" | "queue") => {
     console.error("Set Loop Mode Error:", error);
   }
 };
+export const setPlayerQueue = async (tracks: Track[]) => {
+  try {
+    // Xóa hàng đợi hiện tại
+    await TrackPlayer.reset();
+
+    // Thêm danh sách tracks mới
+    await TrackPlayer.add(tracks);
+
+    // Cập nhật Redux store
+    store.dispatch(setQueue(tracks));
+
+    console.log("Hàng đợi đã được thiết lập với", tracks.length, "bài hát");
+  } catch (error) {
+    console.error("Lỗi khi thiết lập hàng đợi:", error);
+    throw error;
+  }
+};
