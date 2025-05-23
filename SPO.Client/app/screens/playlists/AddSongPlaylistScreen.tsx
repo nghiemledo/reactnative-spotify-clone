@@ -99,8 +99,8 @@ const AddSongPlaylistScreen = ({
     <YStack flex={1} bg="#111" px={24} pt={60}>
       <XStack
         position="absolute"
-        t={0}
-        l={0}
+         t={-30}
+        l={-10}
         r={0}
         height={80}
         items="center"
@@ -138,7 +138,7 @@ const AddSongPlaylistScreen = ({
         <XStack flex={1} />
       </XStack>
       <View>
-        <XStack mt="$6" mb="$2">
+        <XStack mt="$3" mb="$2">
           <Input
             size="$3.5"
             borderWidth={0}

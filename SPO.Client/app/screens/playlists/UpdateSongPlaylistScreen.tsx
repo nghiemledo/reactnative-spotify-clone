@@ -166,8 +166,8 @@ const updateSongPlaylist = ({
     <YStack flex={1} bg="#111" px={24} pt={60}>
       <XStack
         position="absolute"
-        t={0}
-        l={0}
+        t={-30}
+        l={-10}
         r={0}
         height={100}
         items="center"
@@ -214,7 +214,7 @@ const updateSongPlaylist = ({
         justify="center"
         self="center"
         mb="$5"
-        mt="$6"
+        mt="$2"
         p={0}
         onPress={() => console.log("long")}
       >

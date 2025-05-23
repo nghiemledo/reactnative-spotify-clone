@@ -252,7 +252,7 @@ export default function DetailPlaylistScreen({
     switch (option) {
       case "addToThisPlaylist":
         console.log("Navigate to add songs to this playlist");
-        navigation.navigate("AddToPlaylist", { currentPlaylistId });
+        navigation.navigate("AddSongPlaylist");
         break;
       case "editPlaylist":
         console.log("Navigate to edit playlist");
@@ -550,7 +550,7 @@ export default function DetailPlaylistScreen({
                 items="center"
                 space="$1"
                 onPress={() =>
-                  navigation.navigate("AddToPlaylist", { currentPlaylistId })
+                  navigation.navigate("AddSongPlaylist")
                 }
               >
                 <Plus color="white" size="$1" />
