@@ -3,7 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { useAppSelector } from "../store";
-import { Play, Pause } from "@tamagui/lucide-icons";
+import { Play, Pause, ListMusic } from "@tamagui/lucide-icons";
 import { YStack, XStack, Text, Image, Button } from "tamagui";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 import Toast from "react-native-toast-message";
@@ -119,6 +119,15 @@ export default function MiniPlayer() {
                 </Text>
               </YStack>
             </XStack>
+
+            <Button
+              background="transparent"
+              icon={<ListMusic size="$2" color="#fff" />}
+              onPress={() => {
+                // navigation.navigate("")
+              }}
+              chromeless
+            />
 
             {/* Nút Play/Pause */}
             <MotiView

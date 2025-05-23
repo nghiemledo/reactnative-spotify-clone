@@ -13,6 +13,7 @@ export type RootStackParamList = {
   Playing: undefined;
   AddToPlaylist: undefined;
   AddSongPlaylists: undefined;
+  Queue: undefined;
 };
 
 export default function AppNavigator() {
