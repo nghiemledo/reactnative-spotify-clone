@@ -124,7 +124,7 @@ export default function MiniPlayer() {
               background="transparent"
               icon={<ListMusic size="$2" color="#fff" />}
               onPress={() => {
-                // navigation.navigate("")
+                navigation.navigate("Queue");
               }}
               chromeless
             />
