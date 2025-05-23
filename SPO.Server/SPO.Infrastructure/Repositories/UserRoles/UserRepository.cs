@@ -8,6 +8,7 @@ namespace SPO.Infrastructure.Repositories.UserRoles
     {
         Task<bool> AddAsync(CreateUserRequest vm);
         Task<bool> UpdateAsync(UpdateUserRequest vm);
+        Task<User> UpdateLockOutAsync(UpdateLockOutUserRequest vm);
         Task<bool> DeleteAsync(string id);
         Task<User?> GetByIdAsync(string id);
         Task<IEnumerable<User?>> GetAllAsync();
@@ -30,7 +31,6 @@ namespace SPO.Infrastructure.Repositories.UserRoles
                     vm.Email,
                     vm.PhoneNumber,
                     vm.Password
-
                 });
                 return true;
             }
@@ -54,6 +54,30 @@ namespace SPO.Infrastructure.Repositories.UserRoles
             catch (Exception) { return false; }
         }
 
+        public async Task<User> UpdateLockOutAsync(UpdateLockOutUserRequest vm)
+        {
+            try
+            {
+                var parameters = new
+                {
+                    vm.Id,
+                    vm.LockOutEnabled
+                };
+
+                await _db.SaveData("[SP_SPO_UpdateLockOutUser]", parameters);
+                var updatedUser = await _db.GetData<User, dynamic>(
+                    "[SP_SPO_GetUserById]",
+                    new { Id = vm.Id }
+                );
+
+                return updatedUser.FirstOrDefault() ?? throw new Exception("Cannot get data.");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error occured when trying update Album", ex);
+            }
+        }
+
         public async Task<bool> DeleteAsync(string id)
         {
             try
@@ -63,7 +87,6 @@ namespace SPO.Infrastructure.Repositories.UserRoles
             }
             catch (Exception) { return false; }
         }
-
 
         public async Task<User?> GetByIdAsync(string id)
         {

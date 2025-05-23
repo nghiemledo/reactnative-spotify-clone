@@ -134,7 +134,7 @@ namespace SPO.Server.Controllers
             return Ok(new { token = newAccessToken });
         }
 
-       
+
         private string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -160,9 +160,19 @@ namespace SPO.Server.Controllers
         public async Task<IActionResult> UserPut([FromBody] UpdateUserRequest request)
         {
             var item = await _userRepository.GetByIdAsync(request.Id);
-            if (item is null) return BadRequest(await Result<User>.FailAsync("Không tìm thấy người dùng."));
+            if (item is null) return BadRequest(await Result<User>.FailAsync("User not found"));
 
             await _userRepository.UpdateAsync(request);
+            return Ok(await Result<User>.SuccessAsync());
+        }
+
+        [HttpPatch("")]
+        public async Task<IActionResult> UserLockOutPatch([FromBody] UpdateLockOutUserRequest request)
+        {
+            var item = await _userRepository.GetByIdAsync(request.Id);
+            if (item is null) return BadRequest(await Result<User>.FailAsync("User not found"));
+
+            await _userRepository.UpdateLockOutAsync(request);
             return Ok(await Result<User>.SuccessAsync());
         }
 
@@ -170,7 +180,7 @@ namespace SPO.Server.Controllers
         public async Task<IActionResult> UserDelete(string id)
         {
             var item = await _userRepository.GetByIdAsync(id);
-            if (item is null) return BadRequest(await Result<User>.FailAsync("User not found."));
+            if (item is null) return BadRequest(await Result<User>.FailAsync("User not found"));
 
             await _userRepository.DeleteAsync(id);
             return Ok(await Result<Role>.SuccessAsync());
@@ -186,7 +196,7 @@ namespace SPO.Server.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Email!),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())  // ID duy nhất của token
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) 
             };
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
