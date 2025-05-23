@@ -11,19 +11,12 @@ import {
 import { TouchableOpacity } from "react-native";
 import { Eye, EyeOff } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-<<<<<<<< HEAD:SPO.Client/app/components/Login/EmailLoginForm.tsx
-import { RootStackParamList } from "../../types";
-import { useDispatch, useSelector } from "react-redux";
-import { login, setError } from "../../store/authSlice";
-import { RootState, AppDispatch } from "../../store";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-========
-import { SlpashStackParamList } from "../../navigation/SplashNavigator";
+
 import { useLoginMutation } from "../../services/AuthService";
->>>>>>>> feature/nguyenxuantruong/playingscreen:SPO.Client/app/components/auth/EmailLoginForm.tsx
+import { SplashStackParamList } from "../../navigation/SplashNavigator";
 
 type EmailLoginScreenNavigationProp = NativeStackNavigationProp<
-  SlpashStackParamList,
+  SplashStackParamList,
   "EmailLogin"
 >;
 
