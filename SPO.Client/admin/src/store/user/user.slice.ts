@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { User } from "@/types/user.type";
-import { deleteUserData, getUserById, getUserData, postUserData, putUserData } from "./user.actions";
+import { deleteUserData, getUserById, getUserData, patchUserLockOut, postUserData, putUserData } from "./user.actions";
 
 interface initialStateTypes {
     userData: User[];
@@ -49,6 +49,16 @@ const userSlice = createSlice({
                 console.error('Post failed:', action.payload);
             })
             .addCase(putUserData.fulfilled, (state, action) => {
+                const id = action.payload.id;
+                state.userData.some((item, index) => {
+                    if (item.id === id) {
+                        state.userData[index] = action.payload;
+                        return true;
+                    }
+                    return false;
+                })
+            })
+            .addCase(patchUserLockOut.fulfilled, (state, action) => {
                 const id = action.payload.id;
                 state.userData.some((item, index) => {
                     if (item.id === id) {
