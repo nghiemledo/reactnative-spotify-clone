@@ -1,0 +1,17 @@
+services:
+  backend:
+    build:
+      context: ./SPO.Server
+      dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME}/spo-backend:latest
+    container_name: wa-backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge

@@ -3,18 +3,34 @@ import { authRoutes, privateRoutes } from './routes'
 import AdminLayout from './layouts/AdminLayout'
 import AuthLayout from './layouts/AuthLayout';
 import { ThemeProvider } from './components/theme-provider';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import Loading from './components/loading';
 
 function App() {
-  const isAuthenticated = false;
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
+  )
+}
 
-  // const user = JSON.parse(localStorage.getItem('user')!)
-  // const canAccess = user?.roles.includes('admin')
-  const canAccess = true;
+function AppRoutes() {
+  const { isAuthenticated, isLoading } = useAuth();
 
+  const role = localStorage.getItem('role')
+  const canAccess = role === 'Admin' || role === 'SysAdmin';
+  if (isLoading) {
+    return <Loading />
+  }
   return (
     <>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <Routes>
+          <Route
+            path="/"
+            element={isAuthenticated ? <Navigate to="/admin" /> : <Navigate to="/login" />}
+          />
+
           {authRoutes.map(({ path, component: Component }, index) => (
             <Route key={index} path={path} element={
               isAuthenticated ? <Navigate to="/admin" /> : (
@@ -27,7 +43,7 @@ function App() {
 
           {privateRoutes.map(({ path, component: Component }, index) => (
             <Route key={index} path={path} element={
-              canAccess ? (
+              isAuthenticated && canAccess ? (
                 <AdminLayout>
                   <Component />
                 </AdminLayout>
