@@ -31,7 +31,7 @@ interface SongOptionsBottomSheetProps {
   urlAvatar: string;
   type: string;
   artists: Artist[];
-  context?: string; // Added context prop
+  context?: string;
 }
 
 const SongOptionsBottomSheet: React.FC<SongOptionsBottomSheetProps> = ({
@@ -73,7 +73,7 @@ const SongOptionsBottomSheet: React.FC<SongOptionsBottomSheetProps> = ({
   return (
     <BottomSheet
       ref={bottomSheetRef}
-      index={isOpen ? 1 : -1} // Open to 100% (index 1) when isOpen is true
+      index={isOpen ? 1 : -1}
       snapPoints={snapPoints}
       backdropComponent={renderBackdrop}
       backgroundStyle={{ backgroundColor: "#191414" }}

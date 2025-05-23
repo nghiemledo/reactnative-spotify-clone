@@ -18,7 +18,7 @@ export type LibraryStackParamList = {
   ArtistSelection: { selectedIds: string[] };
   PodcastSelection: { selectedIds: string[] };
   SearchInPlaylist: { Items: Song[] };
-  AddToPlaylist: undefined;
+  AddToPlaylist: { songId?: number; currentPlaylistId?: number };
   AddSongPlaylist: undefined;
   updateSongPlaylist: undefined;
   PlaylistNavigator: undefined;
