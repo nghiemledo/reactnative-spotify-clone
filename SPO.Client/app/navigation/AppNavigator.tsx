@@ -5,6 +5,7 @@ import SplashNavigator from "./SplashNavigator";
 import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
 import PlayingScreen from "../screens/PlayingScreen";
 import { AddSongPlaylistsScreen } from "../screens/artist/AddSongPlayListsScreen";
+import QueueScreen from "../screens/QueueScreen";
 
 const Stack = createStackNavigator();
 
@@ -38,6 +39,11 @@ export default function AppNavigator() {
         <Stack.Screen
           name="AddSongPlaylists"
           component={AddSongPlaylistsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Queue"
+          component={QueueScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
