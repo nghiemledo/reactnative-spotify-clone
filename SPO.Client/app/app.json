@@ -1,5 +1,13 @@
 {
   "expo": {
+    "plugins": [
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-9256713212021306~7812929844"
+        }
+      ]
+    ],
     "name": "app",
     "slug": "app",
     "version": "1.0.0",
@@ -13,7 +21,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.truong1510.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +35,8 @@
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "android.permission.CAMERA"
       ],
       "jsEngine": "hermes",
       "config": {
@@ -41,16 +51,31 @@
       },
       "gradleProps": {
         "org.gradle.jvmargs": "-Xmx4g -XX:MaxMetaspaceSize=1g"
-      }
+      },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "myapp",
+              "host": "truong1510.com",
+              "pathPrefix": "/success"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-      
     },
-    
+    "scheme": "myapp",
     "extra": {
       "eas": {
-        "projectId": "22179ceb-5dfa-4be1-9a96-323b018681e6"
+        "projectId": "6b489bd4-224d-4c5e-a3e5-d6c640ddd896"
       }
     }
   }
