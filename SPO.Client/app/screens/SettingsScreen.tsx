@@ -102,7 +102,7 @@ export default function SettingsScreen({
     {
       icon: <Loader color="#fff" size={24} />,
       title: "Advertisements",
-      subtitle: "Tailored ads",  
+      subtitle: "Tailored ads",
       // onPress: () => navigation.navigate("Advertisements"),
     },
     {
@@ -149,14 +149,7 @@ export default function SettingsScreen({
             <Text color="white" fontSize={18} fontWeight="bold" mb={24}>
               Free account
             </Text>
-            <Button
-              bg="#fff"
-              rounded={24}
-              height={38}
-              px={20}
-              py={5}
-              mb={32}
-            >
+            <Button bg="#fff" rounded={24} height={38} px={20} py={5} mb={32}>
               <Text color="#111" fontSize={12} fontWeight="bold">
                 Go Premium
               </Text>
