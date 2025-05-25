@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { YStack, XStack, Text, Button, ScrollView } from "tamagui";
 import { TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -17,6 +17,7 @@ import {
 import { HomeStackParamList } from "../navigation/HomeNavigator";
 import { useAppDispatch } from "../store";
 import { logout } from "../store/authSlice";
+import AdComponent from "../components/AdComponent";
 
 // Settings Item Component
 const SettingsItem = ({
@@ -28,7 +29,7 @@ const SettingsItem = ({
   icon: React.ReactNode;
   title: string;
   subtitle: string;
-  onPress: () => void;
+  onPress?: () => void;
 }) => (
   <TouchableOpacity onPress={onPress}>
     <XStack items="flex-start" gap={16}>
@@ -56,6 +57,7 @@ export default function SettingsScreen({
   navigation: SettingsScreenNavigationProp;
 }) {
   const dispatch = useAppDispatch();
+  const [showAd, setShowAd] = useState(false);
   const settingsOptions = [
     {
       icon: <Music color="#fff" size={24} />,
@@ -103,7 +105,9 @@ export default function SettingsScreen({
       icon: <Loader color="#fff" size={24} />,
       title: "Advertisements",
       subtitle: "Tailored ads",
-      // onPress: () => navigation.navigate("Advertisements"),
+      onPress: () => {
+        setShowAd(true); // Hiển thị AdComponent khi nhấn
+      },
     },
     {
       icon: <Info color="#fff" size={24} />,
@@ -117,14 +121,13 @@ export default function SettingsScreen({
     <YStack flex={1} bg="black">
       {/* Header */}
       <XStack
-        items="center" // Căn giữa theo chiều dọc
-        justify="center" // Căn giữa theo chiều ngang
+        items="center"
+        justify="center"
         px={16}
         height={60}
         bg="#222"
-        position="relative" // Cần thiết nếu dùng Button absolute
+        position="relative"
       >
-        {/* Nút Back (cố định bên trái) */}
         <Button
           chromeless
           icon={<ArrowLeft size={24} />}
@@ -132,12 +135,10 @@ export default function SettingsScreen({
           color="white"
           bg="transparent"
           p={0}
-          position="absolute" // Đặt vị trí tuyệt đối
-          l={16} // Cách lề trái 16px
+          position="absolute"
+          l={16}
           onPress={() => navigation.goBack()}
         />
-
-        {/* Tiêu đề căn giữa */}
         <Text color="white" fontSize={20} fontWeight="bold">
           Settings
         </Text>
@@ -149,7 +150,15 @@ export default function SettingsScreen({
             <Text color="white" fontSize={18} fontWeight="bold" mb={24}>
               Free account
             </Text>
-            <Button bg="#fff" rounded={24} height={38} px={20} py={5} mb={32}>
+            <Button
+              bg="#fff"
+              rounded={24}
+              height={38}
+              px={20}
+              py={5}
+              mb={32}
+              // onPress={() => navigation.navigate("Premium")}
+            >
               <Text color="#111" fontSize={12} fontWeight="bold">
                 Go Premium
               </Text>
@@ -159,13 +168,7 @@ export default function SettingsScreen({
           {/* Settings List */}
           <YStack gap={28}>
             {settingsOptions.map((option, index) => (
-              <SettingsItem
-                onPress={function (): void {
-                  throw new Error("Function not implemented.");
-                }}
-                key={index}
-                {...option}
-              />
+              <SettingsItem key={index} {...option} />
             ))}
           </YStack>
 
@@ -174,7 +177,7 @@ export default function SettingsScreen({
             bg="#fff"
             rounded={24}
             height={38}
-            self={"center"}
+            self="center"
             mt={24}
             mb={40}
             px={20}
@@ -190,6 +193,17 @@ export default function SettingsScreen({
           </Button>
         </YStack>
       </ScrollView>
+
+      {/* Hiển thị AdComponent khi showAd là true */}
+      {showAd && (
+        <AdComponent
+          onClose={() => setShowAd(false)} // Ẩn AdComponent khi quảng cáo đóng
+          onReward={() => {
+            console.log("🎉 Người dùng đã nhận thưởng từ quảng cáo!");
+            setShowAd(false);
+          }}
+        />
+      )}
     </YStack>
   );
 }
