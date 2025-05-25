@@ -5,7 +5,10 @@ import SplashNavigator from "./SplashNavigator";
 import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
 import PlayingScreen from "../screens/PlayingScreen";
 import { AddSongPlaylistsScreen } from "../screens/artist/AddSongPlayListsScreen";
-import QueueScreen from "../screens/QueueScreen";
+import QueueBottomSheet from "../components/QueueBottomSheet";
+import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
+import { PlaylistsScreen } from "../screens/playlists/PlaylistsScreen";
+import { EditProfileScreen } from "../screens/profile/EditProfileScreen";
 
 const Stack = createStackNavigator();
 
@@ -14,7 +17,9 @@ export type RootStackParamList = {
   Playing: undefined;
   AddToPlaylist: undefined;
   AddSongPlaylists: undefined;
-  Queue: undefined;
+  EditProfile: undefined;
+  detailPlaylist: undefined;
+  Playlists: undefined;
 };
 
 export default function AppNavigator() {
@@ -42,8 +47,18 @@ export default function AppNavigator() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Queue"
-          component={QueueScreen}
+          name="EditProfile"
+          component={EditProfileScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="detailPlaylist"
+          component={DetailPlaylistScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Playlists"
+          component={PlaylistsScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
