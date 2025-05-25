@@ -59,10 +59,9 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
 
   const handleShowSpotifyCode = () => {
     if (selectedSong) {
-      Alert.alert(
-        "Spotify Code",
-        `Showing Spotify code for "${selectedSong.title}"`
-      );
+      navigation?.navigate("shareQrSong", {
+        song: selectedSong,
+      });
     } else {
       Alert.alert("Error", "No song selected");
     }

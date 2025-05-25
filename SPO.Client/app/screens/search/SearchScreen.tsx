@@ -12,13 +12,11 @@ import {
   YStack,
 } from "tamagui";
 import { Camera, Search } from "@tamagui/lucide-icons";
-import {
-  FlatList,
-  Animated,
-  TouchableOpacity,
-} from "react-native";
-import PinnedHeader from "../../components/search/PinnedHeader"; 
+import { FlatList, Animated, TouchableOpacity } from "react-native";
+import PinnedHeader from "../../components/search/PinnedHeader";
 import BrowseAll from "../../components/search/BrowseAll";
+import { RootStackParamList } from "../../navigation/AppNavigator";
+import { useNavigation } from "@react-navigation/native";
 
 const data = [
   { id: "1", title: "Tiêu đề 1", image: "https://i.pravatar.cc/150?img=3" },
@@ -39,19 +37,11 @@ const data = [
   { id: "16", title: "Tiêu đề 1", image: "https://i.pravatar.cc/150?img=3" },
 ];
 
-type SearchScreenNavigationProp = NativeStackNavigationProp<
-  SearchStackParamList,
-  "Search"
->;
-
-export default function SearchScreen({
-  navigation,
-}: {
-  navigation: SearchScreenNavigationProp;
-}) {
+export default function SearchScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const headerHeight = 160;
-
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const getRandomHSL = () => {
     const hue = Math.floor(Math.random() * 360);
     return `hsl(${hue}, 70%, 50%)`;
@@ -62,7 +52,7 @@ export default function SearchScreen({
       <Animated.ScrollView
         contentContainerStyle={{ paddingTop: headerHeight }}
         onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } }}],
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: true }
         )}
         scrollEventThrottle={16}
@@ -110,7 +100,7 @@ export default function SearchScreen({
               Search
             </Text>
           </XStack>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("ScanQr")}>
             <Camera color="white" size="$1.5" />
           </TouchableOpacity>
         </XStack>
@@ -124,7 +114,9 @@ export default function SearchScreen({
           px="$1"
           py="$1.5"
           my="$3"
-          onPress={() => navigation.navigate({ name: "SearchResult", params: {} })}
+          onPress={() =>
+            navigation.navigate({ name: "SearchResult", params: {} })
+          }
         >
           <Input
             disabled
