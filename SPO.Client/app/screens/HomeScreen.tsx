@@ -22,9 +22,9 @@ import { useAppSelector } from "../store";
 import { AlbumItem } from "../components/AlbumItem";
 import { ArtistItem } from "../components/ArtistItem";
 import { PodcastItem } from "../components/PodcastItem";
-import { SongItem } from "../components/SongItem";
+import { SongItem } from "../components/song/SongItem";
 import Toast from "react-native-toast-message";
-import SongBottomSheet from "../components/SongBottomSheet";
+import SongBottomSheet from "../components/song/SongBottomSheet";
 import { playSong } from "../services/playerService";
 
 const relaxationItems = [
@@ -281,7 +281,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
                         showArtistName={true}
                         imageSize={60}
                         getArtistName={getArtistName}
-                        navigation={navigation}
                         screen="home"
                         onMorePress={handleMorePress} // Truyền callback
                       />

@@ -7,9 +7,9 @@ import { Dimensions, TouchableOpacity, Alert, Image } from "react-native";
 import { YStack, XStack, Text } from "tamagui";
 import { Plus, ListPlus, QrCode, CircleDot, User } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Song } from "../types/song";
-import { AnyStackParamList } from "../navigation/AnyStackParamList";
-import { RootStackParamList } from "../navigation/AppNavigator";
+import { Song } from "../../types/song";
+import { RootStackParamList } from "../../navigation/AppNavigator";
+import SafeImage from "../SafeImage";
 
 interface Feature {
   key: string;
@@ -189,12 +189,8 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
               borderBottomColor="gray"
             >
               <XStack p="$3" gap="$3">
-                <Image
-                  source={{
-                    uri:
-                      selectedSong.coverImage ||
-                      "https://via.placeholder.com/50",
-                  }}
+                <SafeImage
+                  uri={selectedSong.coverImage}
                   width={50}
                   height={50}
                   borderRadius={8}

@@ -18,8 +18,8 @@ import { HomeStackParamList } from "../../navigation/HomeNavigator";
 import Toast from "react-native-toast-message";
 import { ArtistItem } from "../../components/ArtistItem";
 import { AlbumItem } from "../../components/AlbumItem";
-import { SongItem } from "../../components/SongItem";
-import SongBottomSheet from "../../components/SongBottomSheet";
+import { SongItem } from "../../components/song/SongItem";
+import SongBottomSheet from "../../components/song/SongBottomSheet";
 import {
   playSong,
   addTrackToQ,

@@ -6,7 +6,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { Dimensions } from "react-native";
 import { useAppSelector } from "../store";
-import { SongItem } from "./SongItem";
+import { SongItem } from "./song/SongItem";
 import { Track } from "react-native-track-player";
 
 interface QueueBottomSheetProps {

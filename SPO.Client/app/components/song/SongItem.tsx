@@ -2,12 +2,12 @@ import React, { useEffect, useRef } from "react";
 import { XStack, YStack, Text, Button } from "tamagui";
 import { MoreVertical } from "@tamagui/lucide-icons";
 import { TouchableOpacity, Animated, Easing } from "react-native";
-import SafeImage from "./SafeImage";
-import { Song } from "../types/song";
-import { useAppSelector } from "../store";
-import { playSong } from "../services/playerService";
+import SafeImage from "../SafeImage";
+import { Song } from "../../types/song";
+import { useAppSelector } from "../../store";
+import { playSong } from "../../services/playerService";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../navigation/AppNavigator";
+import { RootStackParamList } from "../../navigation/AppNavigator";
 
 interface SongItemProps {
   song: Song;
