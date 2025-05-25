@@ -1,6 +1,5 @@
 import { Animated, Dimensions, StatusBar, View, FlatList } from "react-native";
 import { YStack, XStack, Text, Image, Button, Spinner } from "tamagui";
-import { TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect, useRef, useMemo, useCallback, useState } from "react";
 import {
@@ -19,7 +18,7 @@ import {
   useGetAlbumsQuery,
 } from "../services/AlbumService";
 import { useGetSongsQuery } from "../services/SongService";
-import { HomeStackParamList } from "../navigation/HomeNavigator";
+import { RootStackParamList } from "../navigation/AppNavigator";
 import { Album } from "../types/album";
 import { useGetArtistsQuery } from "../services/ArtistService";
 import { Artist } from "../types/artist";
@@ -28,16 +27,21 @@ import { Song } from "../types/song";
 import { SongItem } from "../components/SongItem";
 import { AlbumItem } from "../components/AlbumItem";
 import SongBottomSheet from "../components/SongBottomSheet";
+import { playSong, setPlayerQueue } from "../services/playerService";
+import { HomeStackParamList } from "../navigation/HomeNavigator";
+import { store } from "../store";
+import { setQueue as setReduxQueue } from "../store/playerSlice";
 
 type AlbumRouteProp = RouteProp<HomeStackParamList, "Album">;
+
+type AlbumScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function AlbumScreen() {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
-  const scrollY = useRef(new Animated.Value(0)).current;
   const [isAdded, setIsAdded] = useState(false);
-  const navigation =
-    useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const navigation = useNavigation<AlbumScreenNavigationProp>();
   const route = useRoute<AlbumRouteProp>();
   const albumId = route.params?.id;
 
@@ -136,7 +140,7 @@ export default function AlbumScreen() {
     setIsAdded((prev) => !prev);
     Toast.show({
       type: "success",
-      text1: isAdded ? "Removed from Library" : "Added to Library",
+      text1: isAdded ? "Đã xóa khỏi Thư viện" : "Đã thêm vào Thư viện",
       position: "bottom",
       visibilityTime: 2000,
     });
@@ -150,9 +154,9 @@ export default function AlbumScreen() {
   };
 
   const getArtistName = (artistId: string | undefined) => {
-    if (!artistId) return "Unknown artist";
+    if (!artistId) return "Nghệ sĩ không xác định";
     const artist = artists?.data?.find((a: Artist) => a.id === artistId);
-    return artist?.name || "Unknown artist";
+    return artist?.name || "Nghệ sĩ không xác định";
   };
 
   const getArtistUrlAvatar = (artistId: string | undefined) => {
@@ -164,6 +168,60 @@ export default function AlbumScreen() {
   const handleMorePress = (song: Song) => {
     setSelectedSong(song);
     setIsBottomSheetOpen(true);
+  };
+
+  // Hàm xử lý khi nhấn nút Play
+  const handlePlayAll = async () => {
+    if (!filteredSongs || filteredSongs.length === 0) {
+      Toast.show({
+        type: "error",
+        text1: "Không có bài hát nào để phát",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+      return;
+    }
+
+    try {
+      // Chuyển đổi filteredSongs thành định dạng Track
+      const tracks = filteredSongs
+        .filter((song) => song.audioUrl && song.title) // Lọc bài hát hợp lệ
+        .map((song: Song) => ({
+          id: song.id || `song-${song.title}`,
+          url: song.audioUrl || "",
+          title: song.title || "",
+          artist: song.artistId || "Nghệ sĩ không xác định",
+          artwork:
+            song.coverImage ||
+            "https://via.placeholder.com/300?text=Không+có+hình+ảnh",
+          duration: song.duration || 0,
+        }));
+
+      // Xóa hàng đợi hiện tại và thêm danh sách mới
+      store.dispatch(setReduxQueue(tracks));
+      await setPlayerQueue(tracks);
+
+      // Phát bài hát đầu tiên
+      const firstSong = filteredSongs[0];
+      await playSong(firstSong);
+
+      // Điều hướng đến màn hình Playing
+      navigation.navigate("Playing");
+      Toast.show({
+        type: "success",
+        text1: `Đang phát album: ${album?.data?.title || "album"}`,
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+    } catch (error) {
+      console.error("Lỗi khi phát tất cả bài hát:", error);
+      Toast.show({
+        type: "error",
+        text1: "Không thể phát danh sách bài hát",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+    }
   };
 
   const renderAlbumItem = ({ item }: { item: Album }) => (
@@ -211,7 +269,7 @@ export default function AlbumScreen() {
         mb={4}
         numberOfLines={1}
       >
-        {album?.data?.title || "Loading ..."}
+        {album?.data?.title || "Đang tải..."}
       </Text>
       <XStack>
         <Image
@@ -229,8 +287,8 @@ export default function AlbumScreen() {
       <Text fontSize={16} color="rgba(255,255,255,0.8)" mb={4}>
         Album •{" "}
         {album?.data?.createdAt
-          ? new Date(album.data.createdAt).toLocaleDateString()
-          : "no day"}
+          ? new Date(album.data.createdAt).toLocaleDateString("vi-VN")
+          : "Không có ngày"}
       </Text>
 
       <XStack items="center" justify="space-between" mb={12}>
@@ -278,6 +336,7 @@ export default function AlbumScreen() {
             width={56}
             height={56}
             icon={<Play size={28} color="black" fill="black" />}
+            onPress={handlePlayAll} // Gắn hàm handlePlayAll
           />
         </XStack>
       </XStack>
@@ -287,14 +346,14 @@ export default function AlbumScreen() {
   const renderAlbum = () => (
     <YStack mt="$6" mb={70}>
       <Text fontSize={20} fontWeight="bold" color="white" mb="$3">
-        You might also like
+        Bạn cũng có thể thích
       </Text>
       {isAlbumsLoading ? (
         <Spinner size="large" color="$green10" />
       ) : albumsError ? (
-        <Text color="white">Error loading albums</Text>
+        <Text color="white">Lỗi khi tải danh sách album</Text>
       ) : !filteredAlbums || filteredAlbums.length === 0 ? (
-        <Text color="rgba(255,255,255,0.7)">No other albums found</Text>
+        <Text color="rgba(255,255,255,0.7)">Không tìm thấy album khác</Text>
       ) : (
         <FlatList
           data={filteredAlbums}
@@ -372,7 +431,7 @@ export default function AlbumScreen() {
                 marginLeft: 8,
               }}
             >
-              {album?.data?.title || "Loading..."}
+              {album?.data?.title || "Đang tải..."}
             </Animated.Text>
           </View>
         </View>
@@ -391,8 +450,20 @@ export default function AlbumScreen() {
             imageSize={48}
             getArtistName={getArtistName}
             onMorePress={handleMorePress}
-            onSongPress={(song) => {
-              console.log("Song pressed:", song.title);
+            onSongPress={async (song) => {
+              try {
+                await playSong(song);
+                navigation.navigate("Playing");
+                console.log("Bài hát được nhấn:", song.title);
+              } catch (error) {
+                console.error("Lỗi khi phát bài hát:", error);
+                Toast.show({
+                  type: "error",
+                  text1: "Không thể phát bài hát",
+                  position: "bottom",
+                  visibilityTime: 2000,
+                });
+              }
             }}
           />
         )}
@@ -407,8 +478,8 @@ export default function AlbumScreen() {
           ) : (
             <Text color="rgba(255,255,255,0.7)">
               {songsLoading
-                ? "Loading songs..."
-                : "No songs found for this album"}
+                ? "Đang tải bài hát..."
+                : "Không tìm thấy bài hát cho album này"}
             </Text>
           )
         }
@@ -423,16 +494,16 @@ export default function AlbumScreen() {
           setSelectedSong(null);
         }}
         selectedSong={selectedSong}
-        navigation={navigation}
+        navigation={navigation as any}
         screenType="album"
         onAddToOtherPlaylist={() => {
-          // handleNavigation("AddToPlaylist", undefined);
+          navigation.navigate("AddToPlaylist");
         }}
         onAddToQueue={() => {
-          console.log("Add to queue");
+          console.log("Thêm vào hàng đợi");
         }}
         onShowSpotifyCode={() => {
-          console.log("Show Spotify code");
+          console.log("Hiển thị mã Spotify");
         }}
         onGoToAlbum={() => {}}
         onGoToArtist={() => {
@@ -441,7 +512,7 @@ export default function AlbumScreen() {
           } else {
             Toast.show({
               type: "error",
-              text1: "No artist found for this song",
+              text1: "Không tìm thấy nghệ sĩ cho bài hát này",
               position: "bottom",
               visibilityTime: 2000,
             });

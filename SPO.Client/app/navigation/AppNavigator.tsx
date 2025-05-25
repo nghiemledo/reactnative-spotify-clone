@@ -6,18 +6,18 @@ import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
 import { Song } from "../types/song";
 import PlaylistNavigator from "./PlaylistNavigator";
 import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
+import PlayingScreen from "../screens/PlayingScreen";
+import { AddSongPlaylistsScreen } from "../screens/artist/AddSongPlayListsScreen";
+import QueueScreen from "../screens/QueueScreen";
 
 const Stack = createStackNavigator();
 
 export type RootStackParamList = {
   SplashNavigator: undefined;
-  // Album: { id: string };
-  // detailPlaylist: undefined;
-  // Artist: { id: string };
-  // addSongPlaylists: undefined;
-  // Search: undefined;
-  // Settings: undefined;
-
+  Playing: undefined;
+  AddToPlaylist: undefined;
+  AddSongPlaylists: undefined;
+  Queue: undefined;
 };
 
 export default function AppNavigator() {
@@ -29,24 +29,14 @@ export default function AppNavigator() {
           component={SplashNavigator}
           options={{ headerShown: false }}
         />
-        {/* <Stack.Screen
-          name="Album"
-          component={AlbumScreen}
+        <Stack.Screen
+          name="Playing"
+          component={PlayingScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="detailPlaylist"
-          component={DetailPlaylistScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Artist"
-          component={ArtistScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="addSongPlaylist"
-          component={AddSongPlaylistScreen}
+          name="AddToPlaylist"
+          component={AddToPlaylistScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -55,8 +45,8 @@ export default function AppNavigator() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="updateSongPlaylist"
-          component={UpdateSongPlaylistScreen}
+          name="Queue"
+          component={QueueScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

@@ -6,8 +6,6 @@ import PodcastDetailScreen from "../screens/podcast/PodcastDetailScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import { AddSongPlaylistsScreen } from "../screens/artist/AddSongPlayListsScreen";
 import ArtistDetailScreen from "../screens/artist/ArtistDetailScreen";
-import PlayingScreen from "../screens/PlayingScreen";
-// import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
 
 const Stack = createStackNavigator();
 
@@ -19,8 +17,6 @@ export type HomeStackParamList = {
   Podcast: { id: string };
   AddSongPlaylists: undefined;
   Settings: undefined;
-  Playing: undefined
-  // AddToPlaylist: undefined
 };
 
 export default function HomeNavigator() {
@@ -61,16 +57,6 @@ export default function HomeNavigator() {
         component={SettingsScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="Playing"
-        component={PlayingScreen}
-        options={{ headerShown: false }}
-      />
-      {/* <Stack.Screen
-        name="AddToPlaylist"
-        component={AddToPlaylistScreen}
-        options={{ headerShown: false }}
-      /> */}
     </Stack.Navigator>
   );
 }

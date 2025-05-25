@@ -17,11 +17,11 @@ import {
   removeTrackFromQueue,
   setShuffle,
   setLoop,
+  setSleepTimer,
+  clearSleepTimer,
 } from "../store/playerSlice";
 import { Track } from "../types/track";
 import { Song } from "../types/song";
-
-// Định nghĩa interface Track
 
 // Danh sách tracks mẫu
 const tracks: Track[] = [
@@ -50,14 +50,72 @@ const tracks: Track[] = [
     artwork: "https://thantrieu.com/resources/arts/1130295694.webp",
   },
 ];
+let sleepTimerTimeout: ReturnType<typeof setTimeout> | null = null;
+// Hàm thiết lập hẹn giờ
+export const setSleepTimerAsync = async (minutes: number) => {
+  try {
+    // Tính thời gian kết thúc (timestamp)
+    const endTime = Date.now() + minutes * 60 * 1000;
+    store.dispatch(setSleepTimer(endTime));
+
+    // Hủy timeout cũ nếu có
+    if (sleepTimerTimeout) {
+      clearTimeout(sleepTimerTimeout);
+    }
+
+    // Thiết lập timeout mới
+    const timeLeft = endTime - Date.now();
+    sleepTimerTimeout = setTimeout(async () => {
+      try {
+        // Tạm dừng phát nhạc
+        await TrackPlayer.pause();
+        store.dispatch(setPlaying(false));
+        store.dispatch(clearSleepTimer());
+        console.log("Sleep timer ended, playback paused");
+      } catch (error) {
+        console.error("Sleep Timer Pause Error:", error);
+      }
+    }, timeLeft);
+
+    console.log(`Sleep timer set for ${minutes} minutes`);
+  } catch (error) {
+    console.error("Set Sleep Timer Error:", error);
+  }
+};
+
+// Hàm hủy hẹn giờ
+export const cancelSleepTimer = async () => {
+  try {
+    if (sleepTimerTimeout) {
+      clearTimeout(sleepTimerTimeout);
+      sleepTimerTimeout = null;
+    }
+    store.dispatch(clearSleepTimer());
+    console.log("Sleep timer cancelled");
+  } catch (error) {
+    console.error("Cancel Sleep Timer Error:", error);
+  }
+};
+// Hàm chọn track ngẫu nhiên cho chế độ shuffle
+const getRandomTrackIndex = (
+  queue: Track[],
+  currentTrack: Track | null
+): number => {
+  if (!queue.length) return -1;
+  const availableTracks = queue.filter(
+    (track) => !currentTrack || track.id !== currentTrack.id
+  );
+  if (!availableTracks.length) return -1;
+  return Math.floor(Math.random() * availableTracks.length);
+};
 
 // Khởi tạo TrackPlayer và queue
 export const setupPlayer = async () => {
   try {
     await TrackPlayer.setupPlayer();
     console.log("TrackPlayer setup completed");
+
     await playbackService();
-    console.log("Playback service started");
     await TrackPlayer.updateOptions({
       capabilities: [
         Capability.Play,
@@ -84,20 +142,17 @@ export const setupPlayer = async () => {
     });
     console.log("TrackPlayer options updated successfully");
 
-    // Thêm tracks mẫu vào TrackPlayer và Redux
     await TrackPlayer.add(tracks);
     store.dispatch(setQueue(tracks));
     console.log("Tracks added successfully");
 
-    // Đặt track đầu tiên làm track hiện tại
     const track = await TrackPlayer.getTrack(0);
-
     if (track) {
       store.dispatch(
         setCurrentTrack({
           id: track.id ?? "",
           url: String(track.url ?? ""),
-          position: track.position,
+          position: track.position || 0,
           duration: track.duration,
           title: track.title,
           artist: track.artist,
@@ -176,122 +231,109 @@ export async function playbackService() {
 
     TrackPlayer.addEventListener(
       Event.PlaybackProgressUpdated,
-      ({ position, duration }) => {
+      async ({ position, duration }) => {
         try {
+          console.log(
+            "Progress Update - Position:",
+            position,
+            "Duration:",
+            duration
+          );
           store.dispatch(setPosition(position));
           store.dispatch(setDuration(duration));
+
+          // Kiểm tra nếu bài hát kết thúc (position >= duration)
+          if (position >= duration && duration > 0) {
+            const state = store.getState().player;
+            const queue = await TrackPlayer.getQueue();
+            const currentIndex = await TrackPlayer.getCurrentTrack();
+
+            if (!queue.length || currentIndex === null) {
+              store.dispatch(setPlaying(false));
+              store.dispatch(setCurrentTrack(null));
+              console.log("Track ended, no tracks available");
+              return;
+            }
+
+            if (state.loop === "track") {
+              // Lặp lại bài hiện tại
+              await TrackPlayer.seekTo(0);
+              const currentTrack = await TrackPlayer.getTrack(currentIndex);
+              if (currentTrack) {
+                store.dispatch(
+                  setCurrentTrack({
+                    id: currentTrack.id ?? "",
+                    url: String(currentTrack.url ?? ""),
+                    position: 0,
+                    duration: currentTrack.duration,
+                    title: currentTrack.title,
+                    artist: currentTrack.artist,
+                    artwork:
+                      currentTrack.artwork !== undefined
+                        ? String(currentTrack.artwork)
+                        : undefined,
+                  })
+                );
+                await TrackPlayer.play();
+                store.dispatch(setPlaying(true));
+                console.log(
+                  "Track ended, replaying current track:",
+                  currentTrack.title
+                );
+              }
+            } else {
+              // Chuyển sang bài tiếp theo hoặc xử lý shuffle/queue
+              await skipToNext();
+              console.log("Track ended, skipping to next track");
+            }
+          }
         } catch (error) {
           console.error("Progress Update Error:", error);
         }
       }
     );
 
-    TrackPlayer.addEventListener(Event.PlaybackQueueEnded, async () => {
-      try {
-        store.dispatch(setPlaying(false));
-        store.dispatch(setCurrentTrack(null));
-        console.log("Queue ended");
-      } catch (error) {
-        console.error("Queue Ended Error:", error);
+    TrackPlayer.addEventListener(
+      Event.PlaybackTrackChanged,
+      async ({ nextTrack }) => {
+        try {
+          if (nextTrack !== null && nextTrack !== undefined) {
+            const track = await TrackPlayer.getTrack(nextTrack);
+            if (track) {
+              store.dispatch(
+                setCurrentTrack({
+                  id: track.id ?? "",
+                  url: String(track.url ?? ""),
+                  position: 0,
+                  duration: track.duration,
+                  title: track.title,
+                  artist: track.artist,
+                  artwork:
+                    track.artwork !== undefined
+                      ? String(track.artwork)
+                      : undefined,
+                })
+              );
+              store.dispatch(setPlaying(true));
+              console.log("Track changed to:", track.title);
+            }
+          } else {
+            store.dispatch(setCurrentTrack(null));
+            store.dispatch(setPlaying(false));
+            console.log("No next track, stopping playback");
+          }
+        } catch (error) {
+          console.error("Playback Track Changed Error:", error);
+        }
       }
-    });
-
+    );
     console.log("Playback service registered successfully");
   } catch (error) {
     console.error("Playback Service Error:", error);
   }
 }
 
-export const playSong = async (song: Song) => {
-  try {
-    // Kiểm tra dữ liệu bài hát
-    if (!song.audioUrl) {
-      throw new Error("Invalid song URL");
-    }
-    if (!song.title) {
-      throw new Error("Song title is missing");
-    }
-
-    // Chuyển đổi Song thành Track
-    const track: Track = {
-      id: song.id || `song-${song.title}`,
-      url: song.audioUrl,
-      title: song.title,
-      artist: song.artistId || "Unknown Artist",
-      artwork: song.coverImage || "https://via.placeholder.com/300?text=No+Image",
-      duration: song.duration || 0,
-    };
-
-    // Lấy hàng đợi hiện tại
-    const currentQueue = await TrackPlayer.getQueue();
-    const mappedQueue = currentQueue.map((t) => ({
-      id: t.id || "",
-      url: String(t.url || ""),
-      title: t.title,
-      artist: t.artist,
-      artwork: t.artwork,
-      duration: t.duration,
-    }));
-
-    // Kiểm tra xem bài hát đã có trong hàng đợi chưa
-    const trackIndex = mappedQueue.findIndex((t) => t.id === track.id);
-
-    if (trackIndex === -1) {
-      // Thêm vào cuối hàng đợi
-      await TrackPlayer.add([track]);
-      store.dispatch(addTrackToQueue(track));
-      const updatedQueue = await TrackPlayer.getQueue();
-      await TrackPlayer.skip(updatedQueue.length - 1);
-    } else {
-      // Chuyển đến bài hát trong hàng đợi
-      await TrackPlayer.skip(trackIndex);
-    }
-
-    // Cập nhật Redux store
-    store.dispatch(setCurrentTrack(track));
-    store.dispatch(setPosition(0));
-
-    // Phát bài hát
-    await TrackPlayer.play();
-    store.dispatch(setPlaying(true));
-    console.log("Playing song:", track.title);
-  } catch (error) {
-    console.error("Play Song Error:", error);
-    throw error; // Ném lỗi để xử lý ở nơi gọi
-  }
-};
-// Hàm điều khiển playback
-export const togglePlayback = async () => {
-  try {
-    const state = await TrackPlayer.getState();
-    if (state === State.Playing) {
-      await TrackPlayer.pause();
-      store.dispatch(setPlaying(false));
-      console.log("Paused");
-    } else if (state === State.Paused || state === State.Ready) {
-      await TrackPlayer.play();
-      store.dispatch(setPlaying(true));
-      console.log("Playing");
-    }
-  } catch (error) {
-    console.error("Toggle Playback Error:", error);
-  }
-};
-
-// Hàm hỗ trợ shuffle
-// Hàm hỗ trợ shuffle
-const getRandomTrackIndex = (
-  queue: Track[],
-  currentTrack: Track | null
-): number => {
-  if (!queue.length) return -1;
-  const availableTracks = queue.filter(
-    (track) => !currentTrack || track.id !== currentTrack.id
-  );
-  if (!availableTracks.length) return -1;
-  return Math.floor(Math.random() * availableTracks.length);
-};
-
+// Hàm skipToNext đã có sẵn, nhưng đảm bảo nó cập nhật currentTrack
 export const skipToNext = async () => {
   try {
     const state = store.getState().player;
@@ -331,12 +373,14 @@ export const skipToNext = async () => {
           setCurrentTrack({
             id: nextTrack.id ?? "",
             url: String(nextTrack.url ?? ""),
-            position: nextTrack.position || 0,
+            position: 0,
             duration: nextTrack.duration,
             title: nextTrack.title,
             artist: nextTrack.artist,
             artwork:
-              nextTrack.artwork !== undefined ? String(nextTrack.artwork) : undefined,
+              nextTrack.artwork !== undefined
+                ? String(nextTrack.artwork)
+                : undefined,
           })
         );
         await TrackPlayer.play();
@@ -350,6 +394,24 @@ export const skipToNext = async () => {
     }
   } catch (error) {
     console.error("Skip To Next Error:", error);
+  }
+};
+
+// Các hàm khác giữ nguyên
+export const togglePlayback = async () => {
+  try {
+    const state = await TrackPlayer.getState();
+    if (state === State.Playing) {
+      await TrackPlayer.pause();
+      store.dispatch(setPlaying(false));
+      console.log("Paused");
+    } else if (state === State.Paused || state === State.Ready) {
+      await TrackPlayer.play();
+      store.dispatch(setPlaying(true));
+      console.log("Playing");
+    }
+  } catch (error) {
+    console.error("Toggle Playback Error:", error);
   }
 };
 
@@ -380,7 +442,7 @@ export const skipToPrevious = async () => {
       const currentIndex = await TrackPlayer.getCurrentTrack();
       prevTrackIndex = currentIndex !== null ? currentIndex - 1 : 0;
       if (prevTrackIndex < 0 && state.loop === "queue") {
-        prevTrackIndex = queue.length - 1; // Quay lại bài cuối nếu loop queue
+        prevTrackIndex = queue.length - 1;
       }
     }
 
@@ -392,12 +454,14 @@ export const skipToPrevious = async () => {
           setCurrentTrack({
             id: prevTrack.id ?? "",
             url: String(prevTrack.url ?? ""),
-            position: prevTrack.position || 0,
+            position: 0,
             duration: prevTrack.duration,
             title: prevTrack.title,
             artist: prevTrack.artist,
             artwork:
-              prevTrack.artwork !== undefined ? String(prevTrack.artwork) : undefined,
+              prevTrack.artwork !== undefined
+                ? String(prevTrack.artwork)
+                : undefined,
           })
         );
         await TrackPlayer.play();
@@ -424,11 +488,62 @@ export const seekTo = async (position: number) => {
   }
 };
 
-// Hàm quản lý queue
+export const playSong = async (song: Song) => {
+  try {
+    if (!song.audioUrl) {
+      throw new Error("Invalid song URL");
+    }
+    if (!song.title) {
+      throw new Error("Song title is missing");
+    }
+
+    const track: Track = {
+      id: song.id || `song-${song.title}`,
+      url: song.audioUrl,
+      title: song.title,
+      artist: song.artistId || "Unknown Artist",
+      artwork:
+        song.coverImage || "https://via.placeholder.com/300?text=No+Image",
+      duration: song.duration || 0,
+    };
+
+    const currentQueue = await TrackPlayer.getQueue();
+    const mappedQueue = currentQueue.map((t) => ({
+      id: t.id || "",
+      url: String(t.url || ""),
+      title: t.title,
+      artist: t.artist,
+      artwork: t.artwork,
+      duration: t.duration,
+    }));
+
+    const trackIndex = mappedQueue.findIndex((t) => t.id === track.id);
+
+    if (trackIndex === -1) {
+      await TrackPlayer.add([track]);
+      store.dispatch(addTrackToQueue(track));
+      const updatedQueue = await TrackPlayer.getQueue();
+      await TrackPlayer.skip(updatedQueue.length - 1);
+    } else {
+      await TrackPlayer.skip(trackIndex);
+    }
+
+    store.dispatch(setCurrentTrack(track));
+    store.dispatch(setPosition(0));
+
+    await TrackPlayer.play();
+    store.dispatch(setPlaying(true));
+    console.log("Playing song:", track.title);
+  } catch (error) {
+    console.error("Play Song Error:", error);
+    throw error;
+  }
+};
+
 export const addTrackToQ = async (track: Track) => {
   try {
     await TrackPlayer.add([track]);
-    store.dispatch(addTrackToQueue(track) as any);
+    store.dispatch(addTrackToQueue(track));
     console.log("Track added to queue:", track.title);
   } catch (error) {
     console.error("Add Track Error:", error);
@@ -454,16 +569,16 @@ export const removeTrackFromQ = async (trackId: string) => {
 export const clearQueue = async () => {
   try {
     await TrackPlayer.reset();
-    store.dispatch(clearQueue() as any);
+    store.dispatch(setQueue([]));
     store.dispatch(setCurrentTrack(null));
     store.dispatch(setPlaying(false));
+    await cancelSleepTimer();
     console.log("Queue cleared");
   } catch (error) {
     console.error("Clear Queue Error:", error);
   }
 };
 
-// Hàm quản lý shuffle
 export const toggleShuffle = async () => {
   try {
     const currentShuffle = store.getState().player.shuffle;
@@ -474,7 +589,6 @@ export const toggleShuffle = async () => {
   }
 };
 
-// Hàm quản lý loop
 export const setLoopMode = async (mode: "off" | "track" | "queue") => {
   try {
     store.dispatch(setLoop(mode));
@@ -488,5 +602,22 @@ export const setLoopMode = async (mode: "off" | "track" | "queue") => {
     console.log("Loop mode set to:", mode);
   } catch (error) {
     console.error("Set Loop Mode Error:", error);
+  }
+};
+export const setPlayerQueue = async (tracks: Track[]) => {
+  try {
+    // Xóa hàng đợi hiện tại
+    await TrackPlayer.reset();
+
+    // Thêm danh sách tracks mới
+    await TrackPlayer.add(tracks);
+
+    // Cập nhật Redux store
+    store.dispatch(setQueue(tracks));
+
+    console.log("Hàng đợi đã được thiết lập với", tracks.length, "bài hát");
+  } catch (error) {
+    console.error("Lỗi khi thiết lập hàng đợi:", error);
+    throw error;
   }
 };

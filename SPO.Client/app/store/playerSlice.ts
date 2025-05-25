@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Track } from "../types/track";
+
 interface PlayerState {
   isPlaying: boolean;
   playbackState: string | null;
@@ -7,8 +8,9 @@ interface PlayerState {
   position: number;
   duration: number;
   queue: Track[];
-  shuffle: boolean; // Trạng thái shuffle
-  loop: "off" | "track" | "queue"; // Trạng thái lặp lại
+  shuffle: boolean;
+  loop: "off" | "track" | "queue";
+  sleepTimer: number | null;
 }
 
 const initialState: PlayerState = {
@@ -20,6 +22,7 @@ const initialState: PlayerState = {
   queue: [],
   shuffle: false,
   loop: "off",
+  sleepTimer: null, // Khởi tạo null
 };
 
 const playerSlice = createSlice({
@@ -63,6 +66,12 @@ const playerSlice = createSlice({
     setLoop(state, action: PayloadAction<"off" | "track" | "queue">) {
       state.loop = action.payload;
     },
+    setSleepTimer(state, action: PayloadAction<number | null>) {
+      state.sleepTimer = action.payload;
+    },
+    clearSleepTimer(state) {
+      state.sleepTimer = null;
+    },
   },
 });
 
@@ -79,5 +88,7 @@ export const {
   togglePlay,
   setShuffle,
   setLoop,
+  setSleepTimer,
+  clearSleepTimer,
 } = playerSlice.actions;
 export default playerSlice.reducer;

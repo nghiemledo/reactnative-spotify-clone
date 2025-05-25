@@ -20,11 +20,19 @@ import { ArtistItem } from "../../components/ArtistItem";
 import { AlbumItem } from "../../components/AlbumItem";
 import { SongItem } from "../../components/SongItem";
 import SongBottomSheet from "../../components/SongBottomSheet";
+import {
+  playSong,
+  addTrackToQ,
+  setPlayerQueue,
+} from "../../services/playerService";
+import { store } from "../../store";
+import {
+  setCurrentTrack,
+  setQueue as setReduxQueue,
+} from "../../store/playerSlice";
 
-type ArtistScreenNavigationProp = NativeStackNavigationProp<
-  HomeStackParamList,
-  "Artist"
->;
+// Định nghĩa type cho navigation với RootStackParamList
+type ArtistScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function ArtistDetailScreen({
   navigation,
@@ -92,7 +100,7 @@ export default function ArtistDetailScreen({
     setIsAdded((prev) => !prev);
     Toast.show({
       type: "success",
-      text1: isAdded ? "OK, you've stopped following" : "OK, you're following",
+      text1: isAdded ? "OK, bạn đã ngừng theo dõi" : "OK, bạn đang theo dõi",
       position: "bottom",
       visibilityTime: 2000,
     });
@@ -113,6 +121,60 @@ export default function ArtistDetailScreen({
       album.artistId !== undefined && album.artistId === route.params.id
   );
 
+  // Hàm xử lý khi nhấn nút Play
+  const handlePlayAll = async () => {
+    if (!artistSongs || artistSongs.length === 0) {
+      Toast.show({
+        type: "error",
+        text1: "Không có bài hát nào để phát",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+      return;
+    }
+
+    try {
+      // Chuyển đổi artistSongs thành định dạng Track
+      const tracks = artistSongs.map((song: Song) => ({
+        id: song.id || `song-${song.title}`,
+        url: song.audioUrl ?? "",
+        title: song.title ?? "",
+        artist: song.artistId || "Nghệ sĩ không xác định",
+        artwork:
+          song.coverImage ||
+          "https://via.placeholder.com/300?text=Không+có+hình+ảnh",
+        duration: song.duration || 0,
+      }));
+
+      // Xóa hàng đợi hiện tại và thêm danh sách mới
+      store.dispatch(setReduxQueue(tracks));
+      await setPlayerQueue(tracks);
+
+      // Phát bài hát đầu tiên
+      const firstSong = artistSongs[0];
+      await playSong(firstSong);
+
+      // Điều hướng đến màn hình Playing
+      navigation.navigate("Playing");
+      Toast.show({
+        type: "success",
+        text1: `Đang phát danh sách bài hát của ${
+          artist?.data?.name || "nghệ sĩ"
+        }`,
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+    } catch (error) {
+      console.error("Lỗi khi phát tất cả bài hát:", error);
+      Toast.show({
+        type: "error",
+        text1: "Không thể phát danh sách bài hát",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+    }
+  };
+
   const renderArtistItem = ({ item }: { item: Artist }) => (
     <ArtistItem
       artist={item}
@@ -124,7 +186,7 @@ export default function ArtistDetailScreen({
     <AlbumItem
       album={item}
       showDate={true}
-      onPress={() => navigation.navigate("Album", { id: item.id })}
+      onPress={() => (navigation as any).navigate("Album", { id: item.id })}
     />
   );
 
@@ -140,11 +202,11 @@ export default function ArtistDetailScreen({
     return (
       <YStack flex={1} justify="center" items="center" bg="#121212">
         <Text color="white">
-          Error:{" "}
+          Lỗi:{" "}
           {(songsError as any)?.message ||
             (albumsError as any)?.message ||
             (artistError as any)?.message ||
-            "Failed to load data"}
+            "Không thể tải dữ liệu"}
         </Text>
       </YStack>
     );
@@ -196,7 +258,7 @@ export default function ArtistDetailScreen({
                   marginLeft: 8,
                 }}
               >
-                {artist?.data?.name || "Unknown Artist"}
+                {artist?.data?.name || "Nghệ sĩ không xác định"}
               </Text>
             </Animated.View>
           </View>
@@ -246,11 +308,11 @@ export default function ArtistDetailScreen({
           <YStack mb="$4">
             <Text>
               <H3 color="white" fontSize={34} fontWeight="bold">
-                {artist?.data?.name || "Unknown Artist"}
+                {artist?.data?.name || "Nghệ sĩ không xác định"}
               </H3>
             </Text>
             <Text color="#b3b3b3" fontSize={16} fontWeight="400">
-              {artist?.data?.bio || "No bio yet"}
+              {artist?.data?.bio || "Chưa có tiểu sử"}
             </Text>
           </YStack>
           <XStack justify="space-between" items="center" mt="$2" mb="$4">
@@ -288,7 +350,7 @@ export default function ArtistDetailScreen({
                 px="$4"
                 onPress={handleAddButtonPress}
               >
-                {isAdded ? "Following" : "Follow"}
+                {isAdded ? "Đang theo dõi" : "Theo dõi"}
               </Button>
               <Button
                 bg="transparent"
@@ -306,17 +368,18 @@ export default function ArtistDetailScreen({
               circular
               size="$5"
               icon={<Play size={24} color="#000" fill="#000" />}
+              onPress={handlePlayAll} // Gắn hàm handlePlayAll
             />
           </XStack>
 
           <H3 color="white" fontSize={20} fontWeight="bold" mb="$3">
-            Popular
+            Phổ biến
           </H3>
           {isSongsLoading ? (
             <Spinner size="large" color="$green10" />
           ) : !artistSongs || artistSongs.length === 0 ? (
             <Text color="rgba(255,255,255,0.7)">
-              {artist?.data.name} has no songs
+              {artist?.data.name} chưa có bài hát nào
             </Text>
           ) : (
             <FlatList
@@ -331,9 +394,23 @@ export default function ArtistDetailScreen({
                   showArtistName={false}
                   imageSize={48}
                   onMorePress={handleMorePress}
-                  onSongPress={(song) => {
-                    // navigation.navigate("Playing")
-                    console.log("Song pressed:", song.title);
+                  onSongPress={async (song) => {
+                    try {
+                      await playSong(song);
+                      navigation.navigate("Playing");
+                      console.log(
+                        "Bài hát được nhấn và đang phát:",
+                        song.title
+                      );
+                    } catch (error) {
+                      console.error("Lỗi khi phát bài hát:", error);
+                      Toast.show({
+                        type: "error",
+                        text1: "Không thể phát bài hát",
+                        position: "bottom",
+                        visibilityTime: 2000,
+                      });
+                    }
                   }}
                 />
               )}
@@ -341,13 +418,13 @@ export default function ArtistDetailScreen({
           )}
 
           <H3 color="white" fontSize={20} fontWeight="bold" mt="$6" mb="$3">
-            Albums
+            Album
           </H3>
           {isAlbumsLoading ? (
             <Spinner size="large" color="$green10" />
           ) : !artistAlbums || artistAlbums.length === 0 ? (
             <Text color="rgba(255,255,255,0.7)">
-              {artist?.data.name} has no albums
+              {artist?.data.name} chưa có album nào
             </Text>
           ) : (
             <FlatList
@@ -361,24 +438,26 @@ export default function ArtistDetailScreen({
           )}
 
           <H3 color="white" fontSize={20} fontWeight="bold" mt="$6" mb="$3">
-            Fan also Like
+            Người hâm mộ cũng thích
           </H3>
           {isArtistsLoading ? (
-              <Spinner size="large" color="$green10" />
-            ) : artistsError ? (
-              <Text color="white">Error loading artists</Text>
-            ) : !filteredArtists || filteredArtists.length === 0 ? (
-              <Text color="rgba(255,255,255,0.7)">No other artists found</Text>
-            ) : (
-              <FlatList
-                data={filteredArtists}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                keyExtractor={(item) => item.id}
-                renderItem={renderArtistItem}
-                contentContainerStyle={{ paddingRight: 16 }}
-              />
-            )}
+            <Spinner size="large" color="$green10" />
+          ) : artistsError ? (
+            <Text color="white">Lỗi khi tải danh sách nghệ sĩ</Text>
+          ) : !filteredArtists || filteredArtists.length === 0 ? (
+            <Text color="rgba(255,255,255,0.7)">
+              Không tìm thấy nghệ sĩ khác
+            </Text>
+          ) : (
+            <FlatList
+              data={filteredArtists}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item) => item.id}
+              renderItem={renderArtistItem}
+              contentContainerStyle={{ paddingRight: 16 }}
+            />
+          )}
         </LinearGradient>
       </ScrollView>
       <SongBottomSheet
@@ -388,24 +467,24 @@ export default function ArtistDetailScreen({
           setSelectedSong(null);
         }}
         selectedSong={selectedSong}
-        navigation={navigation}
+        navigation={navigation as any}
         screenType="artist"
         onAddToOtherPlaylist={() => {
-          handleNavigation("AddSongPlaylists", undefined);
+          navigation.navigate("AddSongPlaylists");
         }}
         onAddToQueue={() => {
-          console.log("Add to queue");
+          console.log("Thêm vào hàng đợi");
         }}
         onShowSpotifyCode={() => {
-          console.log("Show Spotify code");
+          console.log("Hiển thị mã Spotify");
         }}
         onGoToAlbum={() => {
           if (selectedSong?.albumId) {
-            handleNavigation("Album", { id: selectedSong.albumId });
+            (navigation as any).navigate("Album", { id: selectedSong.albumId });
           } else {
             Toast.show({
               type: "error",
-              text1: "No album found for this song",
+              text1: "Không tìm thấy album cho bài hát này",
               position: "bottom",
               visibilityTime: 2000,
             });
