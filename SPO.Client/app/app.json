@@ -26,7 +26,8 @@
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "android.permission.CAMERA"
       ],
       "jsEngine": "hermes",
       "config": {
@@ -47,7 +48,6 @@
       "favicon": "./assets/favicon.png"
       
     },
-    
     "extra": {
       "eas": {
         "projectId": "22179ceb-5dfa-4be1-9a96-323b018681e6"
