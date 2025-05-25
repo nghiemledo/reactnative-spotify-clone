@@ -3,43 +3,133 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { Dimensions, TouchableOpacity } from "react-native";
+import { Dimensions, TouchableOpacity, Alert, Image } from "react-native";
 import { YStack, XStack, Text } from "tamagui";
 import { Plus, ListPlus, QrCode, CircleDot, User } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { HomeStackParamList } from "../navigation/HomeNavigator";
 import { Song } from "../types/song";
+import { AnyStackParamList } from "../navigation/AnyStackParamList";
+import { RootStackParamList } from "../navigation/AppNavigator";
 
+interface Feature {
+  key: string;
+  label: string;
+  icon: React.ReactNode;
+  action: () => void;
+  visibleOnScreens: string[];
+}
 interface SongBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddToOtherPlaylist: () => void;
-  onAddToQueue: () => void;
-  onShowSpotifyCode: () => void;
-  onGoToAlbum: () => void;
-  onGoToArtist: () => void;
   selectedSong: Song | null;
-  navigation: NativeStackNavigationProp<HomeStackParamList>;
-  screenType: "home" | "artist" | "album";
+  navigation?: NativeStackNavigationProp<RootStackParamList>;
+  screenType?: "home" | "artist" | "album";
 }
 
 const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
   isOpen,
   onClose,
-  onAddToOtherPlaylist,
-  onAddToQueue,
-  onShowSpotifyCode,
-  onGoToAlbum,
-  onGoToArtist,
   selectedSong,
   navigation,
-  screenType,
+  screenType = "home",
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const screenHeight = Dimensions.get("window").height;
 
-  const snapPoints = screenType === "home" ? ["50%"] : ["40%"];
-  const sheetHeight = screenType === "home" ? screenHeight * 0.35 : screenHeight * 0.3;
+  const snapPoints = ["80%"];
+  const sheetHeight =
+    screenType === "home" ? screenHeight * 0.35 : screenHeight * 0.3;
+
+  // Xử lý các hành động bên trong component
+  const handleAddToPlaylist = () => {
+    if (selectedSong) {
+      Alert.alert("Success", `Added "${selectedSong.title}" to playlist`);
+    } else {
+      Alert.alert("Error", "No song selected");
+    }
+  };
+
+  const handleAddToQueue = () => {
+    if (selectedSong) {
+      Alert.alert("Success", `Added "${selectedSong.title}" to queue`);
+    } else {
+      Alert.alert("Error", "No song selected");
+    }
+  };
+
+  const handleShowSpotifyCode = () => {
+    if (selectedSong) {
+      Alert.alert(
+        "Spotify Code",
+        `Showing Spotify code for "${selectedSong.title}"`
+      );
+    } else {
+      Alert.alert("Error", "No song selected");
+    }
+  };
+
+  const handleGoToAlbum = () => {
+    if (!navigation) {
+      Alert.alert("Error", "Navigation is not available");
+      return;
+    }
+    if (selectedSong?.albumId) {
+      navigation.navigate("Album", { id: selectedSong.albumId });
+    } else {
+      Alert.alert("Error", "No album information available");
+    }
+  };
+
+  const handleGoToArtist = () => {
+    if (!navigation) {
+      Alert.alert("Error", "Navigation is not available");
+      return;
+    }
+    if (selectedSong?.artistId) {
+      navigation.navigate("Artist", { id: selectedSong.artistId });
+    } else {
+      Alert.alert("Error", "No artist information available");
+    }
+  };
+
+  // Cấu hình các chức năng
+  const featureConfig: Feature[] = [
+    {
+      key: "addToPlaylist",
+      label: "Add to Playlist",
+      icon: <Plus size="$2" color="white" />,
+      action: handleAddToPlaylist,
+      visibleOnScreens: ["home", "artist", "album"],
+    },
+    {
+      key: "addToQueue",
+      label: "Add to Queue",
+      icon: <ListPlus size="$2" color="white" />,
+      action: handleAddToQueue,
+      visibleOnScreens: ["home", "artist", "album"],
+    },
+    {
+      key: "goToAlbum",
+      label: "Go to Album",
+      icon: <CircleDot size="$2" color="white" />,
+      action: handleGoToAlbum,
+      visibleOnScreens: ["home", "artist"],
+    },
+    {
+      key: "goToArtist",
+      label: "Go to Artist",
+      icon: <User size="$2" color="white" />,
+      action: handleGoToArtist,
+      visibleOnScreens: ["home", "album"],
+    },
+    {
+      key: "showSpotifyCode",
+      label: "Show Spotify Code",
+      icon: <QrCode size="$2" color="white" />,
+      action: handleShowSpotifyCode,
+      visibleOnScreens: ["home", "artist", "album"],
+    },
+  ];
 
   useEffect(() => {
     if (isOpen) {
@@ -80,64 +170,64 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
       handleIndicatorStyle={{ backgroundColor: "white" }}
       onChange={handleSheetChange}
       enablePanDownToClose={true}
-      style={{ zIndex: 1000 }}
+      style={{ zIndex: 2000 }}
     >
       <BottomSheetView
         style={{
           backgroundColor: "#1A1A1A",
-          paddingHorizontal: 20,
-          paddingTop: 20,
+          paddingHorizontal: 16,
           height: sheetHeight,
         }}
       >
         <YStack gap="$4">
-          <TouchableOpacity onPress={onAddToOtherPlaylist}>
-            <XStack items="center" gap="$3">
-              <Plus size="$2" color="white" />
-              <Text fontSize="$5" color="white">
-                Add to Playlist
-              </Text>
-            </XStack>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={onAddToQueue}>
-            <XStack items="center" gap="$3">
-              <ListPlus size="$2" color="white" />
-              <Text fontSize="$5" color="white">
-                Add to Queue
-              </Text>
-            </XStack>
-          </TouchableOpacity>
-
-          {screenType !== "album" && (
-            <TouchableOpacity onPress={onGoToAlbum}>
-              <XStack items="center" gap="$3">
-                <CircleDot size="$2" color="white" />
-                <Text fontSize="$5" color="white">
-                  Go to Album
-                </Text>
+          {selectedSong && (
+            <XStack
+              items="center"
+              gap="$3"
+              pr="$2"
+              borderBottomWidth={1}
+              borderBottomColor="gray"
+            >
+              <XStack p="$3" gap="$3">
+                <Image
+                  source={{
+                    uri:
+                      selectedSong.coverImage ||
+                      "https://via.placeholder.com/50",
+                  }}
+                  width={50}
+                  height={50}
+                  borderRadius={8}
+                />
+                <YStack flex={1}>
+                  <Text fontSize={15} fontWeight="300" color="white">
+                    {selectedSong.title || "Unknown Title"}
+                  </Text>
+                  <Text
+                    fontSize={13}
+                    fontWeight="300"
+                    color="rgba(255, 255, 255, 0.7)"
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    Song • by {selectedSong.artist || "Unknown Artist"}
+                  </Text>
+                </YStack>
               </XStack>
-            </TouchableOpacity>
-          )}
-
-          {screenType !== "artist" && (
-            <TouchableOpacity onPress={onGoToArtist}>
-              <XStack items="center" gap="$3">
-                <User size="$2" color="white" />
-                <Text fontSize="$5" color="white">
-                  Go to Artist
-                </Text>
-              </XStack>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity onPress={onShowSpotifyCode}>
-            <XStack items="center" gap="$3">
-              <QrCode size="$2" color="white" />
-              <Text fontSize="$5" color="white">
-                Show Spotify Code
-              </Text>
             </XStack>
-          </TouchableOpacity>
+          )}
+          {featureConfig
+            .filter((feature) => feature.visibleOnScreens.includes(screenType))
+            .map((feature) => (
+              <TouchableOpacity key={feature.key} onPress={feature.action}>
+                <XStack items="center" gap="$3">
+                  {feature.icon}
+                  <Text fontSize="$5" color="white">
+                    {feature.label}
+                  </Text>
+                </XStack>
+              </TouchableOpacity>
+            ))}
         </YStack>
       </BottomSheetView>
     </BottomSheet>

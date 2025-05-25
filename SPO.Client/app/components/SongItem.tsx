@@ -4,7 +4,10 @@ import { MoreVertical } from "@tamagui/lucide-icons";
 import { TouchableOpacity, Animated, Easing } from "react-native";
 import SafeImage from "./SafeImage";
 import { Song } from "../types/song";
-import { store, useAppSelector } from "../store";
+import { useAppSelector } from "../store";
+import { playSong } from "../services/playerService";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../navigation/AppNavigator";
 
 interface SongItemProps {
   song: Song;
@@ -13,10 +16,12 @@ interface SongItemProps {
   showImage?: boolean;
   showArtistName?: boolean;
   imageSize?: number;
+  screen: string;
   getArtistName?: (artistId: string | undefined) => string;
   onSongPress?: (song: Song) => void;
-  onMorePress: (song: Song) => void;
-  isPlaying?: boolean; // Thêm prop isPlaying
+  onMorePress?: (song: Song) => void; // Thêm prop onMorePress
+  isPlaying?: boolean;
+  navigation?: NativeStackNavigationProp<RootStackParamList>;
 }
 
 export const SongItem: React.FC<SongItemProps> = ({
@@ -26,18 +31,41 @@ export const SongItem: React.FC<SongItemProps> = ({
   showImage = false,
   showArtistName = false,
   imageSize = 48,
+  screen,
   getArtistName,
   onSongPress,
   onMorePress,
   isPlaying: propIsPlaying = false,
+  navigation,
 }) => {
-  // Tạo các giá trị Animated cho 3 thanh bar
   const bar1Height = useRef(new Animated.Value(10)).current;
   const bar2Height = useRef(new Animated.Value(15)).current;
   const bar3Height = useRef(new Animated.Value(10)).current;
   const player = useAppSelector((store) => store.player);
   const isPlaying = player.currentTrack?.id === song.id || propIsPlaying;
-  // Hàm tạo hiệu ứng lên xuống cho các thanh bar
+
+  const handlePressSong = async () => {
+    try {
+      if (onSongPress) {
+        onSongPress(song);
+      } else {
+        await playSong(song);
+        if (navigation) {
+          navigation.navigate("Playing");
+        }
+        console.log("Song pressed and playing:", song.title);
+      }
+    } catch (error) {
+      console.error("Error playing song:", error);
+    }
+  };
+
+  const handleMorePress = () => {
+    if (onMorePress) {
+      onMorePress(song); // Gọi callback để thông báo HomeScreen
+    }
+  };
+
   const animateBars = () => {
     Animated.loop(
       Animated.sequence([
@@ -91,12 +119,10 @@ export const SongItem: React.FC<SongItemProps> = ({
     ).start();
   };
 
-  // Bắt đầu hoặc dừng animation dựa trên isPlaying
   useEffect(() => {
     if (isPlaying) {
       animateBars();
     } else {
-      // Dừng animation và reset chiều cao các thanh bar
       bar1Height.stopAnimation();
       bar2Height.stopAnimation();
       bar3Height.stopAnimation();
@@ -115,8 +141,8 @@ export const SongItem: React.FC<SongItemProps> = ({
   }
 
   return (
-    <XStack items="center" justify="space-between" py="$2">
-      <TouchableOpacity style={{ flex: 1 }} onPress={() => onSongPress?.(song)}>
+    <XStack items="center" justify="space-between" py="$2" my="$1.5">
+      <TouchableOpacity style={{ flex: 1 }} onPress={handlePressSong}>
         <XStack items="center" gap="$3" flex={1}>
           {showIndex && (
             <Text color="#b3b3b3" width={20} fontSize={16}>
@@ -125,13 +151,12 @@ export const SongItem: React.FC<SongItemProps> = ({
           )}
           {showImage &&
             (isPlaying ? (
-              // Hiển thị các thanh bar động khi isPlaying là true
               <XStack
                 width={imageSize}
                 height={imageSize}
                 justify="center"
                 items="center"
-                background="#1DB954"
+                bg="#1DB954"
                 rounded={2}
                 gap="$1"
               >
@@ -139,7 +164,7 @@ export const SongItem: React.FC<SongItemProps> = ({
                   style={{
                     width: 6,
                     height: bar1Height,
-                    backgroundColor: "#1DB954",
+                    backgroundColor: "white",
                     borderRadius: 3,
                   }}
                 />
@@ -147,7 +172,7 @@ export const SongItem: React.FC<SongItemProps> = ({
                   style={{
                     width: 6,
                     height: bar2Height,
-                    backgroundColor: "#1DB954",
+                    backgroundColor: "white",
                     borderRadius: 3,
                   }}
                 />
@@ -155,25 +180,24 @@ export const SongItem: React.FC<SongItemProps> = ({
                   style={{
                     width: 6,
                     height: bar3Height,
-                    backgroundColor: "#1DB954",
+                    backgroundColor: "white",
                     borderRadius: 3,
                   }}
                 />
               </XStack>
             ) : (
-              // Hiển thị hình ảnh bài hát khi không phát
               <SafeImage
                 uri={song.coverImage || "https://via.placeholder.com/40"}
                 width={imageSize}
                 height={imageSize}
-                rounded={2}
+                borderRadius={2}
               />
             ))}
           <YStack flex={1}>
             <Text
               fontSize={16}
               fontWeight="400"
-              color={isPlaying ? "#1DB954" : "white"} // Màu xanh khi isPlaying
+              color={isPlaying ? "#1DB954" : "white"}
               numberOfLines={1}
               ellipsizeMode="tail"
             >
@@ -195,7 +219,7 @@ export const SongItem: React.FC<SongItemProps> = ({
         bg="transparent"
         size="$3"
         p={0}
-        onPress={() => onMorePress(song)}
+        onPress={handleMorePress}
         icon={<MoreVertical size={20} color="#b3b3b3" />}
       />
     </XStack>
