@@ -48,7 +48,6 @@ export default function PremiumSubscriptionScreen({
             console.log("trạng thái: " + paymentDetails.state);
 
             if (paymentDetails.state === "created") {
-              // Lấy thông tin chi tiết từ paymentDetails
               const amount = paymentDetails.transactions[0].amount.total;
               const currency = paymentDetails.transactions[0].amount.currency;
               const createTime = paymentDetails.create_time;
@@ -91,13 +90,11 @@ export default function PremiumSubscriptionScreen({
     };
   }, [navigation, paymentId, plan]);
 
-  // Client ID và Secret từ PayPal Sandbox
   const PAYPAL_CLIENT_ID =
     "AfHGNGn0WTw_452kVntETCGTECssOjiom_ziHQo0st4fCufkNY9wVfZ3xAYxD9UN9oc_lwwvtxuqJfgI";
   const PAYPAL_SECRET =
     "ELXkp3xddZfrVSf3nDVCtKU0TF2vwlrA61-Xswcr7pjSaPRLKAdfCScsbi4aTnlGIZNPGuUtB_kYAX5u"; // Thay bằng Secret thật của bạn
 
-  // Lấy access token từ PayPal
   const getAccessToken = async () => {
     try {
       const accessTokenResponse = await fetch(
@@ -131,7 +128,6 @@ export default function PremiumSubscriptionScreen({
     }
   };
 
-  // Tạo đơn hàng với PayPal API
   const createPayPalOrder = async (price: string, plan: string) => {
     try {
       const accessToken = await getAccessToken();
@@ -150,8 +146,8 @@ export default function PremiumSubscriptionScreen({
             intent: "sale",
             payer: { payment_method: "paypal" },
             redirect_urls: {
-              return_url: "myapp://truong1510.com/success", // Deep link để quay lại ứng dụng
-              cancel_url: "myapp://truong1510.com/cancel", // Deep link để xử lý hủy
+              return_url: "myapp://truong1510.com/success",
+              cancel_url: "myapp://truong1510.com/cancel",
             },
             transactions: [
               {
@@ -185,7 +181,6 @@ export default function PremiumSubscriptionScreen({
     }
   };
 
-  // Lấy chi tiết thanh toán từ PayPal
   const getPaymentDetails = async (paymentId: string) => {
     try {
       const accessToken = await getAccessToken();
@@ -218,21 +213,19 @@ export default function PremiumSubscriptionScreen({
     }
   };
 
-  // Hàm xử lý thanh toán cho Individual plan
   const handlePaypalPaymentIndividual = async () => {
     setIsProcessingIndividual(true);
     try {
       const orderData = await createPayPalOrder(
         (59000 / 23000).toFixed(2),
         "Individual"
-      ); // Chuyển VND sang USD
+      );
       if (!orderData) throw new Error("Không thể tạo đơn hàng");
 
       const { approvalUrl, paymentId } = orderData;
-      setPaymentId(paymentId); // Lưu paymentId
-      setPlan("Individual"); // Lưu plan
+      setPaymentId(paymentId);
+      setPlan("Individual");
 
-      // Mở trình duyệt mặc định với Linking
       await Linking.openURL(approvalUrl);
     } catch (error) {
       console.error("Payment error (Individual):", error);
@@ -245,21 +238,19 @@ export default function PremiumSubscriptionScreen({
     }
   };
 
-  // Hàm xử lý thanh toán cho Student plan
   const handlePaypalPaymentStudent = async () => {
     setIsProcessingStudent(true);
     try {
       const orderData = await createPayPalOrder(
         (29000 / 23000).toFixed(2),
         "Student"
-      ); // Chuyển VND sang USD
+      ); 
       if (!orderData) throw new Error("Không thể tạo đơn hàng");
 
       const { approvalUrl, paymentId } = orderData;
-      setPaymentId(paymentId); // Lưu paymentId
-      setPlan("Student"); // Lưu plan
+      setPaymentId(paymentId); 
+      setPlan("Student"); 
 
-      // Mở trình duyệt mặc định với Linking
       await Linking.openURL(approvalUrl);
     } catch (error) {
       console.error("Payment error (Student):", error);
