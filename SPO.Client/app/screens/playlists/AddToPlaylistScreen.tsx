@@ -4,9 +4,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Button, YStack, XStack, Text, Image } from "tamagui";
 import { ArrowLeft, Check, Heart, Menu } from "@tamagui/lucide-icons";
 import { SearchStackParamList } from "../../navigation/SearchNavigator";
-import { RootStackParamList } from "../../navigation/AppNavigator";
+import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 interface Playlist {
   id: number;
@@ -16,11 +16,16 @@ interface Playlist {
 }
 
 type AddToPlaylistScreenNavigationProp = NativeStackNavigationProp<
-  SearchStackParamList & RootStackParamList,
+  SearchStackParamList & LibraryStackParamList,
   "AddToPlaylist"
 >;
 
 const playlists: Playlist[] = [
+  {
+    id: 0, 
+    name: "My Playlist",
+    image: "https://i.pravatar.cc/150?img=3",
+  },
   {
     id: 2,
     name: "Danh sách phát thử 3 của tôi",
@@ -47,19 +52,23 @@ const likedSongs: Playlist = {
 
 const AddToPlaylistScreen: React.FC<{
   navigation: AddToPlaylistScreenNavigationProp;
-  route: { params?: { songId?: number } };
+  route: { params?: { songId?: number; currentPlaylistId?: number } };
 }> = ({ navigation, route }) => {
   const songId = route.params?.songId;
+  const currentPlaylistId = route.params?.currentPlaylistId;
   const initialPlaylists = [likedSongs];
   const [selectedPlaylists, setSelectedPlaylists] = useState<Playlist[]>(initialPlaylists);
+
+  // Filter out the current playlist only if currentPlaylistId is defined
+  const filteredPlaylists = currentPlaylistId !== undefined
+    ? playlists.filter((playlist) => playlist.id !== currentPlaylistId)
+    : playlists;
 
   const handleSelectPlaylist = (playlist: Playlist) => {
     setSelectedPlaylists((prev) => {
       if (prev.some((p) => p.id === playlist.id)) {
-        // Deselect if already selected
         return prev.filter((p) => p.id !== playlist.id);
       } else {
-        // Add to selected playlists
         return [...prev, playlist];
       }
     });
@@ -72,7 +81,6 @@ const AddToPlaylistScreen: React.FC<{
   const handleDone = () => {
     const toastMessages: string[] = [];
 
-    // Check if "Liked Songs" was deselected
     const wasLikedSongsInitiallySelected = initialPlaylists.some(
       (p) => p.id === likedSongs.id
     );
@@ -83,7 +91,6 @@ const AddToPlaylistScreen: React.FC<{
       toastMessages.push("Removed from Liked Songs");
     }
 
-    // Check for newly added playlists (excluding "Liked Songs")
     const newPlaylists = selectedPlaylists.filter(
       (p) =>
         p.id !== likedSongs.id &&
@@ -98,7 +105,6 @@ const AddToPlaylistScreen: React.FC<{
       selectedPlaylists.map((p) => p.name)
     );
 
-    // Navigate back and pass toast messages
     navigation.navigate("SearchResult", { toastMessages });
   };
 
@@ -107,7 +113,6 @@ const AddToPlaylistScreen: React.FC<{
 
   return (
     <YStack flex={1} bg="#000" pt="$4">
-      {/* Header */}
       <XStack items="center" mb="$4">
         <Button
           icon={<ArrowLeft size="$1" color="white" />}
@@ -117,7 +122,7 @@ const AddToPlaylistScreen: React.FC<{
             bg: "transparent",
             borderBlockColor: "transparent",
           }}
-          onPress={() => navigation.goBack()} // Navigate back
+          onPress={() => navigation.goBack()}
         />
         <XStack width={"70%"} justify="center">
           <Text fontSize="$4" fontWeight="bold" color="white" text="center">
@@ -126,7 +131,6 @@ const AddToPlaylistScreen: React.FC<{
         </XStack>
       </XStack>
 
-      {/* New Playlist Button */}
       <YStack items="center" mb="$4">
         <Button
           bg="white"
@@ -142,7 +146,6 @@ const AddToPlaylistScreen: React.FC<{
         </Button>
       </YStack>
 
-      {/* Saved in Section */}
       <YStack px="$3" flex={1}>
         <YStack py="$3">
           <XStack justify="space-between" mb="$2">
@@ -199,7 +202,7 @@ const AddToPlaylistScreen: React.FC<{
         </YStack>
 
         <ScrollView style={{ paddingVertical: 5 }}>
-          {playlists.map((playlist) => (
+          {filteredPlaylists.map((playlist) => (
             <TouchableOpacity
               key={playlist.id}
               onPress={() => handleSelectPlaylist(playlist)}
@@ -242,7 +245,6 @@ const AddToPlaylistScreen: React.FC<{
         </ScrollView>
       </YStack>
 
-      {/* Done Button */}
       <YStack items="center" p="$3" bg="#000">
         <Button
           bg="#1DB954"

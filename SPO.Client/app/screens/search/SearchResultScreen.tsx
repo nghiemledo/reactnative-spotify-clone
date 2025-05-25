@@ -3,12 +3,20 @@ import React, { useState, useEffect } from "react";
 import Toast, { BaseToastProps } from "react-native-toast-message";
 import { Image, Input, Text, View, XStack, YStack } from "tamagui";
 import { ArrowLeft, X } from "@tamagui/lucide-icons";
-import { Dimensions, FlatList, ScrollView, TouchableOpacity, Keyboard, ActivityIndicator } from "react-native";
+import {
+  Dimensions,
+  FlatList,
+  ScrollView,
+  TouchableOpacity,
+  Keyboard,
+  ActivityIndicator,
+} from "react-native";
 import { SearchStackParamList } from "../../navigation/SearchNavigator";
 import SongOptionsBottomSheet from "../../components/search/SongOptionsBottomSheet";
 import Tabs from "../../components/search/Tabs";
 import ArtistCard from "../../components/search/ArtistCard";
-import SongCard from "../../components/search/SongCard"; 
+import SongCard from "../../components/search/SongCard";
+import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 
 interface Artist {
   id: number;
@@ -80,7 +88,7 @@ const data = [
 ];
 
 type SearchResultScreenNavigationProp = NativeStackNavigationProp<
-  SearchStackParamList,
+  SearchStackParamList & LibraryStackParamList,
   "SearchResult"
 >;
 
