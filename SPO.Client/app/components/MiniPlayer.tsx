@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -8,6 +8,7 @@ import { YStack, XStack, Text, Image, Button } from "tamagui";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 import Toast from "react-native-toast-message";
 import { MotiView, AnimatePresence } from "moti";
+import QueueBottomSheet from "./QueueBottomSheet";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -15,7 +16,15 @@ export default function MiniPlayer() {
   const navigation = useNavigation<NavigationProp>();
   const { currentTrack, isPlaying } = useAppSelector((state) => state.player);
   const { position, duration } = useProgress(1000); // Cập nhật mỗi 1s
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
+  const handleOpenBottomSheet = () => {
+    setIsBottomSheetOpen(true);
+  };
+
+  const handleCloseBottomSheet = () => {
+    setIsBottomSheetOpen(false);
+  };
   // Tính phần trăm tiến độ
   const progress = duration ? (position / duration) * 100 : 0;
 
@@ -47,6 +56,7 @@ export default function MiniPlayer() {
     <AnimatePresence>
       {currentTrack && (
         <MotiView
+          key={currentTrack.id || currentTrack.title || "mini-player"}
           from={{
             translateY: 60,
             opacity: 0,
@@ -121,11 +131,11 @@ export default function MiniPlayer() {
             </XStack>
 
             <Button
+              p={0}
+              m={20}
               background="transparent"
               icon={<ListMusic size="$2" color="#fff" />}
-              onPress={() => {
-                navigation.navigate("Queue");
-              }}
+              onPress={handleOpenBottomSheet}
               chromeless
             />
 
@@ -140,6 +150,8 @@ export default function MiniPlayer() {
               }}
             >
               <Button
+                p={0}
+                m={8}
                 bg="transparent"
                 icon={
                   isPlaying ? (
@@ -176,6 +188,10 @@ export default function MiniPlayer() {
           />
         </MotiView>
       )}
+      <QueueBottomSheet
+        isOpen={isBottomSheetOpen}
+        onClose={handleCloseBottomSheet}
+      />
     </AnimatePresence>
   );
 }
