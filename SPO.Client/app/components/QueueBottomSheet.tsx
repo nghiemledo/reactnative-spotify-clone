@@ -154,21 +154,17 @@ const QueueBottomSheet: React.FC<QueueBottomSheetProps> = ({
             maxHeight: screenHeight * 0.95,
           }}
         >
-          <YStack padding="$4" flex={1}>
+          <YStack p="$4" flex={1}>
             <Text
               color="white"
               fontSize={20}
               fontWeight="bold"
-              textAlign="left"
-              marginBottom="$4"
+              text="left"
+              mb="$4"
             >
               Queue
             </Text>
-            <XStack
-              justifyContent="flex-start"
-              alignItems="center"
-              marginBottom="$4"
-            >
+            <XStack justify="flex-start" items="center" mb="$4">
               <Text fontWeight={"300"} fontSize={16} color="white">
                 Now playing:
               </Text>
@@ -192,12 +188,8 @@ const QueueBottomSheet: React.FC<QueueBottomSheetProps> = ({
                       }}
                       disabled={isActive}
                     >
-                      <XStack
-                        alignItems="center"
-                        justifyContent="space-between"
-                        paddingVertical="$3"
-                      >
-                        <XStack alignItems="center" gap="$3" flex={1}>
+                      <XStack items="center" justify="space-between" py="$3">
+                        <XStack items="center" gap="$3" flex={1}>
                           <Image
                             source={{ uri: item.image }}
                             width={50}
@@ -217,7 +209,7 @@ const QueueBottomSheet: React.FC<QueueBottomSheetProps> = ({
                               color="white"
                               numberOfLines={1}
                               ellipsizeMode="tail"
-                              paddingRight={"$3"}
+                              pr={"$3"}
                             >
                               {item.title}
                             </Text>
@@ -228,9 +220,9 @@ const QueueBottomSheet: React.FC<QueueBottomSheetProps> = ({
                         </XStack>
                         {isCurrentSong ? (
                           <Button
-                            margin={0}
-                            padding={0}
-                            borderRadius={100}
+                            m={0}
+                            p={0}
+                            rounded={100}
                             width="$2"
                             height="$2"
                             icon={
@@ -254,11 +246,11 @@ const QueueBottomSheet: React.FC<QueueBottomSheetProps> = ({
                           />
                         ) : (
                           <Button
-                            margin={0}
-                            padding={0}
+                            m={0}
+                            p={0}
                             width="$2"
                             height="$2"
-                            backgroundColor="transparent"
+                            bg="transparent"
                             icon={
                               <Menu color="white" size="$1" strokeWidth={2} />
                             }
@@ -279,32 +271,27 @@ const QueueBottomSheet: React.FC<QueueBottomSheetProps> = ({
               scrollEnabled={true}
             />
 
-            <XStack justifyContent="space-between" marginTop="$4" gap={"$2"}>
+            <XStack justify="space-between" mt="$4" gap={"$2"}>
               <Button
                 flex={1}
                 size="$5"
-                backgroundColor="gray"
+                bg="gray"
                 color="white"
                 onPress={handleShuffle}
               >
-                <YStack justifyContent="center" alignItems="center">
+                <YStack justify="center" items="center">
                   <Shuffle color={isShuffleEnabled ? "#1DB954" : "white"} />
                   <Text
                     fontSize={12}
                     color={isShuffleEnabled ? "#1DB954" : "white"}
-                    textAlign="center"
+                    text="center"
                   >
                     Shuffle
                   </Text>
                 </YStack>
               </Button>
-              <Button
-                flex={1}
-                size="$5"
-                backgroundColor="gray"
-                onPress={handleRepeatPress}
-              >
-                <YStack justifyContent="center" alignItems="center">
+              <Button flex={1} size="$5" bg="gray" onPress={handleRepeatPress}>
+                <YStack justify="center" items="center">
                   {repeatMode === 2 ? (
                     <Repeat1 color="green" />
                   ) : (
@@ -313,7 +300,7 @@ const QueueBottomSheet: React.FC<QueueBottomSheetProps> = ({
                   <Text
                     fontSize={12}
                     color={repeatMode === 0 ? "white" : "green"}
-                    textAlign="center"
+                    text="center"
                   >
                     Repeat
                   </Text>
@@ -322,7 +309,7 @@ const QueueBottomSheet: React.FC<QueueBottomSheetProps> = ({
               <Button
                 flex={1}
                 size="$5"
-                backgroundColor="gray"
+                bg="gray"
                 color="white"
                 onPress={() => {
                   console.log(
@@ -331,9 +318,9 @@ const QueueBottomSheet: React.FC<QueueBottomSheetProps> = ({
                   setIsTimerSheetOpen(true); // Always open TimerBottomSheet
                 }}
               >
-                <YStack justifyContent="center" alignItems="center">
+                <YStack justify="center" items="center">
                   <Timer color={"white"} />
-                  <Text fontSize={12} color="white" textAlign="center">
+                  <Text fontSize={12} color="white" text="center">
                     Timer
                   </Text>
                 </YStack>
