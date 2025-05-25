@@ -11,7 +11,6 @@ import {
 } from "tamagui";
 import { FlatList, ScrollView, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../navigation/AppNavigator";
 import { useDispatch } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -19,82 +18,127 @@ import {
   Globe,
   ArrowDownCircle,
   UserPlus,
+  Share2,
+  Shuffle,
+  Search,
   EllipsisVertical,
   Play,
   Plus,
   ChevronsUpDown,
   Pen,
-  Share2,
-  Shuffle,
-  Search,
 } from "@tamagui/lucide-icons";
 import { LinearGradient } from "@tamagui/linear-gradient";
+import { Song } from "../../types/song";
+import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
+import SortBottomSheet from "../../components/library/SortBottomSheet";
+import SongOptionsBottomSheet from "../../components/search/SongOptionsBottomSheet";
+import PlaylistOptionsBottomSheet from "../../components/playlist/PlaylistOptionsBottomSheet";
 
-// Dữ liệu giả lập cho queue
-const queueItems = [
+const songs: Song[] = [
   {
     id: "1",
     title: "Song breakdown: I WANT YOU",
-    description: "The Interstellar Tennis Podcast",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    artist: "The Interstellar Tennis Podcast",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-20T10:00:00Z",
   },
   {
     id: "2",
     title: "Accepting the song that blew you up",
-    description: "RAW talk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    artist: "RAW talk",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-19T12:00:00Z",
   },
   {
     id: "3",
     title: "Song breakdown: I WANT YOU",
-    description: "The Interstellar Tennis Podcast",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    artist: "The Interstellar Tennis Podcast",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-18T15:00:00Z",
   },
   {
     id: "4",
     title: "Accepting the song that blew you up",
-    description: "RAW talk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    artist: "RAW talk",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-17T09:00:00Z",
   },
   {
     id: "5",
-    title: "Song breakdown: I WANT YOU",
-    description: "The Interstellar Tennis Podcast",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    title: "Song breakdown: I WANT YOU111",
+    artist: "The Interstellar Tennis Podcast",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-16T14:00:00Z",
   },
   {
     id: "6",
     title: "Accepting the song that blew you up",
-    description: "RAW talk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    artist: "RAW talk",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-15T11:00:00Z",
   },
   {
     id: "7",
     title: "Song breakdown: I WANT YOU",
-    description: "The Interstellar Tennis Podcast",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    artist: "The Interstellar Tennis Podcast",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-14T16:00:00Z",
   },
   {
     id: "8",
     title: "Accepting the song that blew you up",
-    description: "RAW talk",
-    image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    artist: "RAW talk",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-13T08:00:00Z",
+  },
+  {
+    id: "9",
+    title: "Accepting the song that blew you up",
+    artist: "RAW talk",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-12T10:00:00Z",
+  },
+  {
+    id: "10",
+    title: "Accepting the song that blew you up",
+    artist: "RAW talk",
+    coverImage:
+      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+    createdAt: "2025-05-11T13:00:00Z",
   },
 ];
 
 type QueueScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+  LibraryStackParamList,
   "detailPlaylist"
 >;
 
 export default function DetailPlaylistScreen({
   navigation,
+  route,
 }: {
   navigation: QueueScreenNavigationProp;
+  route: { params?: { playlistId?: number } };
 }) {
   const dispatch = useDispatch();
-
   const scrollY = useRef(new Animated.Value(0)).current;
+  const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
+  const [selectedSortOption, setSelectedSortOption] = useState("customerOrder");
+  const [sortedItems, setSortedItems] = useState(songs);
+  const [isSongOptionsOpen, setIsSongOptionsOpen] = useState(false);
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
+  const [isPlaylistOptionsOpen, setIsPlaylistOptionsOpen] = useState(false);
+
+  const currentPlaylistId = route.params?.playlistId ?? 0;
 
   const navbarBackground = scrollY.interpolate({
     inputRange: [190, 220],
@@ -131,6 +175,104 @@ export default function DetailPlaylistScreen({
     });
   }, [navigation]);
 
+  useEffect(() => {
+    let sorted = [...songs];
+    switch (selectedSortOption) {
+      case "customerOrder":
+        sorted.sort(
+          (a, b) =>
+            new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+        );
+        break;
+      case "title":
+        sorted.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+        break;
+      case "artist":
+        sorted.sort((a, b) => (a.artist || "").localeCompare(b.artist || ""));
+        break;
+      case "recentlyAdded":
+        sorted.sort(
+          (a, b) =>
+            new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+        );
+        break;
+      default:
+        break;
+    }
+    setSortedItems(sorted);
+  }, [selectedSortOption]);
+
+  const handleSelectSortOption = (option: string) => {
+    setSelectedSortOption(option);
+    setIsSortSheetOpen(false);
+  };
+
+  const handleSelectSongOption = (option: string) => {
+    if (!selectedSong) return;
+    switch (option) {
+      case "addToOtherPlaylist":
+        console.log(`Add ${selectedSong.title} to another playlist`);
+        navigation.navigate("AddToPlaylist", {
+          songId: Number(songs.find((item) => item.id === selectedSong.id)!.id),
+          currentPlaylistId: 0,
+        });
+        break;
+      case "removeFromThisPlaylist":
+        setSortedItems(
+          sortedItems.filter((item) => item.id !== selectedSong.id)
+        );
+        console.log(`Remove ${selectedSong.title} from this playlist`);
+        break;
+      case "goToAlbum":
+        console.log(`Navigate to album for ${selectedSong.title}`);
+        break;
+      case "goToArtist":
+        console.log(`Navigate to artist ${selectedSong.artist}`);
+        break;
+      case "share":
+        console.log(`Share ${selectedSong.title}`);
+        break;
+      case "goToSongRadio":
+        console.log(`Go to song radio for ${selectedSong.title}`);
+        break;
+      case "viewSongCredits":
+        console.log(`View credits for ${selectedSong.title}`);
+        break;
+      case "showSpotifyCode":
+        console.log(`Show Spotify code for ${selectedSong.title}`);
+        break;
+      default:
+        break;
+    }
+    setIsSongOptionsOpen(false);
+    setSelectedSong(null);
+  };
+
+  const handleSelectPlaylistOption = (option: string) => {
+    switch (option) {
+      case "addToThisPlaylist":
+        console.log("Navigate to add songs to this playlist");
+        navigation.navigate("AddSongPlaylist");
+        break;
+      case "editPlaylist":
+        console.log("Navigate to edit playlist");
+        navigation.navigate("updateSongPlaylist");
+        break;
+      case "deletePlaylist":
+        console.log("Delete this playlist");
+        break;
+      case "share":
+        console.log("Share this playlist");
+        break;
+      case "showSpotifyCode":
+        console.log("Show Spotify code for this playlist");
+        break;
+      default:
+        break;
+    }
+    setIsPlaylistOptionsOpen(false);
+  };
+
   return (
     <LinearGradient
       p={0}
@@ -149,7 +291,7 @@ export default function DetailPlaylistScreen({
       <Animated.View
         style={{
           position: "absolute",
-          top: 0,
+          top: -35,
           left: 0,
           right: 0,
           height: 90,
@@ -191,7 +333,7 @@ export default function DetailPlaylistScreen({
                 marginLeft: 8,
               }}
             >
-              Danh sách phát của tôi
+              My Playlist
             </Animated.Text>
           </View>
           <XStack width={40} />
@@ -204,8 +346,7 @@ export default function DetailPlaylistScreen({
           { useNativeDriver: false }
         )}
       >
-        <YStack flex={1} mt="$6" p="$4">
-          {/* Thanh tìm kiếm */}
+        <YStack flex={1} mt="$0" p="$4">
           <Animated.View style={{ opacity: searchOpacity }}>
             <XStack mt="$6" mb="$6">
               <Input
@@ -214,7 +355,7 @@ export default function DetailPlaylistScreen({
                 rounded="$2"
                 bg="rgba(255, 255, 255, 0.2)"
                 color="white"
-                placeholder="Tìm trong danh sách phát"
+                placeholder="Search in playlist"
                 placeholderTextColor="rgba(255, 255, 255, 0.6)"
                 flex={1}
                 m="auto"
@@ -227,6 +368,9 @@ export default function DetailPlaylistScreen({
                   borderWidth: 0,
                   bg: "rgba(255, 255, 255, 0.3)",
                 }}
+                onFocus={() =>
+                  navigation.navigate("SearchInPlaylist", { Items: songs })
+                }
               />
               <XStack
                 position="absolute"
@@ -248,7 +392,9 @@ export default function DetailPlaylistScreen({
             p={0}
           >
             <Animated.Image
-              source={{ uri: queueItems[0].image }}
+              source={{
+                uri: songs[0]?.coverImage || "https://via.placeholder.com/150",
+              }}
               style={{
                 width: imageSize,
                 height: imageSize,
@@ -265,7 +411,7 @@ export default function DetailPlaylistScreen({
           </XStack>
 
           <H3 mt={0} mb="$3" color="white" fontWeight="bold">
-            Danh sách phát của tôi
+            My Playlist
           </H3>
 
           <YStack>
@@ -273,7 +419,9 @@ export default function DetailPlaylistScreen({
               <Avatar circular size="$2">
                 <Avatar.Image
                   accessibilityLabel="Cam"
-                  src={queueItems[0].image}
+                  src={
+                    songs[0]?.coverImage || "https://via.placeholder.com/150"
+                  }
                 />
                 <Avatar.Fallback backgroundColor="$blue10" />
               </Avatar>
@@ -284,7 +432,7 @@ export default function DetailPlaylistScreen({
                   color="white"
                   text="center"
                 >
-                  Lương Hoàng Hải
+                  Hoàng Hải Lương
                 </Text>
               </YStack>
             </XStack>
@@ -297,7 +445,7 @@ export default function DetailPlaylistScreen({
                   color="white"
                   text="center"
                 >
-                  47 ph
+                  47 min
                 </Text>
               </YStack>
             </XStack>
@@ -347,11 +495,11 @@ export default function DetailPlaylistScreen({
                 }}
               />
               <Button
-                disabled
                 bg="transparent"
                 color="white"
                 m={0}
                 p={0}
+                onPress={() => setIsPlaylistOptionsOpen(true)}
                 icon={
                   <EllipsisVertical size="$2" color="white" strokeWidth={1} />
                 }
@@ -396,16 +544,18 @@ export default function DetailPlaylistScreen({
               size="$3"
               bg="rgba(255, 255, 255, 0.2)"
               rounded={50}
-              onPress={() => console.log("Thêm bài hát")}
+              onPress={() => console.log("Add song")}
             >
               <XStack
                 items="center"
                 space="$1"
-                onPress={() => navigation.navigate("addSongPlaylist")}
+                onPress={() =>
+                  navigation.navigate("AddSongPlaylist")
+                }
               >
                 <Plus color="white" size="$1" />
                 <Text color="white" fontWeight="bold" fontSize="$3">
-                  Thêm
+                  Add
                 </Text>
               </XStack>
             </Button>
@@ -413,12 +563,12 @@ export default function DetailPlaylistScreen({
               size="$3"
               bg="rgba(255, 255, 255, 0.2)"
               rounded={50}
-              onPress={() => console.log("Sắp xếp")}
+              onPress={() => setIsSortSheetOpen(true)}
             >
               <XStack items="center" space="$1">
                 <ChevronsUpDown color="white" size="$1" />
                 <Text fontWeight="bold" color="white" fontSize="$3">
-                  Sắp xếp
+                  Sort
                 </Text>
               </XStack>
             </Button>
@@ -431,27 +581,25 @@ export default function DetailPlaylistScreen({
               <XStack items="center" space="$1">
                 <Pen color="white" size="$1" />
                 <Text fontWeight="bold" color="white" fontSize="$3">
-                  Chỉnh sửa
+                  Edit
                 </Text>
               </XStack>
             </Button>
           </XStack>
 
-          {/* Danh sách bài hát/podcast */}
           <FlatList
-            data={queueItems}
-            keyExtractor={(item) => item.id}
+            data={sortedItems}
+            keyExtractor={(item) => item.id || ""}
             scrollEnabled={false}
             renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("PlayerModal");
-                }}
-              >
+              <TouchableOpacity>
                 <XStack items="center" justify="space-between" py="$2">
                   <XStack items="center" gap="$3" flex={1}>
                     <Image
-                      source={{ uri: item.image }}
+                      source={{
+                        uri:
+                          item.coverImage || "https://via.placeholder.com/150",
+                      }}
                       width={50}
                       height={50}
                       borderRadius={8}
@@ -461,13 +609,17 @@ export default function DetailPlaylistScreen({
                         {item.title}
                       </Text>
                       <Text fontSize={13} color="white" opacity={0.7}>
-                        {item.description}
+                        {item.artist}
                       </Text>
                     </YStack>
                   </XStack>
                   <Button
                     bg="transparent"
                     p={0}
+                    onPress={() => {
+                      setSelectedSong(item);
+                      setIsSongOptionsOpen(true);
+                    }}
                     icon={
                       <EllipsisVertical
                         size="$2"
@@ -486,6 +638,72 @@ export default function DetailPlaylistScreen({
           />
         </YStack>
       </ScrollView>
+
+      <SortBottomSheet
+        isOpen={isSortSheetOpen}
+        onClose={() => setIsSortSheetOpen(false)}
+        onSelectOption={handleSelectSortOption}
+        selectedOption={selectedSortOption}
+        context="detailPlaylist"
+      />
+
+      {selectedSong && (
+        <View
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9999,
+            height: "100%",
+          }}
+        >
+          <SongOptionsBottomSheet
+            isOpen={isSongOptionsOpen}
+            onClose={() => {
+              setIsSongOptionsOpen(false);
+              setSelectedSong(null);
+            }}
+            onSelectOption={handleSelectSongOption}
+            songName={selectedSong.title || ""}
+            urlAvatar={
+              selectedSong.coverImage || "https://via.placeholder.com/150"
+            }
+            type="Song"
+            artists={[
+              {
+                id: parseInt(selectedSong.id || "0"),
+                name: selectedSong.artist || "",
+              },
+            ]}
+            context="detailPlaylist"
+          />
+        </View>
+      )}
+
+      {isPlaylistOptionsOpen && (
+        <View
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9999,
+            height: "100%",
+          }}
+        >
+          <PlaylistOptionsBottomSheet
+            isOpen={isPlaylistOptionsOpen}
+            onClose={() => setIsPlaylistOptionsOpen(false)}
+            onSelectOption={handleSelectPlaylistOption}
+            playlistName="My Playlist"
+            urlAvatar={
+              songs[0]?.coverImage || "https://via.placeholder.com/150"
+            }
+            creator="Long"
+          />
+        </View>
+      )}
     </LinearGradient>
   );
 }

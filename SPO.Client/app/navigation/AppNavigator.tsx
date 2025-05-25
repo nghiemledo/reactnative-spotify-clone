@@ -3,6 +3,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import * as React from "react";
 import SplashNavigator from "./SplashNavigator";
 import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
+import { Song } from "../types/song";
+import PlaylistNavigator from "./PlaylistNavigator";
+import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
 import PlayingScreen from "../screens/PlayingScreen";
 import { AddSongPlaylistsScreen } from "../screens/artist/AddSongPlayListsScreen";
 import QueueBottomSheet from "../components/QueueBottomSheet";
@@ -60,6 +63,24 @@ export default function AppNavigator() {
           name="Playlists"
           component={PlaylistsScreen}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Search"
+          component={SearchScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{ headerShown: false }}
+        /> */}
+       
+        <Stack.Screen
+          name="AddToPlaylist"
+          component={AddToPlaylistScreen}
+          options={{
+            headerShown: false,
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

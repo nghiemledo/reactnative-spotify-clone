@@ -25,6 +25,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import Toast, { BaseToastProps } from "react-native-toast-message";
 import { H6 } from "tamagui";
+import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 
 const songs = [
   {
@@ -45,8 +46,8 @@ const songs = [
 ];
 
 type AddSongPlaylistScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "addSongPlaylist"
+  LibraryStackParamList,
+  "AddSongPlaylist"
 >;
 
 const toastConfig = {
@@ -98,8 +99,8 @@ const AddSongPlaylistScreen = ({
     <YStack flex={1} bg="#111" px={24} pt={60}>
       <XStack
         position="absolute"
-        t={0}
-        l={0}
+         t={-30}
+        l={-10}
         r={0}
         height={80}
         items="center"
@@ -137,7 +138,7 @@ const AddSongPlaylistScreen = ({
         <XStack flex={1} />
       </XStack>
       <View>
-        <XStack mt="$6" mb="$2">
+        <XStack mt="$3" mb="$2">
           <Input
             size="$3.5"
             borderWidth={0}

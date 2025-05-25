@@ -10,4 +10,5 @@ export interface Song {
   id?: string;
   createdAt?: string;
   updatedAt?: string;
+  artist?: string;
 }

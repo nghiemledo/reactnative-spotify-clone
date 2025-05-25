@@ -25,6 +25,7 @@ import CreateBottomSheet from "../../components/library/CreateBottomSheet";
 import SortBottomSheet from "../../components/library/SortBottomSheet";
 import { MotiView } from "moti";
 import { SearchStackParamList } from "../../navigation/SearchNavigator";
+import { RootStackParamList } from "../../navigation/AppNavigator";
 
 type Data = {
   id: number;
@@ -95,9 +96,9 @@ const tabTypes = [
   { id: 3, name: "Albums" },
   { id: 4, name: "Artists" },
 ];
-
+ 
 type LibraryScreenNavigationProp = NativeStackNavigationProp<
-  LibraryStackParamList & SearchStackParamList,
+  LibraryStackParamList & SearchStackParamList & RootStackParamList,
   "Library"
 >;
 
@@ -117,10 +118,6 @@ export default function LibraryScreen({
 
   const toggleIcon = () => {
     setIsGrid((prev) => !prev);
-  };
-
-  const handleItemPress = (item: (typeof initialData)[number]) => {
-    console.log("Pressed item:", item.name);
   };
 
   // Handlers for CreateBottomSheet
@@ -187,6 +184,12 @@ export default function LibraryScreen({
     setSortedData(sorted);
   };
 
+  const handleItems = (type: string) => {
+    if (type === "playlist") {
+      navigation.navigate("detailPlaylist");
+    }
+  };
+
   const handleClearTab = () => {
     setSelectedTab(null);
   };
@@ -234,8 +237,11 @@ export default function LibraryScreen({
             </Text>
           </XStack>
           <XStack gap="$4">
-            <TouchableOpacity  onPress={() => navigation.navigate({ name: "SearchResult", params: {} })}
->
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate({ name: "SearchResult", params: {} })
+              }
+            >
               <Search color="white" size="$1.5" />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleOpenCreateBottomSheet}>
@@ -251,7 +257,7 @@ export default function LibraryScreen({
               transition={{ type: "timing", duration: 200 }}
             >
               <TouchableOpacity onPress={handleClearTab}>
-                <X size="$1" color="white"  />
+                <X size="$1" color="white" />
               </TouchableOpacity>
             </MotiView>
           )}
@@ -307,11 +313,16 @@ export default function LibraryScreen({
         </XStack>
 
         <YStack>
-          <DataList data={sortedData} onItemPress={handleItemPress} />
+          <DataList data={sortedData} onItems={handleItems} />
 
           <YStack gap="$3" mt="$2">
             <TouchableOpacity
-              onPress={() => navigation.navigate({ name: "ArtistSelection", params: { selectedIds: [] } })}
+              onPress={() =>
+                navigation.navigate({
+                  name: "ArtistSelection",
+                  params: { selectedIds: [] },
+                })
+              }
             >
               <XStack items="center" gap="$2">
                 <Button
@@ -329,7 +340,12 @@ export default function LibraryScreen({
               </XStack>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => navigation.navigate({ name: "PodcastSelection", params: { selectedIds: [] }})}
+              onPress={() =>
+                navigation.navigate({
+                  name: "PodcastSelection",
+                  params: { selectedIds: [] },
+                })
+              }
             >
               <XStack items="center" gap="$2">
                 <Button

@@ -37,6 +37,7 @@
     "react": "18.2.0",
     "react-dom": "^19.1.0",
     "react-native": "0.75.1",
+    "react-native-admob-native-ads": "^0.7.6",
     "react-native-draggable-flatlist": "^4.0.3",
     "react-native-gesture-handler": "^2.25.0",
     "react-native-paper": "^5.14.4",
@@ -52,7 +53,8 @@
     "react-native-web": "^0.20.0",
     "react-redux": "^9.2.0",
     "redux-persist": "^6.0.0",
-    "tamagui": "^1.126.12"
+    "tamagui": "^1.126.12",
+    "react-native-google-mobile-ads": "14.2.2"
   },
   "devDependencies": {
     "@babel/core": "7.27.1",
@@ -61,8 +63,7 @@
     "typescript": "~5.3.3"
   },
   "resolutions": {
-    "@babel/core": "7.27.1",
-    "babel-core": "7.27.1"
+    "@babel/core": "7.27.1"
   },
   "private": true,
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
