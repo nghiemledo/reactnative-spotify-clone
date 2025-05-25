@@ -95,7 +95,11 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     screen: T,
     params?: HomeStackParamList[T]
   ) => {
-    navigation.navigate(screen as any, params);
+    if (params !== undefined) {
+      navigation.navigate(screen as any, params);
+    } else {
+      navigation.navigate(screen as any);
+    }
   };
 
   const handleButtonPress = (button: string) => {
@@ -143,7 +147,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           position: "absolute",
           top: 0,
           bottom: 0,
-          zIndex: 10,
+          zIndex: 1000,
         }}
       >
         <Sidebar
@@ -164,9 +168,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
               }),
             },
           ],
+          zIndex: 0,
         }}
       >
-        <XStack items="center" py={10} pl="$4" z={1}>
+        <XStack items="center" py={10} pl="$4">
           <TouchableOpacity onPress={toggleSidebar}>
             <Avatar circular size="$4">
               <Avatar.Image
@@ -266,30 +271,19 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
                   </Text>
                 ) : (
                   <YStack pr="$4">
-                    {songs?.data.map((item: Song) => (
+                    {songs?.data.map((item: Song, index: number) => (
                       <SongItem
                         key={item.id || `song-${item.title}`}
                         song={item}
+                        index={index}
                         showIndex={false}
                         showImage={true}
                         showArtistName={true}
                         imageSize={60}
                         getArtistName={getArtistName}
-                        onMorePress={handleMorePress}
-                        onSongPress={async (song) => {
-                          try {
-                            await playSong(song);
-                            handleNavigation(
-                              "Playing" as keyof HomeStackParamList
-                            );
-                            console.log(
-                              "Song pressed and playing:",
-                              song.title
-                            );
-                          } catch (error) {
-                            console.error("Error playing song:", error);
-                          }
-                        }}
+                        navigation={navigation}
+                        screen="home"
+                        onMorePress={handleMorePress} // Truyền callback
                       />
                     ))}
                   </YStack>
@@ -326,6 +320,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
                 right: 0,
                 bottom: 0,
                 backgroundColor: "rgba(0, 0, 0, 0.5)",
+                zIndex: 500,
               }}
             />
           </TouchableWithoutFeedback>
@@ -341,39 +336,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         selectedSong={selectedSong}
         navigation={navigation}
         screenType="home"
-        onAddToOtherPlaylist={() => {
-          // handleNavigation("AddToPlaylist");
-        }}
-        onAddToQueue={() => {
-          console.log("Add to queue");
-        }}
-        onShowSpotifyCode={() => {
-          console.log("Show Spotify code");
-        }}
-        onGoToAlbum={() => {
-          if (selectedSong?.albumId) {
-            handleNavigation("Album", { id: selectedSong.albumId });
-          } else {
-            Toast.show({
-              type: "error",
-              text1: "No album found for this song",
-              position: "bottom",
-              visibilityTime: 2000,
-            });
-          }
-        }}
-        onGoToArtist={() => {
-          if (selectedSong?.artistId) {
-            handleNavigation("Artist", { id: selectedSong.artistId });
-          } else {
-            Toast.show({
-              type: "error",
-              text1: "No artist found for this song",
-              position: "bottom",
-              visibilityTime: 2000,
-            });
-          }
-        }}
       />
     </YStack>
   );

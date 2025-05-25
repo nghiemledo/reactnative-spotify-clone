@@ -3,15 +3,14 @@ import { createStackNavigator } from "@react-navigation/stack";
 import * as React from "react";
 import SplashNavigator from "./SplashNavigator";
 import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
-import { Song } from "../types/song";
-import PlaylistNavigator from "./PlaylistNavigator";
-import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
 import PlayingScreen from "../screens/PlayingScreen";
 import { AddSongPlaylistsScreen } from "../screens/artist/AddSongPlayListsScreen";
-import QueueBottomSheet from "../components/QueueBottomSheet";
 import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
 import { PlaylistsScreen } from "../screens/playlists/PlaylistsScreen";
 import { EditProfileScreen } from "../screens/profile/EditProfileScreen";
+import AlbumScreen from "../screens/AlbumScreen";
+import { Artist } from "../../admin/src/types/artist.type";
+import ArtistDetailScreen from "../screens/artist/ArtistDetailScreen";
 
 const Stack = createStackNavigator();
 
@@ -23,6 +22,8 @@ export type RootStackParamList = {
   EditProfile: undefined;
   detailPlaylist: undefined;
   Playlists: undefined;
+  Album: { id: string };
+  Artist: { id: string };
 };
 
 export default function AppNavigator() {
@@ -65,22 +66,14 @@ export default function AppNavigator() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Search"
-          component={SearchScreen}
+          name="Album"
+          component={AlbumScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Settings"
-          component={SettingsScreen}
+          name="Artist"
+          component={ArtistDetailScreen}
           options={{ headerShown: false }}
-        /> */}
-       
-        <Stack.Screen
-          name="AddToPlaylist"
-          component={AddToPlaylistScreen}
-          options={{
-            headerShown: false,
-          }}
         />
       </Stack.Navigator>
     </NavigationContainer>
