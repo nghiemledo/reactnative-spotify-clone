@@ -22,6 +22,7 @@ import {
 } from "../store/playerSlice";
 import { Track } from "../types/track";
 import { Song } from "../types/song";
+import { PodcastEpisode } from "../types/podcast";
 
 // Danh sách tracks mẫu
 const tracks: Track[] = [
@@ -488,6 +489,45 @@ export const seekTo = async (position: number) => {
   }
 };
 
+export const playPodcastEpisode = async (episode: PodcastEpisode) => {
+  try {
+    const podcastUrl = episode.audioUrl || "https://thantrieu.com/resources/music/1130295695.mp3";
+    if (!podcastUrl) throw new Error("Invalid podcast URL");
+    if (!episode.title) throw new Error("Podcast title is missing");
+
+    const track: Track = {
+      id: episode.id || `podcast-${episode.title}`,
+      url: podcastUrl,
+      title: episode.title,
+      artist: episode.showId || "Unknown Show",
+      artwork: episode.coverImage || "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f6eefc406626c4c6f14215919",
+      duration: episode.duration || 0,
+    };
+
+    const currentQueue = await TrackPlayer.getQueue();
+    const trackIndex = currentQueue.findIndex((t) => t.id === track.id);
+
+    if (trackIndex === -1) {
+      await TrackPlayer.add([track]);
+      store.dispatch(addTrackToQueue(track));
+      const updatedQueue = await TrackPlayer.getQueue();
+      await TrackPlayer.skip(updatedQueue.length - 1);
+    } else {
+      await TrackPlayer.skip(trackIndex);
+    }
+
+    store.dispatch(setCurrentTrack(track));
+    store.dispatch(setPosition(0));
+    await TrackPlayer.play();
+    store.dispatch(setPlaying(true)); // Cập nhật trạng thái phát
+
+    console.log("Playing podcast episode:", track.title);
+  } catch (error) {
+    console.error("Play Podcast Episode Error:", error);
+    throw error;
+  }
+};
+
 export const playSong = async (song: Song) => {
   try {
     if (!song.audioUrl) {
@@ -503,7 +543,7 @@ export const playSong = async (song: Song) => {
       title: song.title,
       artist: song.artistId || "Unknown Artist",
       artwork:
-        song.coverImage || "https://via.placeholder.com/300?text=No+Image",
+        song.coverImage || "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f6eefc406626c4c6f14215919",
       duration: song.duration || 0,
     };
 
