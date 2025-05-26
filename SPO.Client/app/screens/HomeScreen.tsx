@@ -267,7 +267,33 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
                   />
                 )}
               </YStack>
+            </>
+          )}
 
+          {(selectedButton === "All" || selectedButton === "Podcasts") && (
+            <YStack pl="$4">
+              <Text fontSize={20} fontWeight="bold" color="white" mb="$3">
+                Podcasts
+              </Text>
+              {isPodcastShowsLoading ? (
+                <Spinner size="large" color="$green10" />
+              ) : podcastShowsError ? (
+                <Text color="white">Error loading podcasts</Text>
+              ) : !podcastShows?.data || podcastShows.data.length === 0 ? (
+                <Text color="rgba(255,255,255,0.7)">No podcasts found</Text>
+              ) : (
+                <FlatList
+                  data={podcastShows?.data}
+                  showsVerticalScrollIndicator={false}
+                  keyExtractor={(item) => item.id}
+                  renderItem={renderPodcastShowItem}
+                  scrollEnabled={false}
+                />
+              )}
+            </YStack>
+          )}
+          {(selectedButton === "All" || selectedButton === "Music") && (
+            <>
               <YStack py="$4" pl="$4">
                 <Text fontSize={20} fontWeight="bold" color="white" mb="$3">
                   Trending Songs
@@ -300,29 +326,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
                 )}
               </YStack>
             </>
-          )}
-
-          {(selectedButton === "All" || selectedButton === "Podcasts") && (
-            <YStack p="$4">
-              <Text fontSize={20} fontWeight="bold" color="white" mb="$3">
-                Podcasts
-              </Text>
-              {isPodcastShowsLoading ? (
-                <Spinner size="large" color="$green10" />
-              ) : podcastShowsError ? (
-                <Text color="white">Error loading podcasts</Text>
-              ) : !podcastShows?.data || podcastShows.data.length === 0 ? (
-                <Text color="rgba(255,255,255,0.7)">No podcasts found</Text>
-              ) : (
-                <FlatList
-                  data={podcastShows?.data}
-                  showsVerticalScrollIndicator={false}
-                  keyExtractor={(item) => item.id}
-                  renderItem={renderPodcastShowItem}
-                  scrollEnabled={false}
-                />
-              )}
-            </YStack>
           )}
         </Animated.ScrollView>
 
