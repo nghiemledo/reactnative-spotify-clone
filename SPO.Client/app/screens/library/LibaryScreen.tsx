@@ -24,8 +24,10 @@ import DataList from "../../components/library/DataList";
 import CreateBottomSheet from "../../components/library/CreateBottomSheet";
 import SortBottomSheet from "../../components/library/SortBottomSheet";
 import { MotiView } from "moti";
-import { SearchStackParamList } from "../../navigation/SearchNavigator";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/AppNavigator";
+
 
 type Data = {
   id: number;
@@ -96,17 +98,11 @@ const tabTypes = [
   { id: 3, name: "Albums" },
   { id: 4, name: "Artists" },
 ];
- 
-type LibraryScreenNavigationProp = NativeStackNavigationProp<
-  LibraryStackParamList & SearchStackParamList & RootStackParamList,
-  "Library"
->;
 
-export default function LibraryScreen({
-  navigation,
-}: {
-  navigation: LibraryScreenNavigationProp;
-}) {
+const LibraryScreen = () => {
+
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  
   const scrollY = useRef(new Animated.Value(0)).current;
   const headerHeight = 160;
   const [isCreateBottomSheetOpen, setIsCreateBottomSheetOpen] = useState(false);
@@ -186,7 +182,7 @@ export default function LibraryScreen({
 
   const handleItems = (type: string) => {
     if (type === "playlist") {
-      navigation.navigate("detailPlaylist");
+      navigation.navigate("DetailPlaylist");
     }
   };
 
@@ -239,7 +235,7 @@ export default function LibraryScreen({
           <XStack gap="$4">
             <TouchableOpacity
               onPress={() =>
-                navigation.navigate({ name: "SearchResult", params: {} })
+                navigation.navigate("SearchResult", { toastMessages: [] })
               }
             >
               <Search color="white" size="$1.5" />
@@ -378,4 +374,6 @@ export default function LibraryScreen({
       />
     </YStack>
   );
-}
+};
+
+export default LibraryScreen;

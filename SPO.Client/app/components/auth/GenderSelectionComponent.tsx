@@ -27,20 +27,20 @@ export const GenderSelectionComponent: React.FC<GenderSelectionComponentProps> =
 
   return (
     <YStack width="100%">
-      <Text fontSize="$8" fontWeight="bold" color="#fff" marginBottom="$4">
+      <Text fontSize="$8" fontWeight="bold" color="#fff" mb="$4">
         Giới tính của bạn là gì?
       </Text>
       <XStack space="$2" flexWrap="wrap">
         {genders.map((gender) => (
           <Button
             key={gender.value}
-            backgroundColor={selectedGender === gender.value ? "#1DB954" : "#333"}
+            bg={selectedGender === gender.value ? "#1DB954" : "#333"}
             borderColor="#fff"
             borderWidth={1}
-            borderRadius="$10"
-            paddingVertical="$1"
-            paddingHorizontal="$3"
-            margin="$1"
+            rounded="$10"
+            px="$1"
+            py="$3"
+            m="$1"
             onPress={() => handleSelect(gender.value)}
           >
             <Text color="#fff" fontSize="$4">

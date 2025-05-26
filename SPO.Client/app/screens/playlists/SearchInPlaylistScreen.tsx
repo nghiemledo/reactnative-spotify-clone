@@ -6,20 +6,15 @@ import { ArrowLeft, X, EllipsisVertical } from "@tamagui/lucide-icons";
 import { Dimensions, FlatList, ScrollView, TouchableOpacity } from "react-native";
 import SongOptionsBottomSheet from "../../components/search/SongOptionsBottomSheet";
 import { Song } from "../../types/song"; 
-import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 
-type SearchInPlaylistScreenNavigationProp = NativeStackNavigationProp<
-  LibraryStackParamList,
-  "SearchInPlaylist"
->;
 
-interface SearchInPlaylistScreenProps {
-  navigation: SearchInPlaylistScreenNavigationProp;
-  route: { params: { queueItems: Song[] } };
-}
 
-export default function SearchInPlaylistScreen({ navigation, route }: SearchInPlaylistScreenProps) {
-  const { queueItems } = route.params;
+ const SearchInPlaylistScreen=()=> {
+    const navigation =
+      useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, "SearchInPlaylist">>();
+  const { Items } = route.params;
   const { width, height } = Dimensions.get("window");
   const [searchValue, setSearchValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,7 +26,7 @@ export default function SearchInPlaylistScreen({ navigation, route }: SearchInPl
   const filteredData =
     searchQuery.trim() === ""
       ? []
-      : queueItems.filter((item) => {
+      : Items.filter((item) => {
           const needle = normalize(searchValue);
           return (
             normalize(item.title || "").includes(needle) ||
@@ -250,3 +245,5 @@ export default function SearchInPlaylistScreen({ navigation, route }: SearchInPl
     </YStack>
   );
 }
+
+export default SearchInPlaylistScreen;

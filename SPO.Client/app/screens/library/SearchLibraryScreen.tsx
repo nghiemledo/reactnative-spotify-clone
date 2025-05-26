@@ -4,8 +4,17 @@ import { useGetArtistsQuery } from "../../services/ArtistService";
 import { Artist } from "../../types/artist";
 import { Image, Input, Text, View, XStack, YStack } from "tamagui";
 import { ArrowLeft, X } from "@tamagui/lucide-icons";
-import { Dimensions, FlatList, ScrollView, TouchableOpacity, Keyboard, ActivityIndicator } from "react-native";
+import {
+  Dimensions,
+  FlatList,
+  ScrollView,
+  TouchableOpacity,
+  Keyboard,
+  ActivityIndicator,
+} from "react-native";
 import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
+import { RootStackParamList } from "../../navigation/AppNavigator";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 
 type Podcast = {
   id: string;
@@ -66,19 +75,27 @@ const initialPodcasts: Podcast[] = [
   },
 ];
 
-type SearchLibraryScreenNavigationProp = NativeStackNavigationProp<
-  LibraryStackParamList,
-  "SearchLibaryScreen"
->;
+// type SearchLibraryScreenNavigationProp = NativeStackNavigationProp<
+//   LibraryStackParamList,
+//   "SearchLibaryScreen"
+// >;
 
-interface SearchLibraryScreenProps {
-  navigation: SearchLibraryScreenNavigationProp;
-  route: { params: { type: "artist" | "podcast"; selectedIds?: string[] } };
-}
+// interface SearchLibraryScreenProps {
+//   navigation: SearchLibraryScreenNavigationProp;
+//   route: { params: { type: "artist" | "podcast"; selectedIds?: string[] } };
+// }
 
-export default function SearchLibraryScreen({ navigation, route }: SearchLibraryScreenProps) {
+const SearchLibraryScreen = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route =
+    useRoute<RouteProp<RootStackParamList, "SearchLibraryScreen">>();
   const { type, selectedIds = [] } = route.params;
-  const { data: artists, isLoading: isArtistsLoading, error: artistsError } = useGetArtistsQuery();
+  const {
+    data: artists,
+    isLoading: isArtistsLoading,
+    error: artistsError,
+  } = useGetArtistsQuery();
   const { width, height } = Dimensions.get("window");
   const [searchValue, setSearchValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -86,14 +103,16 @@ export default function SearchLibraryScreen({ navigation, route }: SearchLibrary
 
   const normalize = (s: string) => s.trim().toLowerCase();
 
-  const data: Item[] = type === "artist" ? (artists?.data || []) : initialPodcasts;
+  const data: Item[] =
+    type === "artist" ? artists?.data || [] : initialPodcasts;
 
   const filteredData =
     searchQuery.trim() === ""
       ? []
       : data.filter((item) => {
           const needle = normalize(searchValue); // Use searchValue for real-time filtering
-          const name = type === "artist" ? (item as Artist).name : (item as Podcast).title;
+          const name =
+            type === "artist" ? (item as Artist).name : (item as Podcast).title;
           return normalize(name).includes(needle);
         });
 
@@ -114,8 +133,11 @@ export default function SearchLibraryScreen({ navigation, route }: SearchLibrary
   };
 
   const handleItemPress = (item: Item) => {
-    const targetScreen = type === "artist" ? "ArtistSelection" : "PodcastSelection";
-    navigation.navigate(targetScreen, { selectedIds: [...selectedIds, item.id] });
+    const targetScreen =
+      type === "artist" ? "ArtistSelection" : "PodcastSelection";
+    navigation.navigate(targetScreen, {
+      selectedIds: [...selectedIds, item.id],
+    });
   };
 
   return (
@@ -135,7 +157,9 @@ export default function SearchLibraryScreen({ navigation, route }: SearchLibrary
             bg="transparent"
             color="white"
             fontWeight="bold"
-            placeholder={`Search for ${type === "artist" ? "artists" : "podcasts"}`}
+            placeholder={`Search for ${
+              type === "artist" ? "artists" : "podcasts"
+            }`}
             placeholderTextColor="rgba(255, 255, 255, 0.7)"
             flex={1}
             pl="$7"
@@ -199,7 +223,12 @@ export default function SearchLibraryScreen({ navigation, route }: SearchLibrary
                   <TouchableOpacity onPress={() => handleItemPress(item)}>
                     <XStack items="center" py="$2" gap="$3">
                       <Image
-                        source={{ uri: type === "artist" ? (item as Artist).urlAvatar : (item as Podcast).coverImage }}
+                        source={{
+                          uri:
+                            type === "artist"
+                              ? (item as Artist).urlAvatar
+                              : (item as Podcast).coverImage,
+                        }}
                         style={{
                           width: 50,
                           height: 50,
@@ -208,7 +237,9 @@ export default function SearchLibraryScreen({ navigation, route }: SearchLibrary
                       />
                       <YStack>
                         <Text color="white" fontWeight="bold" fontSize="$4">
-                          {type === "artist" ? (item as Artist).name : (item as Podcast).title}
+                          {type === "artist"
+                            ? (item as Artist).name
+                            : (item as Podcast).title}
                         </Text>
                         <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
                           {type === "artist" ? "Artist" : "Podcast"}
@@ -254,7 +285,8 @@ export default function SearchLibraryScreen({ navigation, route }: SearchLibrary
                   Search for {type === "artist" ? "artists" : "podcasts"}
                 </Text>
                 <Text color="rgba(255, 255, 255, 0.7)" fontSize="$3">
-                  Find your favorite {type === "artist" ? "artists" : "podcasts"}
+                  Find your favorite{" "}
+                  {type === "artist" ? "artists" : "podcasts"}
                 </Text>
               </YStack>
             )}
@@ -263,4 +295,6 @@ export default function SearchLibraryScreen({ navigation, route }: SearchLibrary
       </YStack>
     </YStack>
   );
-}
+};
+
+export default SearchLibraryScreen;

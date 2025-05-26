@@ -10,17 +10,12 @@ import {
 } from "tamagui";
 import { TouchableOpacity } from "react-native";
 import { Eye, EyeOff } from "@tamagui/lucide-icons";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { SlpashStackParamList } from "../../navigation/SplashNavigator";
+import { SplashStackParamList } from "../../navigation/SplashNavigator";
 import { useLoginMutation } from "../../services/AuthService";
-
-type EmailLoginScreenNavigationProp = NativeStackNavigationProp<
-  SlpashStackParamList,
-  "EmailLogin"
->;
+import { NavigationProp } from "@react-navigation/native";
 
 interface EmailLoginFormProps {
-  navigation: EmailLoginScreenNavigationProp;
+  navigation: NavigationProp<SplashStackParamList>;
 }
 
 const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ navigation }) => {

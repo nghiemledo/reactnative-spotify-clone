@@ -5,18 +5,11 @@ import { ArrowLeft } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/AppNavigator";
 import EmailLoginForm from "../../../components/auth/EmailLoginForm";
-import { SlpashStackParamList } from "../../../navigation/SplashNavigator";
+import { SplashStackParamList } from "../../../navigation/SplashNavigator";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 
-type EmailLoginScreenNavigationProp = NativeStackNavigationProp<
-  SlpashStackParamList,
-  "EmailLogin"
->;
-
-export default function EmailLoginScreen({
-  navigation,
-}: {
-  navigation: EmailLoginScreenNavigationProp;
-}) {
+const EmailLoginScreen = () => {
+  const navigation = useNavigation<NavigationProp<SplashStackParamList>>();
   return (
     <YStack flex={1} bg="#111">
       <XStack
@@ -58,4 +51,6 @@ export default function EmailLoginScreen({
       <EmailLoginForm navigation={navigation} />
     </YStack>
   );
-}
+};
+
+export default memo(EmailLoginScreen);

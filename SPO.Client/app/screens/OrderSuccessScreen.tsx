@@ -1,32 +1,19 @@
 import React from "react";
 import { YStack, Text, Button, XStack, AnimatePresence } from "tamagui";
 import { CheckCircle } from "@tamagui/lucide-icons";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { LinearGradient } from "@tamagui/linear-gradient";
 import { PremiumStackParamList } from "../navigation/PremiumNavigator";
+import { NavigationProp, RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 
 // Define navigation params type
-type OrderSuccessScreenNavigationProp = NativeStackNavigationProp<
-  PremiumStackParamList,
-  "OrderSuccess"
->;
 
-type OrderSuccessScreenProps = {
-  navigation: OrderSuccessScreenNavigationProp;
-  route: {
-    params: {
-      plan: string;
-      amount: string;
-      currency: string;
-      createTime: string;
-    };
-  };
-};
-
-const OrderSuccessScreen = ({ route, navigation }: OrderSuccessScreenProps) => {
+const OrderSuccessScreen = () => {
+  const navigation =
+    useNavigation<NavigationProp<PremiumStackParamList>>();
+  const route = useRoute<RouteProp<PremiumStackParamList, "OrderSuccess">>();
   const { plan, amount, currency, createTime } = route.params;
-const formatVND = (usdAmount: string) => {
-    const exchangeRate = 23000; 
+  const formatVND = (usdAmount: string) => {
+    const exchangeRate = 23000;
     const vndAmount = parseFloat(usdAmount) * exchangeRate;
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",

@@ -29,10 +29,11 @@ import {
 } from "@tamagui/lucide-icons";
 import { LinearGradient } from "@tamagui/linear-gradient";
 import { Song } from "../../types/song";
-import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 import SortBottomSheet from "../../components/library/SortBottomSheet";
 import SongOptionsBottomSheet from "../../components/search/SongOptionsBottomSheet";
 import PlaylistOptionsBottomSheet from "../../components/playlist/PlaylistOptionsBottomSheet";
+import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "../../navigation/AppNavigator";
 
 const songs: Song[] = [
   {
@@ -117,18 +118,10 @@ const songs: Song[] = [
   },
 ];
 
-type QueueScreenNavigationProp = NativeStackNavigationProp<
-  LibraryStackParamList,
-  "detailPlaylist"
->;
-
-export default function DetailPlaylistScreen({
-  navigation,
-  route,
-}: {
-  navigation: QueueScreenNavigationProp;
-  route: { params?: { playlistId?: number } };
-}) {
+const DetailPlaylistScreen = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  // const route = useRoute<RouteProp<LibraryStackParamList, "">>();
   const dispatch = useDispatch();
   const scrollY = useRef(new Animated.Value(0)).current;
   const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
@@ -137,8 +130,6 @@ export default function DetailPlaylistScreen({
   const [isSongOptionsOpen, setIsSongOptionsOpen] = useState(false);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [isPlaylistOptionsOpen, setIsPlaylistOptionsOpen] = useState(false);
-
-  const currentPlaylistId = route.params?.playlistId ?? 0;
 
   const navbarBackground = scrollY.interpolate({
     inputRange: [190, 220],
@@ -549,9 +540,7 @@ export default function DetailPlaylistScreen({
               <XStack
                 items="center"
                 space="$1"
-                onPress={() =>
-                  navigation.navigate("AddSongPlaylist")
-                }
+                onPress={() => navigation.navigate("AddSongPlaylist")}
               >
                 <Plus color="white" size="$1" />
                 <Text color="white" fontWeight="bold" fontSize="$3">
@@ -706,4 +695,7 @@ export default function DetailPlaylistScreen({
       )}
     </LinearGradient>
   );
-}
+};
+
+
+export default DetailPlaylistScreen;

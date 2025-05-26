@@ -14,15 +14,7 @@ const Stack = createStackNavigator();
 
 export type LibraryStackParamList = {
   LibraryScreen: undefined;
-  SearchLibraryScreen: undefined;
-  ArtistSelection: { selectedIds: string[] };
-  PodcastSelection: { selectedIds: string[] };
-  SearchInPlaylist: { Items: Song[] };
-  AddToPlaylist: { songId?: number; currentPlaylistId?: number };
-  AddSongPlaylist: undefined;
-  updateSongPlaylist: undefined;
   PlaylistNavigator: undefined;
-  detailPlaylist: undefined;
 };
 
 export default function LibraryNavigator() {
@@ -33,42 +25,8 @@ export default function LibraryNavigator() {
         component={LibraryScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="ArtistSelection"
-        component={ArtistSelectionScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="SearchLibraryScreen"
-        component={SearchLibraryScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="PodcastSelection"
-        component={PodcastSelectionScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="detailPlaylist"
-        component={DetailPlaylistScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="AddSongPlaylist"
-        component={AddSongPlaylistScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="updateSongPlaylist"
-        component={UpdateSongPlaylistScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="SearchInPlaylist"
-        component={SearchInPlaylistScreen}
-        options={{ headerShown: false }}
-      />
       
+ 
     </Stack.Navigator>
   );
 }
