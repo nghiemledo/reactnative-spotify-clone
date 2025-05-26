@@ -2,11 +2,13 @@ import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "../screens/HomeScreen";
 import AlbumScreen from "../screens/AlbumScreen";
 import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
-import PodcastDetailScreen from "../screens/podcast/PodcastDetailScreen";
+import PodcastDetailScreen from "../screens/podcast/PodcastEpisodeScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import { AddSongPlaylistsScreen } from "../screens/artist/AddSongPlayListsScreen";
 import ArtistDetailScreen from "../screens/artist/ArtistDetailScreen";
 import { ProfileScreen } from "../screens/profile/ProfileScreen";
+import PodcastEpisodesScreen from "../screens/podcast/PodcastShowScreen";
+import PodcastShowScreen from "../screens/podcast/PodcastShowScreen";
 
 const Stack = createStackNavigator();
 
@@ -19,6 +21,7 @@ export type HomeStackParamList = {
   AddSongPlaylists: undefined;
   Settings: undefined;
   Profile: undefined;
+  PodcastShow: { showId: string };
 };
 
 export default function HomeNavigator() {
@@ -62,6 +65,11 @@ export default function HomeNavigator() {
       <Stack.Screen
         name="Profile"
         component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PodcastShow"
+        component={PodcastShowScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
