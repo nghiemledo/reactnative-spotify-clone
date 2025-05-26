@@ -12,9 +12,9 @@ import AlbumScreen from "../screens/AlbumScreen";
 import { Artist } from "../../admin/src/types/artist.type";
 import ArtistDetailScreen from "../screens/artist/ArtistDetailScreen";
 import { Song } from "../types/song";
-import ShareSongScreen from "../screens/ShareSongScreen";
+// import ShareSongScreen from "../screens/ShareSongScreen";
 import SearchScreen from "../screens/search/SearchScreen";
-import ScanScreen from "../screens/ScanScreen";
+// import ScanScreen from "../screens/ScanScreen";
 
 const Stack = createStackNavigator();
 
@@ -82,7 +82,7 @@ export default function AppNavigator() {
           component={ArtistDetailScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen
+        {/* <Stack.Screen
           name="shareQrSong"
           component={ShareSongScreen}
           options={{ headerShown: false }}
@@ -91,7 +91,7 @@ export default function AppNavigator() {
           name="ScanQr"
           component={ScanScreen}
           options={{ headerShown: false }}
-        />
+        /> */}
 
         <Stack.Screen
           name="search"
