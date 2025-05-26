@@ -7,25 +7,20 @@ import {
   View,
   Input,
   ScrollView,
-  Image,
-  H3,
-  H2,
-  H4,
-  H1,
+  Image
 } from "tamagui";
 import { TouchableOpacity, StatusBar, FlatList } from "react-native";
 import {
   ArrowLeft,
   CircleCheck,
   CirclePlus,
-  Plus,
   Search,
 } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import Toast, { BaseToastProps } from "react-native-toast-message";
 import { H6 } from "tamagui";
-import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
+import { useNavigation } from "@react-navigation/native";
 
 const songs = [
   {
@@ -44,11 +39,6 @@ const songs = [
     image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
   },
 ];
-
-type AddSongPlaylistScreenNavigationProp = NativeStackNavigationProp<
-  LibraryStackParamList,
-  "AddSongPlaylist"
->;
 
 const toastConfig = {
   success: ({ text1, text2 }: BaseToastProps) => (
@@ -74,11 +64,8 @@ const toastConfig = {
   ),
 };
 
-const AddSongPlaylistScreen = ({
-  navigation,
-}: {
-  navigation: AddSongPlaylistScreenNavigationProp;
-}) => {
+const AddSongPlaylistScreen = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [likedItems, setLikedItems] = useState<{ [key: number]: boolean }>({});
   const handlePress = (id: number) => {
     setLikedItems((prev) => {
@@ -99,7 +86,7 @@ const AddSongPlaylistScreen = ({
     <YStack flex={1} bg="#111" px={24} pt={60}>
       <XStack
         position="absolute"
-         t={-30}
+        t={-30}
         l={-10}
         r={0}
         height={80}

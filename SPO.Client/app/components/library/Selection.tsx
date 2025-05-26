@@ -14,12 +14,13 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 import { SearchStackParamList } from "../../navigation/SearchNavigator";
+import { RootStackParamList } from "../../navigation/AppNavigator";
 
 type SelectionProps<T> = {
   data: T[];
   title: string;
-  navigation: NativeStackNavigationProp<SearchStackParamList>;
-  route: RouteProp<LibraryStackParamList, "ArtistSelection" | "PodcastSelection">;
+  navigation: NativeStackNavigationProp<RootStackParamList>;
+  route: RouteProp<RootStackParamList, "ArtistSelection" | "PodcastSelection">;
   renderItem: (
     item: T,
     index: number,
@@ -81,7 +82,7 @@ export const Selection = <T extends { id: string }>({
   }, [route.params?.selectedIds]);
 
   const handleSearch = () => {
-    navigation.navigate("SearchLibaryScreen", { type, selectedIds: selectedItems });
+    navigation.navigate("SearchLibraryScreen", { type, selectedIds: selectedItems });
   };
 
   if (showGreatPicks) {

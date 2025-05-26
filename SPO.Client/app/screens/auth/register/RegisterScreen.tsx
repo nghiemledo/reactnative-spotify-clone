@@ -1,20 +1,11 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { YStack, XStack, Button, Text, Image } from "tamagui";
 import { Mail, Smartphone } from "@tamagui/lucide-icons";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../navigation/AppNavigator";
-import { SlpashStackParamList } from "../../../navigation/SplashNavigator";
+import { SplashStackParamList } from "../../../navigation/SplashNavigator";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 
-type RegisterScreenNavigationProp = NativeStackNavigationProp<
-  SlpashStackParamList,
-  "Register"
->;
-
-export default function RegisterScreen({
-  navigation,
-}: {
-  navigation: RegisterScreenNavigationProp;
-}) {
+const RegisterScreen = () => {
+  const navigation = useNavigation<NavigationProp<SplashStackParamList>>();
   const handleEmailRegister = () => {
     navigation.navigate("EmailRegister");
   };
@@ -128,4 +119,6 @@ export default function RegisterScreen({
       </YStack>
     </YStack>
   );
-}
+};
+
+export default RegisterScreen;

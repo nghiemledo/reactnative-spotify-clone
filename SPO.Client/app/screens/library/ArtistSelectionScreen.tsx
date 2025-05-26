@@ -1,30 +1,17 @@
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RouteProp } from "@react-navigation/native";
-import { RootStackParamList } from "../../navigation/AppNavigator";
+import { NavigationProp, RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { Selection } from "../../components/library/Selection";
 import { SelectionCard } from "../../components/library/SelectionCard";
 import { useGetArtistsQuery } from "../../services/ArtistService";
 import { Artist } from "../../types/artist";
 import { Text } from "tamagui";
 import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
+import { RootStackParamList } from "../../navigation/AppNavigator";
 
-type ArtistScreenNavigationProp = NativeStackNavigationProp<
-  LibraryStackParamList,
-  "ArtistSelection"
->;
-
-type ArtistScreenRouteProp = RouteProp<LibraryStackParamList, "ArtistSelection">;
-
-interface ArtistSelectionScreenProps {
-  navigation: ArtistScreenNavigationProp;
-  route: ArtistScreenRouteProp;
-}
-
-export default function ArtistSelectionScreen({
-  navigation,
-  route,
-}: ArtistSelectionScreenProps) {
+const ArtistSelectionScreen = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, "ArtistSelection">>();
   const { data: artists, isLoading, error } = useGetArtistsQuery();
 
   if (isLoading) return <Text color="white">Loading...</Text>;
@@ -52,4 +39,6 @@ export default function ArtistSelectionScreen({
       type="artist"
     />
   );
-}
+};
+
+export default ArtistSelectionScreen;

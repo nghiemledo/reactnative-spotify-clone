@@ -2,18 +2,11 @@ import React from "react";
 import { YStack, XStack, Button, Text, Image } from "tamagui";
 import { Mail, Smartphone } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { SlpashStackParamList } from "../../../navigation/SplashNavigator";
+import { SplashStackParamList } from "../../../navigation/SplashNavigator";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 
-type LoginScreenNavigationProp = NativeStackNavigationProp<
-  SlpashStackParamList,
-  "Login"
->;
-
-export default function LoginScreen({
-  navigation,
-}: {
-  navigation: LoginScreenNavigationProp;
-}) {
+const LoginScreen = () => {
+  const navigation = useNavigation<NavigationProp<SplashStackParamList>>();
   const handleEmailLogin = () => {
     navigation.navigate("EmailLogin");
   };
@@ -123,4 +116,6 @@ export default function LoginScreen({
       </YStack>
     </YStack>
   );
-}
+};
+
+export default LoginScreen;

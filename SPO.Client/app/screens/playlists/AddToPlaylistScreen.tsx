@@ -3,8 +3,8 @@ import { View, ScrollView, Dimensions, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Button, YStack, XStack, Text, Image } from "tamagui";
 import { ArrowLeft, Check, Heart, Menu } from "@tamagui/lucide-icons";
-import { SearchStackParamList } from "../../navigation/SearchNavigator";
-import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
+import { RootStackParamList } from "../../navigation/AppNavigator";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
@@ -15,14 +15,9 @@ interface Playlist {
   selected?: boolean;
 }
 
-type AddToPlaylistScreenNavigationProp = NativeStackNavigationProp<
-  SearchStackParamList & LibraryStackParamList,
-  "AddToPlaylist"
->;
-
 const playlists: Playlist[] = [
   {
-    id: 0, 
+    id: 0,
     name: "My Playlist",
     image: "https://i.pravatar.cc/150?img=3",
   },
@@ -50,19 +45,20 @@ const likedSongs: Playlist = {
   selected: true,
 };
 
-const AddToPlaylistScreen: React.FC<{
-  navigation: AddToPlaylistScreenNavigationProp;
-  route: { params?: { songId?: number; currentPlaylistId?: number } };
-}> = ({ navigation, route }) => {
+const AddToPlaylistScreen = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, "AddToPlaylist">>();
   const songId = route.params?.songId;
   const currentPlaylistId = route.params?.currentPlaylistId;
   const initialPlaylists = [likedSongs];
-  const [selectedPlaylists, setSelectedPlaylists] = useState<Playlist[]>(initialPlaylists);
+  const [selectedPlaylists, setSelectedPlaylists] =
+    useState<Playlist[]>(initialPlaylists);
 
   // Filter out the current playlist only if currentPlaylistId is defined
-  const filteredPlaylists = currentPlaylistId !== undefined
-    ? playlists.filter((playlist) => playlist.id !== currentPlaylistId)
-    : playlists;
+  const filteredPlaylists =
+    currentPlaylistId !== undefined
+      ? playlists.filter((playlist) => playlist.id !== currentPlaylistId)
+      : playlists;
 
   const handleSelectPlaylist = (playlist: Playlist) => {
     setSelectedPlaylists((prev) => {
