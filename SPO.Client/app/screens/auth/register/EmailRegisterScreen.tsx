@@ -9,8 +9,9 @@ import { ArrowLeft } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StatusBar } from "react-native";
 import { z } from "zod";
-import { SlpashStackParamList } from "../../../navigation/SplashNavigator";
+import { SplashStackParamList } from "../../../navigation/SplashNavigator";
 import { useRegisterMutation } from "../../../services/AuthService";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -25,18 +26,8 @@ const formSchema = z.object({
 type FormSchemaKeys = keyof typeof formSchema.shape;
 type PickObject = Partial<Record<FormSchemaKeys, true>>;
 
-type RegisterFormScreenNavigationProp = NativeStackNavigationProp<
-  SlpashStackParamList,
-  "EmailRegister"
->;
-
-interface RegisterFormScreenProps {
-  navigation: RegisterFormScreenNavigationProp;
-}
-
-export default function EmailRegisterScreen({
-  navigation,
-}: RegisterFormScreenProps) {
+const EmailRegisterScreen = () => {
+  const navigation = useNavigation<NavigationProp<SplashStackParamList>>();
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({
     email: "",
@@ -322,4 +313,6 @@ export default function EmailRegisterScreen({
       </YStack>
     </YStack>
   );
-}
+};
+
+export default EmailRegisterScreen;
