@@ -1,14 +1,10 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useRef } from "react";
-import { RootStackParamList } from "../types";
+import { SearchStackParamList } from "../../navigation/SearchNavigator";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-  Card,
-  CardHeader,
-  H5,
-  Image,
   Input,
   Text,
   View,
@@ -16,11 +12,11 @@ import {
   YStack,
 } from "tamagui";
 import { Camera, Search } from "@tamagui/lucide-icons";
-import {
-  FlatList,
-  Animated,
-  TouchableOpacity,
-} from "react-native";
+import { FlatList, Animated, TouchableOpacity } from "react-native";
+import PinnedHeader from "../../components/search/PinnedHeader";
+import BrowseAll from "../../components/search/BrowseAll";
+import { RootStackParamList } from "../../navigation/AppNavigator";
+import { useNavigation } from "@react-navigation/native";
 
 const data = [
   { id: "1", title: "Tiêu đề 1", image: "https://i.pravatar.cc/150?img=3" },
@@ -41,75 +37,29 @@ const data = [
   { id: "16", title: "Tiêu đề 1", image: "https://i.pravatar.cc/150?img=3" },
 ];
 
-type SearchScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "Search"
->;
-
-export default function SearchScreen({
-  navigation,
-}: {
-  navigation: SearchScreenNavigationProp;
-}) {
+export default function SearchScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
-  const headerHeight = 160; // Adjusted header height
-
+  const headerHeight = 160;
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const getRandomHSL = () => {
     const hue = Math.floor(Math.random() * 360);
     return `hsl(${hue}, 70%, 50%)`;
   };
 
   return (
-    <YStack flex={1} backgroundColor="#000" paddingHorizontal="$3">
-      {/* Main scrollable content */}
+    <YStack flex={1} bg="#000" px="$3">
       <Animated.ScrollView
         contentContainerStyle={{ paddingTop: headerHeight }}
         onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } }}],
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: true }
         )}
         scrollEventThrottle={16}
       >
-        {/* Browse all section */}
-        <H5 fontWeight="bold" color="white" marginTop="$3">
-          Browse all
-        </H5>
-
-        <FlatList
-          data={data}
-          renderItem={({ item }) => (
-            <View flex={1} maxWidth="50%" marginBottom="$3">
-              <Card
-                height="$9"
-                overflow="hidden"
-                backgroundColor={getRandomHSL()}
-              >
-                <CardHeader padded width="70%">
-                  <Text fontSize="$5" color="white" fontWeight="bold">
-                    {item.title}
-                  </Text>
-                </CardHeader>
-                <Image
-                  source={{ uri: item.image }}
-                  width="$6"
-                  height="$6"
-                  position="absolute"
-                  top={30}
-                  right={-20}
-                  transform={[{ rotate: "45deg" }]}
-                  borderRadius={7}
-                />
-              </Card>
-            </View>
-          )}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          columnWrapperStyle={{ gap: 12 }}
-          scrollEnabled={false}
-        />
+        <BrowseAll data={data} getRandomHSL={getRandomHSL} />
       </Animated.ScrollView>
 
-      {/* Sticky header */}
       <Animated.View
         style={{
           position: "absolute",
@@ -131,70 +81,63 @@ export default function SearchScreen({
           ],
         }}
       >
-        <XStack
-          alignItems="center"
-          justifyContent="space-between"
-          marginTop="$5"
-        >
-          <XStack alignItems="center">
+        <XStack items="center" justify="space-between" mt="$5">
+          <XStack items="center">
             <Avatar circular size="$3">
               <AvatarImage src="https://i.pravatar.cc/150?img=3" />
               <AvatarFallback
-                backgroundColor="$pink8"
+                bg="pink"
                 flexDirection="row"
-                justifyContent="center"
-                alignItems="center"
+                justify="center"
+                items="center"
               >
                 <Text fontWeight="bold" color="black" fontSize="$5">
                   L
                 </Text>
               </AvatarFallback>
             </Avatar>
-            <Text
-              fontWeight="bold"
-              paddingHorizontal="$4"
-              color="white"
-              fontSize="$8"
-            >
+            <Text fontWeight="bold" px="$4" color="white" fontSize="$8">
               Search
             </Text>
           </XStack>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("ScanQr")}>
             <Camera color="white" size="$1.5" />
           </TouchableOpacity>
         </XStack>
 
-        {/* Search input */}
         <View
           width="100%"
-          backgroundColor="white"
-          borderRadius={7}
+          bg="white"
+          rounded={7}
           flexDirection="row"
-          alignItems="center"
-          paddingHorizontal="$1"
-          paddingVertical="$1.5"
-          marginVertical="$3"
+          items="center"
+          px="$1"
+          py="$1.5"
+          my="$3"
+          onPress={() =>
+            navigation.navigate({ name: "SearchResult", params: {} })
+          }
         >
           <Input
             disabled
             size="$3.5"
             borderWidth={0}
-            borderRadius="$2"
-            backgroundColor="white"
+            rounded="$2"
+            bg="white"
             color="black"
             fontWeight="bold"
             placeholder="What do you want to listen to?"
             placeholderTextColor="rgba(0, 0, 0, 0.7)"
             pointerEvents="none"
             flex={1}
-            margin="auto"
-            paddingLeft="$7"
+            m="auto"
+            pl="$7"
           />
           <XStack
             position="absolute"
-            left="$3"
-            top="$3"
-            alignItems="center"
+            l="$3"
+            t="$3"
+            items="center"
             pointerEvents="none"
           >
             <Search size="$1" color="rgba(0, 0, 0, 0.7)" />
@@ -202,67 +145,7 @@ export default function SearchScreen({
         </View>
       </Animated.View>
 
-      {/* Mini sticky search bar */}
-      <Animated.View
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 20,
-          backgroundColor: "#000",
-          padding: 12,
-          paddingTop: 12,
-          opacity: scrollY.interpolate({
-            inputRange: [headerHeight / 2, headerHeight],
-            outputRange: [0, 1],
-            extrapolate: "clamp",
-          }),
-          transform: [
-            {
-              translateY: scrollY.interpolate({
-                inputRange: [0, headerHeight],
-                outputRange: [-60, 0],
-                extrapolate: "clamp",
-              }),
-            },
-          ],
-        }}
-      >
-        <View
-          backgroundColor="white"
-          borderRadius={7}
-          flexDirection="row"
-          alignItems="center"
-          paddingHorizontal="$1"
-          paddingVertical="$1.5"
-        >
-          <Input
-            disabled
-            size="$3.5"
-            borderWidth={0}
-            borderRadius="$2"
-            backgroundColor="white"
-            color="black"
-            fontWeight="bold"
-            placeholder="What do you want to listen to?"
-            placeholderTextColor="rgba(0, 0, 0, 0.7)"
-            pointerEvents="none"
-            flex={1}
-            margin="auto"
-            paddingLeft="$7"
-          />
-          <XStack
-            position="absolute"
-            left="$3"
-            top="$3"
-            alignItems="center"
-            pointerEvents="none"
-          >
-            <Search size="$1" color="rgba(0, 0, 0, 0.7)" />
-          </XStack>
-        </View>
-      </Animated.View>
+      <PinnedHeader scrollY={scrollY} headerHeight={headerHeight} />
     </YStack>
   );
 }

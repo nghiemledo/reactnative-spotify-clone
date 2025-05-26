@@ -4,20 +4,23 @@ import { YStack, View, Image } from "tamagui";
 import { MotiView } from "moti";
 import { RootState, useAppSelector } from "../store";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { SlpashStackParamList } from "../navigation/SplashNavigator";
+import { SplashStackParamList } from "../navigation/SplashNavigator";
 import { Text } from "tamagui";
+import { HomeStackParamList } from "../navigation/HomeNavigator";
 
 const SplashScreen = () => {
-  const navigation = useNavigation<NavigationProp<SlpashStackParamList>>();
+  const navigation = useNavigation<NavigationProp<SplashStackParamList>>();
   const user = useAppSelector((state: RootState) => state.auth.user);
 
   React.useEffect(() => {
     setTimeout(() => {
-      if (user) {
+      // if (user) {
+      //   navigation.navigate("Main");
+      // } else {
+      //   navigation.navigate("Login");
+      // }
         navigation.navigate("Main");
-      } else {
-        navigation.navigate("Login");
-      }
+
     }, 2000);
   }, [user, navigation]);
 

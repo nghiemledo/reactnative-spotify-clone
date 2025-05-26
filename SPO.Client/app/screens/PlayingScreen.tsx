@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ImageBackground, Image } from "react-native";
 import { YStack, XStack, Text, Button } from "tamagui";
+import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "@tamagui/linear-gradient";
 import {
   Shuffle,
@@ -9,7 +10,6 @@ import {
   Play,
   Pause,
   SkipForward,
-  User,
   ChevronLeft,
   Ellipsis,
 } from "@tamagui/lucide-icons";
@@ -25,22 +25,89 @@ import {
 } from "../services/playerService";
 import { formatTime } from "../utils/timeUtils";
 import { Slider } from "tamagui";
+import PlayingBottomSheet from "../components/PlayingBottomSheet";
+import TrackPlayer, { useProgress } from "react-native-track-player";
+import { useGetArtistsQuery } from "../services/ArtistService";
+import { Artist } from "../types/artist";
 
 const PlayingScreen = () => {
-  const dispatch = useAppDispatch();
-  const { isPlaying, currentTrack, queue, shuffle, loop } = useAppSelector(
+  const navigation = useNavigation();
+  const { isPlaying, currentTrack, shuffle, loop } = useAppSelector(
     (state) => state.player
   );
   const [isHovered, setIsHovered] = useState(false);
+  const [isPlayingSheetOpen, setIsPlayingSheetOpen] = useState(false);
+  const { position, duration } = useProgress(1000);
+  const {
+    data: artists,
+    isLoading: isArtistsLoading,
+    error: artistsError,
+  } = useGetArtistsQuery();
 
-  const handleToggleLoop = () =>
-    setLoopMode(loop === "off" ? "track" : loop === "track" ? "queue" : "off");
+  const getArtistName = (artistId: string | undefined) => {
+    if (!artistId) return "Unknown Artist";
+    const artist = artists?.data?.find((a: Artist) => a.id === artistId);
+    return artist?.name || "Unknown Artist";
+  };
+
+  // Xử lý khi giá trị slider thay đổi
+  const handleSliderChange = async (value: number[]) => {
+    const seekPosition = value[0]; // Lấy giá trị đầu tiên từ mảng
+    await TrackPlayer.seekTo(seekPosition);
+  };
+
+  // Xử lý nút Next và Previous
+  const handleSkipNext = async () => {
+    try {
+      await skipToNext();
+    } catch (error) {
+      console.error("Skip Next Error:", error);
+    }
+  };
+
+  const handleSkipPrevious = async () => {
+    try {
+      await skipToPrevious();
+    } catch (error) {
+      console.error("Skip Previous Error:", error);
+    }
+  };
+
+  // Xử lý chế độ lặp
+  const handleToggleLoop = async () => {
+    try {
+      await setLoopMode(
+        loop === "off" ? "track" : loop === "track" ? "queue" : "off"
+      );
+    } catch (error) {
+      console.error("Toggle Loop Error:", error);
+    }
+  };
+
+  // Xử lý trường hợp không có bài hát
+  if (!currentTrack) {
+    return (
+      <YStack flex={1} justify="center" items="center" bg="black">
+        <Text fontSize="$6" color="#fff">
+          No track is playing
+        </Text>
+        <Button
+          onPress={() => navigation.goBack()}
+          icon={<ChevronLeft size="$3" color="#fff" />}
+          bg="transparent"
+          mt="$4"
+        >
+          Go Back
+        </Button>
+      </YStack>
+    );
+  }
 
   return (
     <ImageBackground
       source={{
         uri:
-          currentTrack?.artwork ??
+          currentTrack.artwork ??
           "https://via.placeholder.com/400?text=No+Image",
       }}
       style={{ flex: 1 }}
@@ -58,20 +125,21 @@ const PlayingScreen = () => {
             icon={<ChevronLeft size="$3" color="#fff" />}
             bg="transparent"
             circular
-            onPress={() => {}}
+            onPress={() => navigation.goBack()}
             chromeless
           />
           <Text fontSize="$5" color="#fff" fontWeight="600">
             Now Playing
           </Text>
           <Button
+            onPress={() => setIsPlayingSheetOpen(true)}
             icon={<Ellipsis size="$3" color="#fff" />}
             bg="transparent"
             circular
-            onPress={() => {}}
             chromeless
           />
         </XStack>
+
         {/* Artwork Section */}
         <YStack items="center" justify="center" flex={1}>
           <MotiView
@@ -82,8 +150,8 @@ const PlayingScreen = () => {
             transition={{
               rotate: {
                 type: "timing",
-                duration: isPlaying ? 10000 : 0,
-                loop: isPlaying, // Xoay mãi khi đang phát
+                duration: 10000,
+                loop: isPlaying,
               },
               scale: {
                 type: "spring",
@@ -100,7 +168,7 @@ const PlayingScreen = () => {
             <Image
               source={{
                 uri:
-                  currentTrack?.artwork ??
+                  currentTrack.artwork ??
                   "https://via.placeholder.com/300?text=No+Image",
               }}
               style={{
@@ -121,14 +189,14 @@ const PlayingScreen = () => {
               fontSize="$9"
               fontWeight="600"
               color="#fff"
-              text={"center"}
+              style={{ textAlign: "center" }}
               numberOfLines={1}
             >
-              {currentTrack?.title ?? "Unknown Title"}
+              {currentTrack.title ?? "Unknown Title"}
             </Text>
           </YStack>
           <Text fontSize="$5" color="#fff" opacity={0.7}>
-            {currentTrack?.artist ?? "Unknown Artist"}
+            {getArtistName(currentTrack.artist) ?? "Unknown Artist"}
           </Text>
         </YStack>
 
@@ -136,29 +204,25 @@ const PlayingScreen = () => {
         <YStack>
           <XStack justify="space-between" px="$2">
             <Text fontSize="$4" color="#fff" fontWeight="500">
-              {formatTime(0)}
+              {formatTime(position)}
             </Text>
             <Text fontSize="$4" color="#fff" fontWeight="500">
-              {formatTime(currentTrack?.duration ?? 0)}
+              {formatTime(duration ?? 0)}
             </Text>
           </XStack>
           <Slider
             size="$2"
             my="$3"
-            width={"100%"}
-            defaultValue={[currentTrack?.position ?? 0]}
-            max={100}
+            width="100%"
+            value={[position]}
+            max={duration || 100}
             step={1}
+            onValueChange={handleSliderChange}
           >
             <Slider.Track>
-              <Slider.TrackActive />
+              <Slider.TrackActive bg="$green9" />
             </Slider.Track>
-            <Slider.Thumb
-              size="$1"
-              circular
-              index={0}
-              style={{ backgroundColor: "#15803d" }}
-            />
+            <Slider.Thumb size="$1" circular index={0} bg="$green9" />
           </Slider>
         </YStack>
 
@@ -175,15 +239,17 @@ const PlayingScreen = () => {
             icon={<SkipBack size="$3" color="#fff" />}
             bg="transparent"
             circular
-            onPress={skipToPrevious}
+            onPress={handleSkipPrevious}
             chromeless
           />
           <YStack
             onHoverIn={() => setIsHovered(true)}
             onHoverOut={() => setIsHovered(false)}
+            onPressIn={() => setIsHovered(true)}
+            onPressOut={() => setIsHovered(false)}
           >
             <MotiView
-              animate={{ scale: isPlaying ? 1.1 : 1 }}
+              animate={{ scale: isHovered ? 1.1 : 1 }}
               transition={{ type: "spring", damping: 20 }}
             >
               <Button
@@ -206,12 +272,12 @@ const PlayingScreen = () => {
             icon={<SkipForward size="$3" color="#fff" />}
             bg="transparent"
             circular
-            onPress={skipToNext}
+            onPress={handleSkipNext}
             chromeless
           />
           <Button
             icon={
-              <Repeat size="$2" color={loop !== "off" ? "green" : "white"} />
+              <Repeat size="$2" color={loop !== "off" ? "#15803d" : "#fff"} />
             }
             bg="transparent"
             circular
@@ -220,6 +286,15 @@ const PlayingScreen = () => {
           />
         </XStack>
       </YStack>
+
+      {/* PlayingBottomSheet */}
+      <PlayingBottomSheet
+        isOpen={isPlayingSheetOpen}
+        onClose={() => setIsPlayingSheetOpen(false)}
+        onAddToPlaylist={() => console.log("Add to playlist")}
+        onSleepTimer={() => {}}
+        onShowSpotifyCode={() => console.log("Show Spotify code")}
+      />
     </ImageBackground>
   );
 };

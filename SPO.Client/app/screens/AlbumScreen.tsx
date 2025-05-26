@@ -1,91 +1,88 @@
-import { Animated, Dimensions, StatusBar, View } from "react-native";
-import {
-  YStack,
-  XStack,
-  Text,
-  Image,
-  Button,
-  H3,
-  Avatar,
-  Input,
-} from "tamagui";
-import { FlatList, ScrollView, TouchableOpacity } from "react-native";
+import { Animated, Dimensions, StatusBar, View, FlatList } from "react-native";
+import { YStack, XStack, Text, Image, Button, Spinner } from "tamagui";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
-import { useDispatch } from "react-redux";
-import { playSong } from "../store/playerSlice";
 import { useEffect, useRef, useMemo, useCallback, useState } from "react";
 import {
   ArrowLeft,
-  Globe,
   ArrowDownCircle,
   EllipsisVertical,
   Play,
-  Plus,
-  Search,
+  PlusCircle,
+  Shuffle,
+  CheckCircle,
 } from "@tamagui/lucide-icons";
 import { LinearGradient } from "@tamagui/linear-gradient";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import {
+  useGetAlbumByIdQuery,
+  useGetAlbumsQuery,
+} from "../services/AlbumService";
+import { useGetSongsQuery } from "../services/SongService";
+import { RootStackParamList } from "../navigation/AppNavigator";
+import { Album } from "../types/album";
+import { useGetArtistsQuery } from "../services/ArtistService";
+import { Artist } from "../types/artist";
+import Toast from "react-native-toast-message";
+import { Song } from "../types/song";
+import { SongItem } from "../components/song/SongItem";
+import { AlbumItem } from "../components/AlbumItem";
+import SongBottomSheet from "../components/song/SongBottomSheet";
+import { playSong, setPlayerQueue } from "../services/playerService";
+import { HomeStackParamList } from "../navigation/HomeNavigator";
+import { store } from "../store";
+import { setQueue as setReduxQueue } from "../store/playerSlice";
 
-// Dữ liệu giả lập cho album và danh sách bài hát
-const albumData = {
-  id: "1",
-  title: "Đánh Đổi",
-  releaseDate: "10 Oct 2023",
-  coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  artistName: "Obito, Shiki",
-  totalSongs: 20,
-  totalDuration: "56 min",
-};
+type AlbumRouteProp = RouteProp<HomeStackParamList, "Album">;
 
-const songs = [
-  { id: "1", title: "Còn Nợ Ba Mẹ", artist: "Obito, Shiki", duration: "3:15" },
-  { id: "2", title: "Champion", artist: "Obito, Shiki", duration: "4:20" },
-  { id: "3", title: "Chưa Xong", artist: "Obito, Shiki", duration: "2:10" },
-  { id: "4", title: "Chúa Xong", artist: "Obito, Shiki", duration: "5:00" },
-  { id: "5", title: "Tự Suong", artist: "Obito, Shiki", duration: "3:45" },
-  { id: "6", title: "Outro", artist: "Obito, Shiki", duration: "5:00" },
-  // Thêm các bài hát khác nếu cần để đạt 20 bài
-];
+type AlbumScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-const recommendedAlbums = [
-  {
-    id: "1",
-    title: "Hip-hop Việt",
-    artist: "HIEUTHUHAI, Dangrangto, Wxrdie, R...",
-    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    year: "2023",
-  },
-  {
-    id: 2,
-    title: "Best of Hip-hop Việt 2023",
-    artist: "HIEUTHUHAI, tlinh, RPT MCK, Andree Right Han...",
-    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    year: "2023",
-  },
-  {
-    id: "3",
-    title: "SOOI",
-    artist: "Vũ, DatKaa...",
-    coverImage: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    year: "2023",
-  },
-];
-
-type AlbumScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "AlbumScreen"
->;
-
-export default function AlbumScreen({
-  navigation,
-}: {
-  navigation: AlbumScreenNavigationProp;
-}) {
-  const dispatch = useDispatch();
+export default function AlbumScreen() {
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
+  const [isAdded, setIsAdded] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
-  const [search, setSearch] = useState("");
+  const navigation = useNavigation<AlbumScreenNavigationProp>();
+  const route = useRoute<AlbumRouteProp>();
+  const albumId = route.params?.id;
 
-  // Memoize interpolated values
+  if (!albumId) {
+    return (
+      <YStack flex={1} justify="center" items="center">
+        <Text color="white">Lỗi: Không tìm thấy ID album</Text>
+        <Button onPress={() => navigation.goBack()} mt="$4">
+          Quay lại
+        </Button>
+      </YStack>
+    );
+  }
+
+  const { data: album, isLoading, error } = useGetAlbumByIdQuery(albumId);
+  const {
+    data: songs,
+    isLoading: songsLoading,
+    error: songsError,
+  } = useGetSongsQuery();
+  const {
+    data: albums,
+    isLoading: isAlbumsLoading,
+    error: albumsError,
+  } = useGetAlbumsQuery();
+  const {
+    data: artists,
+    isLoading: isArtistsLoading,
+    error: artistsError,
+  } = useGetArtistsQuery();
+
+  const filteredAlbums = albums?.data?.filter(
+    (item: Album) => item.id !== albumId
+  );
+
+  const filteredSongs = useMemo(() => {
+    return (
+      songs?.data?.filter((item) => item.albumId === album?.data?.id) || []
+    );
+  }, [songs, album]);
+
   const navbarBackground = useMemo(
     () =>
       scrollY.interpolate({
@@ -106,16 +103,6 @@ export default function AlbumScreen({
     [scrollY]
   );
 
-  const searchOpacity = useMemo(
-    () =>
-      scrollY.interpolate({
-        inputRange: [0, 100],
-        outputRange: [1, 0],
-        extrapolate: "clamp",
-      }),
-    [scrollY]
-  );
-
   const screenWidth = Dimensions.get("window").width;
 
   const imageSize = useMemo(
@@ -125,7 +112,7 @@ export default function AlbumScreen({
         outputRange: [screenWidth * 0.5, screenWidth * 0.3],
         extrapolate: "clamp",
       }),
-    [scrollY, screenWidth]
+    [screenWidth]
   );
 
   const opacity = useMemo(
@@ -138,12 +125,10 @@ export default function AlbumScreen({
     [scrollY]
   );
 
-  // Memoize handlers
   const handleScroll = useCallback(
-    Animated.event(
-      [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-      { useNativeDriver: false }
-    ),
+    Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+      useNativeDriver: false,
+    }),
     [scrollY]
   );
 
@@ -151,23 +136,249 @@ export default function AlbumScreen({
     navigation.goBack();
   }, [navigation]);
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
+  const handleAddButtonPress = useCallback(() => {
+    setIsAdded((prev) => !prev);
+    Toast.show({
+      type: "success",
+      text1: isAdded ? "Đã xóa khỏi Thư viện" : "Đã thêm vào Thư viện",
+      position: "bottom",
+      visibilityTime: 2000,
     });
+  }, [isAdded]);
 
+  const handleNavigation = <T extends keyof HomeStackParamList>(
+    screen: T,
+    params: HomeStackParamList[T]
+  ) => {
+    navigation.navigate(screen as any, params);
+  };
+
+  const getArtistName = (artistId: string | undefined) => {
+    if (!artistId) return "Nghệ sĩ không xác định";
+    const artist = artists?.data?.find((a: Artist) => a.id === artistId);
+    return artist?.name || "Nghệ sĩ không xác định";
+  };
+
+  const getArtistUrlAvatar = (artistId: string | undefined) => {
+    if (!artistId) return "https://via.placeholder.com/120";
+    const artist = artists?.data?.find((a: Artist) => a.id === artistId);
+    return artist?.urlAvatar || "https://via.placeholder.com/120";
+  };
+
+  const handleMorePress = (song: Song) => {
+    setSelectedSong(song);
+    setIsBottomSheetOpen(true);
+  };
+
+  // Hàm xử lý khi nhấn nút Play
+  const handlePlayAll = async () => {
+    if (!filteredSongs || filteredSongs.length === 0) {
+      Toast.show({
+        type: "error",
+        text1: "Không có bài hát nào để phát",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+      return;
+    }
+
+    try {
+      // Chuyển đổi filteredSongs thành định dạng Track
+      const tracks = filteredSongs
+        .filter((song) => song.audioUrl && song.title) // Lọc bài hát hợp lệ
+        .map((song: Song) => ({
+          id: song.id || `song-${song.title}`,
+          url: song.audioUrl || "",
+          title: song.title || "",
+          artist: song.artistId || "Nghệ sĩ không xác định",
+          artwork:
+            song.coverImage ||
+            "https://via.placeholder.com/300?text=Không+có+hình+ảnh",
+          duration: song.duration || 0,
+        }));
+
+      // Xóa hàng đợi hiện tại và thêm danh sách mới
+      store.dispatch(setReduxQueue(tracks));
+      await setPlayerQueue(tracks);
+
+      // Phát bài hát đầu tiên
+      const firstSong = filteredSongs[0];
+      await playSong(firstSong);
+
+      // Điều hướng đến màn hình Playing
+      navigation.navigate("Playing");
+      Toast.show({
+        type: "success",
+        text1: `Đang phát album: ${album?.data?.title || "album"}`,
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+    } catch (error) {
+      console.error("Lỗi khi phát tất cả bài hát:", error);
+      Toast.show({
+        type: "error",
+        text1: "Không thể phát danh sách bài hát",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+    }
+  };
+
+  const renderAlbumItem = ({ item }: { item: Album }) => (
+    <AlbumItem
+      album={item}
+      getArtistName={getArtistName}
+      showDate={false}
+      onPress={() => handleNavigation("Album", { id: item.id })}
+    />
+  );
+
+  const renderInfo = () => (
+    <YStack pt={16} pb={20}>
+      <XStack items="center" justify="center" mb={16}>
+        <View
+          style={{
+            borderRadius: 18,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.3,
+            shadowRadius: 16,
+            elevation: 8,
+          }}
+        >
+          <Animated.Image
+            source={{
+              uri: album?.data?.coverImage || "https://via.placeholder.com/300",
+            }}
+            style={{
+              width: imageSize,
+              height: imageSize,
+              borderRadius: 18,
+              opacity,
+            }}
+            resizeMode="cover"
+          />
+        </View>
+      </XStack>
+
+      <Text
+        fontSize={28}
+        width="90%"
+        fontWeight="bold"
+        color="white"
+        mb={4}
+        numberOfLines={1}
+      >
+        {album?.data?.title || "Đang tải..."}
+      </Text>
+      <XStack>
+        <Image
+          source={{ uri: getArtistUrlAvatar(album?.data?.artistId) }}
+          width={27}
+          height={27}
+          borderRadius={100}
+          marginInlineEnd={10}
+        />
+        <Text fontSize={15} color="#fff" fontWeight="bold" mb={10}>
+          {getArtistName(album?.data?.artistId)}
+        </Text>
+      </XStack>
+
+      <Text fontSize={16} color="rgba(255,255,255,0.8)" mb={4}>
+        Album •{" "}
+        {album?.data?.createdAt
+          ? new Date(album.data.createdAt).toLocaleDateString("vi-VN")
+          : "Không có ngày"}
+      </Text>
+
+      <XStack items="center" justify="space-between" mb={12}>
+        <XStack>
+          <Button
+            bg="transparent"
+            mr={20}
+            rounded={100}
+            p={0}
+            onPress={handleAddButtonPress}
+            icon={
+              isAdded ? (
+                <CheckCircle
+                  size={25}
+                  color="black"
+                  bg="#1DB954"
+                  rounded="$10"
+                />
+              ) : (
+                <PlusCircle size={25} color="#AAAAAA" />
+              )
+            }
+          />
+          <Button
+            mr={20}
+            bg="transparent"
+            rounded={100}
+            p={0}
+            icon={<ArrowDownCircle size={25} color="#AAAAAA" />}
+          />
+          <Button
+            bg="transparent"
+            rounded={100}
+            p={0}
+            icon={<EllipsisVertical size={25} color="#AAAAAA" />}
+          />
+        </XStack>
+        <XStack items="center">
+          <Button bg="transparent">
+            <Shuffle color="#1DB954" />
+          </Button>
+          <Button
+            bg="#1DB954"
+            rounded={100}
+            width={56}
+            height={56}
+            icon={<Play size={28} color="black" fill="black" />}
+            onPress={handlePlayAll} // Gắn hàm handlePlayAll
+          />
+        </XStack>
+      </XStack>
+    </YStack>
+  );
+
+  const renderAlbum = () => (
+    <YStack mt="$6" mb={70}>
+      <Text fontSize={20} fontWeight="bold" color="white" mb="$3">
+        Bạn cũng có thể thích
+      </Text>
+      {isAlbumsLoading ? (
+        <Spinner size="large" color="$green10" />
+      ) : albumsError ? (
+        <Text color="white">Lỗi khi tải danh sách album</Text>
+      ) : !filteredAlbums || filteredAlbums.length === 0 ? (
+        <Text color="rgba(255,255,255,0.7)">Không tìm thấy album khác</Text>
+      ) : (
+        <FlatList
+          data={filteredAlbums}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id}
+          renderItem={renderAlbumItem}
+          contentContainerStyle={{ paddingRight: 16 }}
+        />
+      )}
+    </YStack>
+  );
+
+  useEffect(() => {
     return () => {
-      // Cleanup animations if needed
       scrollY.stopAnimation();
     };
-  }, [navigation, scrollY]);
+  }, [scrollY]);
 
   return (
     <LinearGradient
-      padding={0}
-      margin={0}
+      p={0}
+      m={0}
       flex={1}
-      colors={["#3a4a5a", "#000000"]}
+      colors={["#3a4a5a", "#111111"]}
       start={[0, 0]}
       end={[0, 0.5]}
     >
@@ -183,7 +394,7 @@ export default function AlbumScreen({
           top: 0,
           left: 0,
           right: 0,
-          height: 90,
+          height: 60,
           zIndex: 1000,
           backgroundColor: navbarBackground,
         }}
@@ -191,7 +402,6 @@ export default function AlbumScreen({
         <View
           style={{
             flex: 1,
-            paddingTop: StatusBar.currentHeight || 44,
             flexDirection: "row",
             alignItems: "center",
             paddingHorizontal: 10,
@@ -199,20 +409,19 @@ export default function AlbumScreen({
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <TouchableOpacity onPress={handleGoBack}>
-              <Button
-                size="$8"
-                chromeless
-                icon={ArrowLeft}
-                color="white"
-                padding={0}
-                backgroundColor="transparent"
-                pressStyle={{
-                  backgroundColor: "transparent",
-                  borderBlockColor: "transparent",
-                }}
-              />
-            </TouchableOpacity>
+            <Button
+              onPress={handleGoBack}
+              size="$8"
+              chromeless
+              icon={ArrowLeft}
+              color="#fff"
+              p={0}
+              bg="transparent"
+              pressStyle={{
+                bg: "transparent",
+                borderBlockColor: "transparent",
+              }}
+            />
             <Animated.Text
               style={{
                 color: "white",
@@ -222,129 +431,94 @@ export default function AlbumScreen({
                 marginLeft: 8,
               }}
             >
-              {albumData.title}
+              {album?.data?.title || "Đang tải..."}
             </Animated.Text>
           </View>
-          <XStack width={40} />
         </View>
       </Animated.View>
 
-      <ScrollView
+      <FlatList
+        style={{ marginHorizontal: 16 }}
+        data={filteredSongs}
+        keyExtractor={(item, index) => item.id || `song-${index}`}
+        renderItem={({ item }) => (
+          <SongItem
+            song={item}
+            showIndex={false}
+            showImage={true}
+            showArtistName={true}
+            imageSize={48}
+            getArtistName={getArtistName}
+            onMorePress={handleMorePress}
+            onSongPress={async (song) => {
+              try {
+                await playSong(song);
+                navigation.navigate("Playing");
+                console.log("Bài hát được nhấn:", song.title);
+              } catch (error) {
+                console.error("Lỗi khi phát bài hát:", error);
+                Toast.show({
+                  type: "error",
+                  text1: "Không thể phát bài hát",
+                  position: "bottom",
+                  visibilityTime: 2000,
+                });
+              }
+            }}
+          />
+        )}
+        ListHeaderComponent={renderInfo}
+        ListFooterComponent={renderAlbum}
         scrollEventThrottle={16}
         onScroll={handleScroll}
-      >
-        <YStack flex={1} marginTop="$6" padding="$4">
-          {/* Search Bar */}
-          <Animated.View style={{ opacity: searchOpacity }}>
-            <XStack marginTop={0} marginBottom={20} alignItems="center">
-              <Input
-                value={search}
-                onChangeText={setSearch}
-                size="$3.5"
-                borderWidth={0}
-                borderRadius={12}
-                backgroundColor="#23272b"
-                color="white"
-                placeholder="Find in playlist"
-                placeholderTextColor="rgba(255,255,255,0.7)"
-                flex={1}
-                margin="auto"
-                style={{ fontSize: 15, paddingLeft: 40, fontWeight: "bold", height: 44 }}
-                focusStyle={{ borderWidth: 0, backgroundColor: "#2d3136" }}
-              />
-              <View style={{ position: "absolute", left: 16, top: 12, pointerEvents: "none" }}>
-                <Search size={20} color="rgba(255,255,255,0.7)" />
-              </View>
-              <Button backgroundColor="#23272b" borderRadius={12} marginLeft={12} paddingHorizontal={18} paddingVertical={10}>
-                <Text color="white" fontWeight="bold">Sort</Text>
-              </Button>
-            </XStack>
-          </Animated.View>
+        contentContainerStyle={{ paddingBottom: 70 }}
+        ListEmptyComponent={
+          songsLoading ? (
+            <Spinner size="large" color="$green10" />
+          ) : (
+            <Text color="rgba(255,255,255,0.7)">
+              {songsLoading
+                ? "Đang tải bài hát..."
+                : "Không tìm thấy bài hát cho album này"}
+            </Text>
+          )
+        }
+        showsVerticalScrollIndicator={false}
+      />
 
-          {/* Album Image */}
-          <XStack alignItems="center" justifyContent="center" marginBottom={16}>
-            <View
-              style={{
-                borderRadius: 18,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.3,
-                shadowRadius: 16,
-                elevation: 8,
-              }}
-            >
-              <Animated.Image
-                source={{ uri: albumData.coverImage }}
-                style={{
-                  width: imageSize,
-                  height: imageSize,
-                  borderRadius: 18,
-                  opacity,
-                }}
-                resizeMode="cover"
-              />
-            </View>
-          </XStack>
-
-          {/* Title & Info */}
-          <Text fontSize={28} fontWeight="bold" color="white" marginBottom={4}>
-            {albumData.title}
-          </Text>
-          <Text fontSize={16} color="rgba(255,255,255,0.8)" marginBottom={4}>
-            With {albumData.artistName}
-          </Text>
-          <Text color="rgba(255,255,255,0.7)" fontSize={13} marginBottom={8}>
-            {albumData.totalSongs} saves • {albumData.totalDuration}
-          </Text>
-
-          {/* Control Buttons */}
-          <XStack alignItems="center" justifyContent="space-between" marginBottom={12}>
-            <XStack gap={16}>
-              <Button backgroundColor="rgba(255,255,255,0.05)" borderRadius={100} icon={<Image source={{ uri: albumData.coverImage }} width={28} height={28} borderRadius={8} />} />
-              <Button backgroundColor="rgba(255,255,255,0.05)" borderRadius={100} icon={<Plus size={20} color="white" />} />
-              <Button backgroundColor="rgba(255,255,255,0.05)" borderRadius={100} icon={<ArrowDownCircle size={20} color="white" />} />
-              <Button backgroundColor="rgba(255,255,255,0.05)" borderRadius={100} icon={<EllipsisVertical size={20} color="white" />} />
-            </XStack>
-            <Button backgroundColor="#1DB954" borderRadius={100} width={56} height={56} icon={<Play size={28} color="black" fill="black" />} />
-          </XStack>
-
-          {/* Song List */}
-          <YStack marginTop={8}>
-            {songs.map((item) => (
-              <XStack key={item.id} alignItems="center" justifyContent="space-between" paddingVertical={10}>
-                <XStack alignItems="center" gap={12} flex={1}>
-                  <Image source={{ uri: albumData.coverImage }} width={48} height={48} borderRadius={8} />
-                  <YStack flex={1}>
-                    <Text fontSize={16} fontWeight="bold" color="white">{item.title}</Text>
-                    <Text fontSize={13} color="rgba(255,255,255,0.7)">{item.artist}</Text>
-                  </YStack>
-                </XStack>
-                <Text color="rgba(255,255,255,0.7)" fontSize={13} marginRight={12}>{item.duration}</Text>
-                <Button backgroundColor="transparent" padding={0} icon={<EllipsisVertical size={20} color="white" />} pressStyle={{ backgroundColor: "transparent", borderBlockColor: "transparent" }} />
-              </XStack>
-            ))}
-          </YStack>
-
-          {/* You might also like */}
-          <Text fontSize={20} fontWeight="bold" color="white" marginTop={32} marginBottom={12}>You might also like</Text>
-          <FlatList
-            data={recommendedAlbums}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <YStack width={160} marginRight={16}>
-                  <Image source={{ uri: item.coverImage }} width={160} height={160} borderRadius={14} />
-                  <Text color="white" fontWeight="bold" marginTop={8} fontSize={16}>{item.title}</Text>
-                  <Text color="rgba(255,255,255,0.7)" fontSize={13}>{item.artist} {item.year && `• ${item.year}`}</Text>
-                </YStack>
-              </TouchableOpacity>
-            )}
-            scrollEnabled={true}
-          />
-        </YStack>
-      </ScrollView>
+      <Toast />
+      <SongBottomSheet
+        isOpen={isBottomSheetOpen}
+        onClose={() => {
+          setIsBottomSheetOpen(false);
+          setSelectedSong(null);
+        }}
+        selectedSong={selectedSong}
+        navigation={navigation as any}
+        screenType="album"
+        onAddToOtherPlaylist={() => {
+          navigation.navigate("AddToPlaylist");
+        }}
+        onAddToQueue={() => {
+          console.log("Thêm vào hàng đợi");
+        }}
+        onShowSpotifyCode={() => {
+          console.log("Hiển thị mã Spotify");
+        }}
+        onGoToAlbum={() => {}}
+        onGoToArtist={() => {
+          if (selectedSong?.artistId) {
+            handleNavigation("Artist", { id: selectedSong.artistId });
+          } else {
+            Toast.show({
+              type: "error",
+              text1: "Không tìm thấy nghệ sĩ cho bài hát này",
+              position: "bottom",
+              visibilityTime: 2000,
+            });
+          }
+        }}
+      />
     </LinearGradient>
   );
 }
