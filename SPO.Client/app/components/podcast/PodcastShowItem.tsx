@@ -62,13 +62,13 @@ export const PodcastShowItem = ({ item, navigation }: PodcastShowItemProps) => {
             Preview episode
           </Text>
         </Button>
-        <Button
+        {/* <Button
           bg="$green10"
           rounded={100}
           width={45}
           height={45}
           icon={<Play size={25} fill="black" />}
-        />
+        /> */}
       </XStack>
     </YStack>
   );
