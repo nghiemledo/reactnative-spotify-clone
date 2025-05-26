@@ -21,11 +21,16 @@ import { HomeStackParamList } from "../navigation/HomeNavigator";
 import { useAppSelector } from "../store";
 import { AlbumItem } from "../components/AlbumItem";
 import { ArtistItem } from "../components/ArtistItem";
-import { PodcastItem } from "../components/PodcastItem";
 import { SongItem } from "../components/song/SongItem";
 import Toast from "react-native-toast-message";
 import SongBottomSheet from "../components/song/SongBottomSheet";
 import { playSong } from "../services/playerService";
+import {
+  useGetPodcastCategoriesQuery,
+  useGetPodcastShowsQuery,
+} from "../services/PodcastService";
+import { PodcastShowItem } from "../components/podcast/PodcastShowItem";
+import { PodcastShow } from "../types/podcast";
 
 const relaxationItems = [
   {
@@ -82,6 +87,12 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     error: songsError,
   } = useGetSongsQuery();
 
+  const {
+    data: podcastShows,
+    isLoading: isPodcastShowsLoading,
+    error: podcastShowsError,
+  } = useGetPodcastShowsQuery();
+
   const toggleSidebar = () => {
     Animated.timing(sidebarAnim, {
       toValue: isSidebarOpen ? -Dimensions.get("window").width * 0.75 : 0,
@@ -133,8 +144,8 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     />
   );
 
-  const renderPodcastItem = ({ item }: { item: any }) => (
-    <PodcastItem item={item} handleNavigation={handleNavigation} />
+  const renderPodcastShowItem = ({ item }: { item: PodcastShow }) => (
+    <PodcastShowItem item={item} navigation={navigation} />
   );
 
   return (
@@ -296,15 +307,21 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
               <Text fontSize={20} fontWeight="bold" color="white" mb="$3">
                 Podcasts
               </Text>
-              <YStack>
-                {relaxationItems.map((item) => (
-                  <PodcastItem
-                    key={item.id}
-                    item={item}
-                    handleNavigation={handleNavigation}
-                  />
-                ))}
-              </YStack>
+              {isPodcastShowsLoading ? (
+                <Spinner size="large" color="$green10" />
+              ) : podcastShowsError ? (
+                <Text color="white">Error loading podcasts</Text>
+              ) : !podcastShows?.data || podcastShows.data.length === 0 ? (
+                <Text color="rgba(255,255,255,0.7)">No podcasts found</Text>
+              ) : (
+                <FlatList
+                  data={podcastShows?.data}
+                  showsVerticalScrollIndicator={false}
+                  keyExtractor={(item) => item.id}
+                  renderItem={renderPodcastShowItem}
+                  scrollEnabled={false}
+                />
+              )}
             </YStack>
           )}
         </Animated.ScrollView>
