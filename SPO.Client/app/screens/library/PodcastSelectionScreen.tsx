@@ -1,9 +1,10 @@
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { Selection } from "../../components/library/Selection";
 import { SelectionCard } from "../../components/library/SelectionCard";
 import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
+import { RootStackParamList } from "../../navigation/AppNavigator";
 
 type Podcast = {
   id: string;
@@ -14,18 +15,6 @@ type Podcast = {
   createdAt: string;
   type: string;
 };
-
-type PodcastSelectionScreenNavigationProp = NativeStackNavigationProp<
-  LibraryStackParamList,
-  "PodcastSelection"
->;
-
-type PodcastSelectionScreenRouteProp = RouteProp<LibraryStackParamList, "PodcastSelection">;
-
-interface PodcastSelectionScreenProps {
-  navigation: PodcastSelectionScreenNavigationProp;
-  route: PodcastSelectionScreenRouteProp;
-}
 
 const initialPodcasts: Podcast[] = [
   {
@@ -74,10 +63,10 @@ const initialPodcasts: Podcast[] = [
   },
 ];
 
-export default function PodcastSelectionScreen({
-  navigation,
-  route,
-}: PodcastSelectionScreenProps) {
+const PodcastSelectionScreen = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const route = useRoute<RouteProp<RootStackParamList, "PodcastSelection">>();
+  
   return (
     <Selection
       data={initialPodcasts}
@@ -100,4 +89,6 @@ export default function PodcastSelectionScreen({
       type="podcast"
     />
   );
-}
+};
+
+export default PodcastSelectionScreen;

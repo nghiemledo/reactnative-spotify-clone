@@ -11,12 +11,12 @@ import {
   Keyboard,
   ActivityIndicator,
 } from "react-native";
-import { SearchStackParamList } from "../../navigation/SearchNavigator";
 import SongOptionsBottomSheet from "../../components/search/SongOptionsBottomSheet";
 import Tabs from "../../components/search/Tabs";
 import ArtistCard from "../../components/search/ArtistCard";
 import SongCard from "../../components/search/SongCard";
-import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
+import { RootStackParamList } from "../../navigation/AppNavigator";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 
 interface Artist {
   id: number;
@@ -87,18 +87,10 @@ const data = [
   },
 ];
 
-type SearchResultScreenNavigationProp = NativeStackNavigationProp<
-  SearchStackParamList & LibraryStackParamList,
-  "SearchResult"
->;
-
-export default function SearchResultScreen({
-  navigation,
-  route,
-}: {
-  navigation: SearchResultScreenNavigationProp;
-  route: { params?: { toastMessages?: string[] } };
-}) {
+const SearchResultScreen = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, "SearchResult">>();
   const { width, height } = Dimensions.get("window");
   const [likedItems, setLikedItems] = useState<{ [key: number]: boolean }>({});
   const [searchValue, setSearchValue] = useState("");
@@ -448,4 +440,6 @@ export default function SearchResultScreen({
       )}
     </YStack>
   );
-}
+};
+
+export default SearchResultScreen;
