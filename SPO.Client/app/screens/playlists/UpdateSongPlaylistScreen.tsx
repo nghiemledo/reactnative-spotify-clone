@@ -1,23 +1,13 @@
 import { memo, useState } from "react";
-import {
-  YStack,
-  XStack,
-  Button,
-  Text,
-  View,
-  Input,
-  Image,
-  Dialog,
-} from "tamagui";
+import { YStack, XStack, Button, Text, Input, Image, Dialog } from "tamagui";
 import { TouchableOpacity, StatusBar } from "react-native";
 import { ArrowLeft, CircleMinus, Menu } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/AppNavigator";
-import Toast, { BaseToastProps } from "react-native-toast-message";
 import DraggableFlatList, {
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
-import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
+import { useNavigation } from "@react-navigation/native";
 
 const songs = [
   {
@@ -116,16 +106,9 @@ const songs = [
   },
 ];
 
-type updateSongPlaylistNavigationProp = NativeStackNavigationProp<
-  LibraryStackParamList,
-  "updateSongPlaylist"
->;
-
-const updateSongPlaylist = ({
-  navigation,
-}: {
-  navigation: updateSongPlaylistNavigationProp;
-}) => {
+const updateSongPlaylist = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [playlistName, setPlaylistName] = useState<string>("My playlist");
   const [songList, setSongList] = useState(songs);
   const [description, setDescription] = useState<string>("");
