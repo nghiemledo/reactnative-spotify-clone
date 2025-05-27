@@ -116,8 +116,8 @@ export default function SearchScreen() {
               Search
             </Text>
           </XStack>
-          {/* <TouchableOpacity onPress={() => navigation.navigate("ScanQr")}> */}
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("ScanScreen")}>
+          {/* <TouchableOpacity> */}
             <Camera color="white" size="$1.5" />
           </TouchableOpacity>
         </XStack>

@@ -21,6 +21,7 @@ import SearchLibraryScreen from "../screens/library/SearchLibraryScreen";
 import AddSongPlaylistScreen from "../screens/playlists/AddSongPlaylistScreen";
 import UpdateSongPlaylistScreen from "../screens/playlists/UpdateSongPlaylistScreen";
 import SearchInPlaylistScreen from "../screens/playlists/SearchInPlaylistScreen";
+import ShareSongScreen from "../screens/ShareSongScreen";
 // import ScanScreen from "../screens/ScanScreen";
 
 const Stack = createStackNavigator();
@@ -141,16 +142,11 @@ export default function AppNavigator() {
           component={SearchInPlaylistScreen}
           options={{ headerShown: false }}
         />
-        {/* <Stack.Screen
+        <Stack.Screen
           name="shareQrSong"
           component={ShareSongScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="ScanQr"
-          component={ScanScreen}
-          options={{ headerShown: false }}
-        /> */}
 
         <Stack.Screen
           name="search"
