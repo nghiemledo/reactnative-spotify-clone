@@ -1,4 +1,5 @@
 ﻿using SPO.Application.DataTransferObjects.Request.UserRoles.User;
+using SPO.Application.DataTransferObjects.Response.User;
 using SPO.Domain.Entities.UserRoles;
 using SPO.Infrastructure.Dappers.Base;
 
@@ -13,6 +14,10 @@ namespace SPO.Infrastructure.Repositories.UserRoles
         Task<User?> GetByIdAsync(string id);
         Task<IEnumerable<User?>> GetAllAsync();
         Task<Role?> GetRoleByUserId(string id);
+        Task<bool> FollowArtistAsync(string userId, string artistId);
+        Task<IEnumerable<FollowedArtistResponse>> GetFollowedArtistsAsync(string userId);
+        Task<IEnumerable<GetPlaylistByUserIdResponse>> GetPlaylistsByUserIdAsync(string userId);
+        Task<bool> FollowPodcastAsync(string userId, string showId);
     }
 
     public class UserRepository : IUserRepository
@@ -105,5 +110,73 @@ namespace SPO.Infrastructure.Repositories.UserRoles
             IEnumerable<Role> result = await _db.GetData<Role, dynamic>("[SP_SPO_GetRoleByUserId]", new { UserId = id });
             return result.FirstOrDefault();
         }
+
+        public async Task<bool> FollowArtistAsync(string userId, string artistId)
+        {
+            try
+            {
+                await _db.SaveData("[dbo].[SP_SPO_FollowArtist]", new
+                {
+                    UserId = Guid.Parse(userId),
+                    ArtistId = Guid.Parse(artistId)
+                });
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<IEnumerable<FollowedArtistResponse>> GetFollowedArtistsAsync(string userId)
+        {
+            try
+            {
+                if (!Guid.TryParse(userId, out Guid userGuid))
+                {
+                    throw new ArgumentException("Invalid UserId format.");
+                }
+                var result = await _db.GetData<FollowedArtistResponse, dynamic>(
+                    "[dbo].[SP_SPO_GetFollowedArtists]",
+                    new { UserId = userGuid }
+                );
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error occurred when retrieving followed artists", ex);
+            }
+        }
+
+        public async Task<IEnumerable<GetPlaylistByUserIdResponse>> GetPlaylistsByUserIdAsync(string userId)
+        {
+            try
+            {
+                var result = await _db.GetData<GetPlaylistByUserIdResponse, dynamic>(
+                    "[dbo].[SP_SPO_GetPlaylistsByUserId]",
+                    new { UserId = userId }
+                );
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error occurred when retrieving playlists", ex);
+            }
+        }
+
+        public async Task<bool> FollowPodcastAsync(string userId, string showId)
+        {
+            try
+            {
+                await _db.SaveData("[dbo].[SP_SPO_FollowPodcast]", new
+                {
+                    UserId = userId,
+                    ShowId = showId
+                });
+                return true;
+            }
+            catch (Exception) { return false; }
+        }
+
     }
 }
