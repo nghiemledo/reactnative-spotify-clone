@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using SPO.Infrastructure.EntityFramework.DbContexts;
-
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -14,6 +13,7 @@ using SPO.Domain.Wrappers;
 using SPO.Infrastructure.Repositories;
 using SPO.Application.DataTransferObjects.Request.UserToken;
 using System.Security.Cryptography;
+using SPO.Application.DataTransferObjects.Response.User;
 
 namespace SPO.Server.Controllers
 {
@@ -208,5 +208,156 @@ namespace SPO.Server.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        [HttpPost("follow-artist")]
+        public async Task<IActionResult> FollowArtist([FromBody] FollowArtistRequest request)
+        {
+            try
+            {
+                if (!Guid.TryParse(request.UserId, out Guid userGuid) || !Guid.TryParse(request.ArtistId, out Guid artistGuid))
+                {
+                    return BadRequest(await Result<object>.FailAsync("Invalid UserId or ArtistId format."));
+                }
+
+                var user = await _userRepository.GetByIdAsync(request.UserId);
+                if (user is null)
+                {
+                    return BadRequest(await Result<object>.FailAsync("User not found."));
+                }
+
+                var result = await _userRepository.FollowArtistAsync(request.UserId, request.ArtistId);
+                if (!result)
+                {
+                    return BadRequest(await Result<object>.FailAsync("Failed to follow/unfollow artist."));
+                }
+
+                return Ok(await Result<object>.SuccessAsync("Successfully followed/unfollowed artist."));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(await Result<object>.FailAsync($"Error occurred: {ex.Message}"));
+            }
+        }
+
+        [HttpGet("followed-artists")]
+        public async Task<IActionResult> GetFollowedArtists(string userId)
+        {
+            try
+            {
+                if (!Guid.TryParse(userId, out Guid userGuid))
+                {
+                    return BadRequest(await Result<List<FollowedArtistResponse>>.FailAsync("Invalid UserId format."));
+                }
+
+                var user = await _userRepository.GetByIdAsync(userId);
+                if (user is null)
+                {
+                    return BadRequest(await Result<List<FollowedArtistResponse>>.FailAsync("User not found."));
+                }
+
+                var followedArtists = await _userRepository.GetFollowedArtistsAsync(userId);
+                var results = followedArtists.ToList();
+
+                if (results.Any(r => r.ErrorCode != 0))
+                {
+                    return BadRequest(await Result<List<FollowedArtistResponse>>.FailAsync(
+                        results.First(r => r.ErrorCode != 0).ErrorMessage ?? "Error retrieving followed artists."));
+                }
+
+                var validResults = results
+                    .Where(r => r.ErrorCode == 0 && r.Id.HasValue)
+                    .Select(r => new FollowedArtistResponse
+                    {
+                        Id = r.Id!.Value,
+                        Name = r.Name!,
+                        FollowedAt = r.FollowedAt!.Value
+                    })
+                    .ToList();
+
+                return Ok(await Result<List<FollowedArtistResponse>>.SuccessAsync(validResults, "Successfully retrieved followed artists."));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(await Result<List<FollowedArtistResponse>>.FailAsync($"Error occurred: {ex.Message}"));
+            }
+        }
+
+        [HttpGet("playlists")]
+        public async Task<IActionResult> GetPlaylists(string userId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return BadRequest(await Result<List<GetPlaylistByUserIdResponse>>.FailAsync("Invalid UserId format."));
+                }
+
+                var user = await _userRepository.GetByIdAsync(userId);
+                if (user is null)
+                {
+                    return BadRequest(await Result<List<GetPlaylistByUserIdResponse>>.FailAsync("User not found."));
+                }
+
+                var playlists = await _userRepository.GetPlaylistsByUserIdAsync(userId);
+                var results = playlists.ToList();
+
+                if (results.Any(r => r.ErrorCode != 0))
+                {
+                    return BadRequest(await Result<List<GetPlaylistByUserIdResponse>>.FailAsync(
+                        results.First(r => r.ErrorCode != 0).ErrorMessage ?? "Error retrieving playlists."));
+                }
+
+                var validResults = results
+                    .Where(r => r.ErrorCode == 0 && !string.IsNullOrEmpty(r.Id))
+                    .Select(r => new GetPlaylistByUserIdResponse
+                    {
+                        Id = r.Id!,
+                        Title = r.Title!,
+                        Description = r.Description,
+                        CoverImage = r.CoverImage,
+                        IsPublic = r.IsPublic,
+                        CreatedAt = r.CreatedAt!.Value,
+                        UpdatedAt = r.UpdatedAt
+                    })
+                    .ToList();
+
+                return Ok(await Result<List<GetPlaylistByUserIdResponse>>.SuccessAsync(validResults, "Successfully retrieved playlists."));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(await Result<List<GetPlaylistByUserIdResponse>>.FailAsync($"Error occurred: {ex.Message}"));
+            }
+        }
+
+        [HttpPost("follow-podcast")]
+        public async Task<IActionResult> FollowPodcast([FromBody] FollowPodcastRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.UserId) || string.IsNullOrEmpty(request.ShowId))
+                {
+                    return BadRequest(await Result<object>.FailAsync("Invalid UserId or ShowId format."));
+                }
+
+                var user = await _userRepository.GetByIdAsync(request.UserId);
+                if (user is null)
+                {
+                    return BadRequest(await Result<object>.FailAsync("User not found."));
+                }
+
+                var result = await _userRepository.FollowPodcastAsync(request.UserId, request.ShowId);
+                if (!result)
+                {
+                    return BadRequest(await Result<object>.FailAsync("Failed to follow/unfollow podcast."));
+                }
+
+                return Ok(await Result<object>.SuccessAsync("Successfully followed/unfollowed podcast."));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(await Result<object>.FailAsync($"Error occurred: {ex.Message}"));
+            }
+        }
+
     }
 }
