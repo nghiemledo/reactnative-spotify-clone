@@ -11,6 +11,7 @@ namespace SPO.Infrastructure.Repositories
         Task<bool> DeleteAsync(string id);
         Task<Song?> GetByIdAsync(string id);
         Task<IEnumerable<Song>> GetAllAsync();
+        Task<IEnumerable<Song>> GetAllTrendingAsync();
     }
 
     public class SongRepository : ISongRepository
@@ -99,6 +100,12 @@ namespace SPO.Infrastructure.Repositories
         public async Task<IEnumerable<Song>> GetAllAsync()
         {
             string query = "[SP_SPO_GetAllSongs]";
+            return await _db.GetData<Song, dynamic>(query, new { });
+        }
+
+        public async Task<IEnumerable<Song>> GetAllTrendingAsync()
+        {
+            string query = "[SP_SPO_GetAllTrendingSongs]";
             return await _db.GetData<Song, dynamic>(query, new { });
         }
     }
