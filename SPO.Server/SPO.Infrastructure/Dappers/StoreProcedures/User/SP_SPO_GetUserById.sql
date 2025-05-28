@@ -9,7 +9,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 -- drop procedure [SP_SPO_GetUserById]
-create procedure [dbo].[SP_SPO_GetUserById] (
+alter procedure [dbo].[SP_SPO_GetUserById] (
     @Id nvarchar(MAX)
 )
 as

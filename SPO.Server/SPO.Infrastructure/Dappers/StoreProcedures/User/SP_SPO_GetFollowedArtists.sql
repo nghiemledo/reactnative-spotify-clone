@@ -34,7 +34,7 @@ begin
             a.Name,
             uaf.FollowedAt
         FROM 
-            [dbo].[UserArtistFollows] uaf
+            [dbo].[UserFollows] uaf
             INNER JOIN [dbo].[Artists] a ON uaf.ArtistId = a.Id
         WHERE 
             uaf.UserId = @UserId

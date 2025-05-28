@@ -34,17 +34,17 @@ begin
         begin transaction;
 
         -- Kiểm tra đã follow chưa
-        IF EXISTS (SELECT 1 FROM [dbo].[UserArtistFollows] WHERE [UserId] = @UserId AND [ArtistId] = @ArtistId)
+        IF EXISTS (SELECT 1 FROM [dbo].[UserFollows] WHERE [UserId] = @UserId AND [ArtistId] = @ArtistId)
         BEGIN
             -- Nếu đã follow, xóa (unfollow)
-            DELETE FROM [dbo].[UserArtistFollows]
+            DELETE FROM [dbo].[UserFollows]
             WHERE [UserId] = @UserId AND [ArtistId] = @ArtistId;
         END
         ELSE
         BEGIN
             -- Nếu chưa follow, thêm mới
-            INSERT INTO [dbo].[UserArtistFollows] ([UserId], [ArtistId], [FollowedAt])
-            VALUES (@UserId, @ArtistId, GETDATE());
+            INSERT INTO [dbo].[UserFollows] (Id, [UserId], [ArtistId], [FollowedAt])
+            VALUES (NEWID(), @UserId, @ArtistId, GETDATE());
         END
 
         COMMIT TRANSACTION;
