@@ -359,5 +359,49 @@ namespace SPO.Server.Controllers
             }
         }
 
+        [HttpGet("followed-podcasts")]
+        public async Task<IActionResult> GetFollowedPodcasts(string userId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return BadRequest(await Result<List<FollowedPodcastResponse>>.FailAsync("Invalid UserId format."));
+                }
+
+                var user = await _userRepository.GetByIdAsync(userId);
+                if (user is null)
+                {
+                    return BadRequest(await Result<List<FollowedPodcastResponse>>.FailAsync("User not found."));
+                }
+
+                var followedPodcasts = await _userRepository.GetFollowedPodcastsAsync(userId);
+                var results = followedPodcasts.ToList();
+
+                if (results.Any(r => r.ErrorCode != 0))
+                {
+                    return BadRequest(await Result<List<FollowedPodcastResponse>>.FailAsync(
+                        results.First(r => r.ErrorCode != 0).ErrorMessage ?? "Error retrieving followed podcasts."));
+                }
+
+                var validResults = results
+                    .Where(r => r.ErrorCode == 0 && !string.IsNullOrEmpty(r.Id))
+                    .Select(r => new FollowedPodcastResponse
+                    {
+                        Id = r.Id!,
+                        Title = r.Title!,
+                        Creator = r.Creator!,
+                        FollowedAt = r.FollowedAt!.Value
+                    })
+                    .ToList();
+
+                return Ok(await Result<List<FollowedPodcastResponse>>.SuccessAsync(validResults, "Successfully retrieved followed podcasts."));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(await Result<List<FollowedPodcastResponse>>.FailAsync($"Error occurred: {ex.Message}"));
+            }
+        }
+
     }
 }

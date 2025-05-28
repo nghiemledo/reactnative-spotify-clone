@@ -18,6 +18,7 @@ namespace SPO.Infrastructure.Repositories.UserRoles
         Task<IEnumerable<FollowedArtistResponse>> GetFollowedArtistsAsync(string userId);
         Task<IEnumerable<GetPlaylistByUserIdResponse>> GetPlaylistsByUserIdAsync(string userId);
         Task<bool> FollowPodcastAsync(string userId, string showId);
+        Task<IEnumerable<FollowedPodcastResponse>> GetFollowedPodcastsAsync(string userId);
     }
 
     public class UserRepository : IUserRepository
@@ -176,6 +177,22 @@ namespace SPO.Infrastructure.Repositories.UserRoles
                 return true;
             }
             catch (Exception) { return false; }
+        }
+
+        public async Task<IEnumerable<FollowedPodcastResponse>> GetFollowedPodcastsAsync(string userId)
+        {
+            try
+            {
+                var result = await _db.GetData<FollowedPodcastResponse, dynamic>(
+                    "[dbo].[SP_SPO_GetFollowedPodcasts]",
+                    new { UserId = userId }
+                );
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error occurred when retrieving followed podcasts", ex);
+            }
         }
 
     }
