@@ -29,6 +29,7 @@ import PlayingBottomSheet from "../components/PlayingBottomSheet";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 import { useGetArtistsQuery } from "../services/ArtistService";
 import { Artist } from "../types/artist";
+import SongBottomSheet from "../components/song/SongBottomSheet";
 
 const PlayingScreen = () => {
   const navigation = useNavigation();
@@ -288,12 +289,12 @@ const PlayingScreen = () => {
       </YStack>
 
       {/* PlayingBottomSheet */}
-      <PlayingBottomSheet
+      <SongBottomSheet
         isOpen={isPlayingSheetOpen}
         onClose={() => setIsPlayingSheetOpen(false)}
-        onAddToPlaylist={() => console.log("Add to playlist")}
-        onSleepTimer={() => {}}
-        onShowSpotifyCode={() => console.log("Show Spotify code")}
+        screenType="playing"
+        selectedSong={currentTrack}
+        navigation={navigation}
       />
     </ImageBackground>
   );
