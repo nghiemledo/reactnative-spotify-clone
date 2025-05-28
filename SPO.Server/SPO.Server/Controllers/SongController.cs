@@ -26,7 +26,7 @@ namespace SPO.Server.Controllers
         }
 
         [HttpGet]
-        [Route("/trending")]
+        [Route("trending")]
         public async Task<ActionResult> TrendingSongsGet()
         {
             var result = await _repository.GetAllTrendingAsync();
