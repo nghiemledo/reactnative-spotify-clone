@@ -582,11 +582,25 @@ export const playSong = async (song: Song) => {
 
 export const addTrackToQ = async (track: Track) => {
   try {
+    const currentQueue = await TrackPlayer.getQueue();
+    
+    // Kiểm tra xem track đã có trong queue chưa
+    const existingTrackIndex = currentQueue.findIndex((t) => t.id === track.id);
+    
+    if (existingTrackIndex !== -1) {
+      await TrackPlayer.remove([existingTrackIndex]);
+      store.dispatch(removeTrackFromQueue(track.id));
+      console.log("Removed existing track from queue:", track.title);
+    }
+    
+    // Thêm track vào cuối queue
     await TrackPlayer.add([track]);
     store.dispatch(addTrackToQueue(track));
-    console.log("Track added to queue:", track.title);
+    
+    console.log("Track added to end of queue:", track.title);
   } catch (error) {
     console.error("Add Track Error:", error);
+    throw error; 
   }
 };
 
