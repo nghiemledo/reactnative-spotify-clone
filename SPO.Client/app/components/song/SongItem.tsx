@@ -229,16 +229,21 @@ export const SongItem: React.FC<SongItemProps> = ({
         </XStack>
       </TouchableOpacity>
       <XStack gap="$2">
-        {screen === "queue" && (
-          <Button
-            bg="transparent"
-            size="$2"
-            p={0}
-            onPress={handleRemovePress}
-            icon={<X size={20} color="#b3b3b3" />}
-          />
-        )}
-        {screen !== "queue" && (
+        {screen === "queue" ? (
+          !isPlaying ? (
+            <Button
+              bg="transparent"
+              size="$2"
+              p={0}
+              onPress={handleRemovePress}
+              icon={<X size={20} color="#b3b3b3" />}
+            />
+          ) : (
+            // Hiển thị placeholder giữ layout
+            <XStack width={36} height={36} />
+          )
+        ) : null}
+        {screen !== "queue" && isPlaying && (
           <Button
             bg="transparent"
             size="$3"
