@@ -334,7 +334,6 @@ export async function playbackService() {
   }
 }
 
-// Hàm skipToNext đã có sẵn, nhưng đảm bảo nó cập nhật currentTrack
 export const skipToNext = async () => {
   try {
     const state = store.getState().player;
