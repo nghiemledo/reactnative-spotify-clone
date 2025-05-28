@@ -184,7 +184,7 @@ namespace SPO.Infrastructure.Repositories.UserRoles
             try
             {
                 var result = await _db.GetData<FollowedPodcastResponse, dynamic>(
-                    "[dbo].[SP_SPO_GetFollowedPodcasts]",
+                    "[dbo].[SP_SPO_GetFollowedPodcast]",
                     new { UserId = userId }
                 );
                 return result;

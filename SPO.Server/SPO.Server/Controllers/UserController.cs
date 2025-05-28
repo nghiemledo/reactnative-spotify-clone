@@ -244,7 +244,7 @@ namespace SPO.Server.Controllers
         {
             try
             {
-                if (!Guid.TryParse(userId, out Guid userGuid))
+                if (string.IsNullOrEmpty(userId))
                 {
                     return BadRequest(await Result<List<FollowedArtistResponse>>.FailAsync("Invalid UserId format."));
                 }
@@ -254,7 +254,6 @@ namespace SPO.Server.Controllers
                 {
                     return BadRequest(await Result<List<FollowedArtistResponse>>.FailAsync("User not found."));
                 }
-
                 var followedArtists = await _userRepository.GetFollowedArtistsAsync(userId);
                 var results = followedArtists.ToList();
 
@@ -265,10 +264,10 @@ namespace SPO.Server.Controllers
                 }
 
                 var validResults = results
-                    .Where(r => r.ErrorCode == 0 && r.Id.HasValue)
+                      .Where(r => r.ErrorCode == 0 && !string.IsNullOrEmpty(r.Id))
                     .Select(r => new FollowedArtistResponse
                     {
-                        Id = r.Id!.Value,
+                        Id = r.Id!,
                         Name = r.Name!,
                         FollowedAt = r.FollowedAt!.Value
                     })
