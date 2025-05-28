@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ImageBackground, Image } from "react-native";
 import { YStack, XStack, Text, Button } from "tamagui";
 import { useNavigation } from "@react-navigation/native";
@@ -30,20 +30,26 @@ import TrackPlayer, { useProgress } from "react-native-track-player";
 import { useGetArtistsQuery } from "../services/ArtistService";
 import { Artist } from "../types/artist";
 import SongBottomSheet from "../components/song/SongBottomSheet";
+import AdComponent from "../components/AdComponent";
 
 const PlayingScreen = () => {
   const navigation = useNavigation();
   const { isPlaying, currentTrack, shuffle, loop } = useAppSelector(
     (state) => state.player
   );
+  const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState(false);
   const [isPlayingSheetOpen, setIsPlayingSheetOpen] = useState(false);
+  const [skipCount, setSkipCount] = useState(0);
+  const [showAd, setShowAd] = useState(false);
+  const [lastAdTime, setLastAdTime] = useState(0);
   const { position, duration } = useProgress(1000);
   const {
     data: artists,
     isLoading: isArtistsLoading,
     error: artistsError,
   } = useGetArtistsQuery();
+  const MIN_AD_INTERVAL = 5 * 60 * 1000; // 5 phút
 
   const getArtistName = (artistId: string | undefined) => {
     if (!artistId) return "Unknown Artist";
@@ -51,24 +57,41 @@ const PlayingScreen = () => {
     return artist?.name || "Unknown Artist";
   };
 
+  // Kiểm tra xem có thể hiển thị quảng cáo không
+  const canShowAd = () => {
+    const currentTime = Date.now();
+    return currentTime - lastAdTime >= MIN_AD_INTERVAL;
+  };
+
   // Xử lý khi giá trị slider thay đổi
   const handleSliderChange = async (value: number[]) => {
-    const seekPosition = value[0]; // Lấy giá trị đầu tiên từ mảng
+    const seekPosition = value[0];
     await TrackPlayer.seekTo(seekPosition);
   };
 
-  // Xử lý nút Next và Previous
+  // Xử lý nút Next
   const handleSkipNext = async () => {
     try {
-      await skipToNext();
+      if (skipCount >= 4 && canShowAd()) {
+        setShowAd(true);
+      } else {
+        setSkipCount(skipCount + 1);
+        await skipToNext();
+      }
     } catch (error) {
       console.error("Skip Next Error:", error);
     }
   };
 
+  // Xử lý nút Previous
   const handleSkipPrevious = async () => {
     try {
-      await skipToPrevious();
+      if (skipCount >= 4 && canShowAd()) {
+        setShowAd(true);
+      } else {
+        setSkipCount(skipCount + 1);
+        await skipToPrevious();
+      }
     } catch (error) {
       console.error("Skip Previous Error:", error);
     }
@@ -83,6 +106,19 @@ const PlayingScreen = () => {
     } catch (error) {
       console.error("Toggle Loop Error:", error);
     }
+  };
+
+  // Xử lý khi quảng cáo đóng
+  const handleAdClose = () => {
+    setShowAd(false);
+    setLastAdTime(Date.now());
+  };
+
+  // Xử lý khi nhận thưởng từ quảng cáo
+  const handleAdReward = () => {
+    setSkipCount(0); // Reset số lần skip
+    setShowAd(false);
+    setLastAdTime(Date.now());
   };
 
   // Xử lý trường hợp không có bài hát
@@ -233,7 +269,7 @@ const PlayingScreen = () => {
             icon={<Shuffle size="$2" color={shuffle ? "#15803d" : "#fff"} />}
             bg="transparent"
             circular
-            onPress={toggleShuffle}
+            // onPress={() => dispatch(toggleShuffle())}
             chromeless
           />
           <Button
@@ -261,7 +297,7 @@ const PlayingScreen = () => {
                     <Play size="$4" color="#fff" />
                   )
                 }
-                onPress={togglePlayback}
+                // onPress={() => dispatch(togglePlayback())}
                 bg="$green9"
                 circular
                 size="$6"
@@ -287,6 +323,11 @@ const PlayingScreen = () => {
           />
         </XStack>
       </YStack>
+
+      {/* Ad Component */}
+      {showAd && (
+        <AdComponent onClose={handleAdClose} onReward={handleAdReward} />
+      )}
 
       {/* PlayingBottomSheet */}
       <SongBottomSheet
