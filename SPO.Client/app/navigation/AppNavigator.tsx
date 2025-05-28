@@ -4,7 +4,6 @@ import * as React from "react";
 import SplashNavigator from "./SplashNavigator";
 import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
 import PlayingScreen from "../screens/PlayingScreen";
-import { AddSongPlaylistsScreen } from "../screens/artist/AddSongPlayListsScreen";
 import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
 import { PlaylistsScreen } from "../screens/playlists/PlaylistsScreen";
 import { EditProfileScreen } from "../screens/profile/EditProfileScreen";
@@ -125,11 +124,6 @@ export default function AppNavigator() {
         <Stack.Screen
           name="AddSongPlaylist"
           component={AddSongPlaylistScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="AddSongPlaylists"
-          component={AddSongPlaylistsScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

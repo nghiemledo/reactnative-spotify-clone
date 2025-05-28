@@ -27,7 +27,7 @@ export default function BrowseAll({ data, getRandomHSL }: BrowseAllProps) {
         renderItem={({ item }) => (
           <View flex={1} maxW="50%" mb="$3">
             <TouchableOpacity
-              onPress={() => navigation.navigate("Genre", { genreId: item.id })}
+              onPress={() => navigation.navigate("Genre", { id: item.id })}
             >
               <Card
                 height="$9"

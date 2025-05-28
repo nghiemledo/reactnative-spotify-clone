@@ -327,9 +327,6 @@ export default function AlbumScreen() {
           />
         </XStack>
         <XStack items="center">
-          <Button bg="transparent">
-            <Shuffle color="#1DB954" />
-          </Button>
           <Button
             bg="#1DB954"
             rounded={100}
@@ -497,28 +494,6 @@ export default function AlbumScreen() {
         selectedSong={selectedSong}
         navigation={navigation as any}
         screenType="album"
-        onAddToOtherPlaylist={() => {
-          navigation.navigate("AddToPlaylist");
-        }}
-        onAddToQueue={() => {
-          console.log("Thêm vào hàng đợi");
-        }}
-        onShowSpotifyCode={() => {
-          console.log("Show Spotify code");
-        }}
-        onGoToAlbum={() => {}}
-        onGoToArtist={() => {
-          if (selectedSong?.artistId) {
-            handleNavigation("Artist", { id: selectedSong.artistId });
-          } else {
-            Toast.show({
-              type: "error",
-              text1: "No artist found for this song",
-              position: "bottom",
-              visibilityTime: 2000,
-            });
-          }
-        }}
       />
     </LinearGradient>
   );

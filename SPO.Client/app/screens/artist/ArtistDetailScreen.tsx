@@ -352,7 +352,7 @@ export default function ArtistDetailScreen({
               >
                 {isAdded ? "Following" : "Follow"}
               </Button>
-              <Button
+              {/* <Button
                 bg="transparent"
                 size="$3"
                 p={0}
@@ -360,7 +360,7 @@ export default function ArtistDetailScreen({
                   setIsBottomSheetOpen(true);
                 }}
                 icon={<MoreVertical size={20} color="#b3b3b3" />}
-              />
+              /> */}
             </XStack>
 
             <Button
@@ -368,7 +368,7 @@ export default function ArtistDetailScreen({
               circular
               size="$5"
               icon={<Play size={24} color="#000" fill="#000" />}
-              onPress={handlePlayAll} // Gắn hàm handlePlayAll
+              onPress={handlePlayAll}
             />
           </XStack>
 
@@ -439,16 +439,14 @@ export default function ArtistDetailScreen({
           )}
 
           <H3 color="white" fontSize={20} fontWeight="bold" mt="$6" mb="$3">
-           Fan also like
+            Fan also like
           </H3>
           {isArtistsLoading ? (
             <Spinner size="large" color="$green10" />
           ) : artistsError ? (
             <Text color="white">Error loading Artist</Text>
           ) : !filteredArtists || filteredArtists.length === 0 ? (
-            <Text color="rgba(255,255,255,0.7)">
-              No other artists found
-            </Text>
+            <Text color="rgba(255,255,255,0.7)">No other artists found</Text>
           ) : (
             <FlatList
               data={filteredArtists}
@@ -470,28 +468,6 @@ export default function ArtistDetailScreen({
         selectedSong={selectedSong}
         navigation={navigation as any}
         screenType="artist"
-        onAddToOtherPlaylist={() => {
-          navigation.navigate("AddSongPlaylists");
-        }}
-        onAddToQueue={() => {
-          console.log("Thêm vào hàng đợi");
-        }}
-        onShowSpotifyCode={() => {
-          console.log("Hiển thị mã Spotify");
-        }}
-        onGoToAlbum={() => {
-          if (selectedSong?.albumId) {
-            (navigation as any).navigate("Album", { id: selectedSong.albumId });
-          } else {
-            Toast.show({
-              type: "error",
-              text1: "No album found for this song",
-              position: "bottom",
-              visibilityTime: 2000,
-            });
-          }
-        }}
-        onGoToArtist={() => {}}
       />
       <Toast />
     </YStack>

@@ -19,9 +19,7 @@ import { Artist } from "../types/artist";
 import SongBottomSheet from "../components/song/SongBottomSheet";
 
 interface GenreScreenProps {
-  navigation: NativeStackNavigationProp<
-    SearchStackParamList
-  >;
+  navigation: NativeStackNavigationProp<SearchStackParamList>;
   route: { params: { id: string } };
 }
 
@@ -57,6 +55,7 @@ function GenreScreen({ navigation, route }: GenreScreenProps) {
     const artist = artists?.data?.find((a: Artist) => a.id === artistId);
     return artist?.name || "Unknown Artist";
   };
+  console.log("GenreScreen - genre:", id);
 
   const filteredAlbums = albums?.data?.filter(
     (album: Album) => album.genreId === id
