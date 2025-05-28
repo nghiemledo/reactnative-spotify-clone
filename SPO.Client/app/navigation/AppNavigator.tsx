@@ -4,7 +4,6 @@ import * as React from "react";
 import SplashNavigator from "./SplashNavigator";
 import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
 import PlayingScreen from "../screens/PlayingScreen";
-import { AddSongPlaylistsScreen } from "../screens/artist/AddSongPlayListsScreen";
 import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
 import { PlaylistsScreen } from "../screens/playlists/PlaylistsScreen";
 import { EditProfileScreen } from "../screens/profile/EditProfileScreen";
@@ -21,6 +20,7 @@ import SearchLibraryScreen from "../screens/library/SearchLibraryScreen";
 import AddSongPlaylistScreen from "../screens/playlists/AddSongPlaylistScreen";
 import UpdateSongPlaylistScreen from "../screens/playlists/UpdateSongPlaylistScreen";
 import SearchInPlaylistScreen from "../screens/playlists/SearchInPlaylistScreen";
+import ShareSongScreen from "../screens/ShareSongScreen";
 // import ScanScreen from "../screens/ScanScreen";
 
 const Stack = createStackNavigator();
@@ -127,11 +127,6 @@ export default function AppNavigator() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="AddSongPlaylists"
-          component={AddSongPlaylistsScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
           name="updateSongPlaylist"
           component={UpdateSongPlaylistScreen}
           options={{ headerShown: false }}
@@ -141,16 +136,11 @@ export default function AppNavigator() {
           component={SearchInPlaylistScreen}
           options={{ headerShown: false }}
         />
-        {/* <Stack.Screen
+        <Stack.Screen
           name="shareQrSong"
           component={ShareSongScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="ScanQr"
-          component={ScanScreen}
-          options={{ headerShown: false }}
-        /> */}
 
         <Stack.Screen
           name="search"

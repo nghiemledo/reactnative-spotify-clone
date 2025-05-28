@@ -327,9 +327,6 @@ export default function AlbumScreen() {
           />
         </XStack>
         <XStack items="center">
-          <Button bg="transparent">
-            <Shuffle color="#1DB954" />
-          </Button>
           <Button
             bg="#1DB954"
             rounded={100}
@@ -346,14 +343,14 @@ export default function AlbumScreen() {
   const renderAlbum = () => (
     <YStack mt="$6" mb={70}>
       <Text fontSize={20} fontWeight="bold" color="white" mb="$3">
-        Bạn cũng có thể thích
+        You might also like
       </Text>
       {isAlbumsLoading ? (
         <Spinner size="large" color="$green10" />
       ) : albumsError ? (
-        <Text color="white">Lỗi khi tải danh sách album</Text>
+        <Text color="white">Error loading album list</Text>
       ) : !filteredAlbums || filteredAlbums.length === 0 ? (
-        <Text color="rgba(255,255,255,0.7)">Không tìm thấy album khác</Text>
+        <Text color="rgba(255,255,255,0.7)">No other albums found</Text>
       ) : (
         <FlatList
           data={filteredAlbums}
@@ -465,6 +462,7 @@ export default function AlbumScreen() {
                 });
               }
             }}
+            screen={""}
           />
         )}
         ListHeaderComponent={renderInfo}
@@ -478,8 +476,8 @@ export default function AlbumScreen() {
           ) : (
             <Text color="rgba(255,255,255,0.7)">
               {songsLoading
-                ? "Đang tải bài hát..."
-                : "Không tìm thấy bài hát cho album này"}
+                ? "Loading Songs..."
+                : "No songs found for this album"}
             </Text>
           )
         }
@@ -496,28 +494,6 @@ export default function AlbumScreen() {
         selectedSong={selectedSong}
         navigation={navigation as any}
         screenType="album"
-        onAddToOtherPlaylist={() => {
-          navigation.navigate("AddToPlaylist");
-        }}
-        onAddToQueue={() => {
-          console.log("Thêm vào hàng đợi");
-        }}
-        onShowSpotifyCode={() => {
-          console.log("Hiển thị mã Spotify");
-        }}
-        onGoToAlbum={() => {}}
-        onGoToArtist={() => {
-          if (selectedSong?.artistId) {
-            handleNavigation("Artist", { id: selectedSong.artistId });
-          } else {
-            Toast.show({
-              type: "error",
-              text1: "Không tìm thấy nghệ sĩ cho bài hát này",
-              position: "bottom",
-              visibilityTime: 2000,
-            });
-          }
-        }}
       />
     </LinearGradient>
   );

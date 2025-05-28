@@ -2,6 +2,17 @@
   "expo": {
     "plugins": [
       [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0",
+            "kotlinVersion": "1.8.22"
+          }
+        }
+      ],
+      [
         "react-native-google-mobile-ads",
         {
           "androidAppId": "ca-app-pub-9256713212021306~7812929844"
@@ -28,8 +39,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.truong1510.app"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
@@ -41,9 +51,9 @@
       "package": "com.truong1510.app",
       "permissions": [
         "android.permission.INTERNET",
+        "android.permission.CAMERA",
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
-        "android.permission.CAMERA"
       ],
       "jsEngine": "hermes",
       "config": {
@@ -52,7 +62,7 @@
           "type": "mediaPlayback"
         }
       },
-      "kotlinVersion": "1.9.22",
+      "kotlinVersion": "1.8.22",
       "splash": {
         "backgroundColor": "#FFFFFF"
       },
@@ -82,7 +92,7 @@
     "scheme": "myapp",
     "extra": {
       "eas": {
-        "projectId": "6b489bd4-224d-4c5e-a3e5-d6c640ddd896"
+        "projectId": "7795495a-d7e4-4fc6-9967-9a4085108503"
       }
     }
   }
