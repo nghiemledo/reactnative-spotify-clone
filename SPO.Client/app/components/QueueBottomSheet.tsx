@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import { Text, YStack } from "tamagui";
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -8,6 +8,7 @@ import { Dimensions } from "react-native";
 import { useAppSelector } from "../store";
 import { SongItem } from "./song/SongItem";
 import { Track } from "react-native-track-player";
+import { removeTrackFromQ } from "../services/playerService";
 
 interface QueueBottomSheetProps {
   isOpen: boolean;
@@ -22,6 +23,8 @@ const QueueBottomSheet: React.FC<QueueBottomSheetProps> = ({
   const screenHeight = Dimensions.get("window").height;
   const snapPoints = ["50%", "95%"];
   const { queue } = useAppSelector((state) => state.player);
+  const isRemoving = useRef(false); // Flag to prevent multiple rapid calls
+
   const newQueue = queue.map((item: Track) => ({
     id: item.id,
     title: item.title,
@@ -39,6 +42,20 @@ const QueueBottomSheet: React.FC<QueueBottomSheetProps> = ({
     createdAt: undefined,
     updatedAt: undefined,
   }));
+
+  const handleRemovePress = async (songId: string) => {
+    if (isRemoving.current) return; // Prevent multiple calls
+    isRemoving.current = true;
+
+    try {
+      await removeTrackFromQ(songId);
+      console.log("Track removed from queue:", songId);
+    } catch (error) {
+      console.error("Error removing track:", error);
+    } finally {
+      isRemoving.current = false; // Reset flag
+    }
+  };
 
   const renderBackdrop = useCallback(
     (props: any) => (
@@ -99,10 +116,11 @@ const QueueBottomSheet: React.FC<QueueBottomSheetProps> = ({
                 key={item.id}
                 song={item}
                 showImage={true}
+                screen="queue"
                 onMorePress={() => {
                   console.log("More options pressed for song:", item.title);
-                  // Handle more options logic here
                 }}
+                onRemovePress={handleRemovePress}
               />
             ))}
           </YStack>
