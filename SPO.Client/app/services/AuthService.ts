@@ -101,7 +101,21 @@ export const authServices = baseRestApi.injectEndpoints({
         }
       },
     }),
+    getUserById: builder.query<ApiResponse<UserInfo>, string>({
+      query: (id) => ({
+        url: `${entity}/${id}`,
+        method: "GET",
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error("Get user by ID failed:", error);
+        }
+      },
+    }),
   }),
+  overrideExisting: true, 
 });
 
 export const {
@@ -109,4 +123,5 @@ export const {
   useRegisterMutation,
   useRefreshTokenMutation,
   useLogoutMutation,
+  useGetUserByIdQuery,
 } = authServices;
