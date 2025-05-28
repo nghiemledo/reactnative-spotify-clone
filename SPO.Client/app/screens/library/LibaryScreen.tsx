@@ -25,12 +25,13 @@ import CreateBottomSheet from "../../components/library/CreateBottomSheet";
 import SortBottomSheet from "../../components/library/SortBottomSheet";
 import { MotiView } from "moti";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/AppNavigator";
-
+import { useGetPlaylistsByUserIdQuery } from "../../services/playlistServices"; // Import new API hook
+import { UserInfo } from "../../types/user";
+import { useSelector } from "react-redux";
 
 type Data = {
-  id: number;
+  id: string;
   type: string;
   name: string;
   image: string;
@@ -39,58 +40,11 @@ type Data = {
   creator?: string;
 };
 
-const initialData: Data[] = [
-  {
-    id: 1,
-    type: "artist",
-    name: "HieuThuHai",
-    image: "https://i.pravatar.cc/150?img=3",
-    createdAt: "2025-05-10T11:21:00+07:00",
-    creator: "UserA",
-  },
-  {
-    id: 2,
-    type: "playlist",
-    name: "HieuThuHai",
-    artists: [
-      { id: 1, name: "MANBO" },
-      { id: 2, name: "obito" },
-    ],
-    image: "https://i.pravatar.cc/150?img=3",
-    createdAt: "2025-05-12T11:21:00+07:00",
-    creator: "UserB",
-  },
-  {
-    id: 3,
-    type: "album",
-    name: "Hà Nội",
-    artists: [
-      { id: 1, name: "MANBO" },
-      { id: 2, name: "obito" },
-      { id: 3, name: "dangrangto" },
-      { id: 4, name: "tlinh" },
-      { id: 5, name: "mck" },
-    ],
-    image: "https://i.pravatar.cc/150?img=3",
-    createdAt: "2025-05-11T11:21:00+07:00",
-    creator: "UserC",
-  },
-  {
-    id: 4,
-    type: "playlist",
-    name: "playlist",
-    artists: [
-      { id: 1, name: "MANBO" },
-      { id: 2, name: "obito" },
-      { id: 3, name: "dangrangto" },
-      { id: 4, name: "tlinh" },
-      { id: 5, name: "mck" },
-    ],
-    image: "https://i.pravatar.cc/150?img=3",
-    createdAt: "2025-05-13T11:21:00+07:00",
-    creator: "UserA",
-  },
-];
+interface AuthState {
+  token: { accessToken: string; refreshToken: string } | null;
+  user: UserInfo | null;
+  role: string | null;
+}
 
 const tabTypes = [
   { id: 1, name: "Playlists" },
@@ -100,17 +54,41 @@ const tabTypes = [
 ];
 
 const LibraryScreen = () => {
-
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  
+  const user = useSelector((state: { auth: AuthState }) => state.auth.user); // Get user from Redux
+  const userId = user?.id; // Extract userId
+  const {
+    data: playlistData,
+    isLoading,
+    error,
+  } = useGetPlaylistsByUserIdQuery(userId || "", { skip: !userId }); // Fetch playlists by userId
+
   const scrollY = useRef(new Animated.Value(0)).current;
   const headerHeight = 160;
   const [isCreateBottomSheetOpen, setIsCreateBottomSheetOpen] = useState(false);
   const [isSortBottomSheetOpen, setIsSortBottomSheetOpen] = useState(false);
-  const [sortedData, setSortedData] = useState<Data[]>(initialData);
+  const [sortedData, setSortedData] = useState<Data[]>([]);
   const [sortOption, setSortOption] = useState<string>("recents");
   const [isGrid, setIsGrid] = useState(true);
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
+
+  // Map API data to Data format
+  useEffect(() => {
+    if (playlistData?.data) {
+      const mappedData: Data[] = playlistData.data.map((playlist) => ({
+        id: playlist.id,
+        type: "playlist",
+        name: playlist.title,
+        image:
+          playlist.coverImage ||
+          "https://images.unsplash.com/photo-1507838153414-b4b713384a76", // Fallback image
+        createdAt: playlist.createdAt,
+        creator: playlist.userId,
+        artists: [],
+      }));
+      setSortedData(mappedData);
+    }
+  }, [playlistData]);
 
   const toggleIcon = () => {
     setIsGrid((prev) => !prev);
@@ -139,7 +117,7 @@ const LibraryScreen = () => {
     handleCloseCreateBottomSheet();
     switch (option) {
       case "playlist_note":
-        console.log("Create playlist with note");
+        navigation.navigate("CreatePlaylist");
         break;
       case "collaborative_note":
         console.log("Create collaborative playlist");
@@ -156,10 +134,10 @@ const LibraryScreen = () => {
     setSortOption(option);
     handleCloseSortBottomSheet();
 
-    let sorted = [...initialData];
+    let sorted = [...sortedData];
     switch (option) {
       case "recents":
-        sorted.sort((a, b) => b.id - a.id);
+        sorted.sort((a, b) => parseInt(b.id) - parseInt(a.id));
         break;
       case "recentlyAdded":
         sorted.sort((a, b) => {
@@ -180,15 +158,32 @@ const LibraryScreen = () => {
     setSortedData(sorted);
   };
 
-  const handleItems = (type: string) => {
+  // Update handleItems to pass playlist id
+  const handleItems = (type: string, id: string) => {
     if (type === "playlist") {
-      navigation.navigate("DetailPlaylist");
+      navigation.navigate("DetailPlaylist", { id });
     }
   };
 
   const handleClearTab = () => {
     setSelectedTab(null);
   };
+
+  if (!userId) {
+    return <Text color="white">Please log in to view your playlists.</Text>;
+  }
+
+  if (isLoading) {
+    return <Text color="white">Loading...</Text>;
+  }
+
+  if (error) {
+    return (
+      <Text color="white">
+        Failed to load playlists: {JSON.stringify(error)}
+      </Text>
+    );
+  }
 
   return (
     <YStack flex={1} bg="#000" px="$3" pt="$15">
