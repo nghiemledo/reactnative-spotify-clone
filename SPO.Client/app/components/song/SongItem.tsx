@@ -243,7 +243,7 @@ export const SongItem: React.FC<SongItemProps> = ({
             <XStack width={36} height={36} />
           )
         ) : null}
-        {screen !== "queue" && isPlaying && (
+        {screen !== "queue" && (
           <Button
             bg="transparent"
             size="$3"
