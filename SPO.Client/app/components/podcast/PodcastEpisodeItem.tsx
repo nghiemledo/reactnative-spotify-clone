@@ -18,16 +18,16 @@ import { useAppSelector, useAppDispatch } from "../../store";
 import TrackPlayer from "react-native-track-player"; // Import TrackPlayer
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import { setPlaying } from "../../store/playerSlice";
+import { TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 interface PodcastEpisodeItemProps {
   episode: PodcastEpisode;
-  navigation: NativeStackNavigationProp<RootStackParamList>;
 }
 
-export const PodcastEpisodeItem = ({
-  episode,
-  navigation,
-}: PodcastEpisodeItemProps) => {
+export const PodcastEpisodeItem = ({ episode }: PodcastEpisodeItemProps) => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
   const formatDuration = useCallback((durationInSeconds: number) => {
     const minutes = Math.floor(durationInSeconds / 60);
     const hours = Math.floor(minutes / 60);
@@ -41,8 +41,7 @@ export const PodcastEpisodeItem = ({
   // Lấy trạng thái từ Redux store
   const { isPlaying, currentTrack } = useAppSelector((state) => state.player);
   const dispatch = useAppDispatch();
-  const isCurrentEpisodePlaying =
-    isPlaying && currentTrack?.id === episode.id;
+  const isCurrentEpisodePlaying = isPlaying && currentTrack?.id === episode.id;
 
   const handlePlayPause = async () => {
     // Điều hướng ngay lập tức khi nhấn play
@@ -86,18 +85,24 @@ export const PodcastEpisodeItem = ({
 
   return (
     <YStack>
-      <XStack items="center" mb="$4">
-        <SafeImage
-          uri={episode.coverImage || "https://via.placeholder.com/300?text=Podcast+Cover"}
-          width={60}
-          height={60}
-          borderRadius={4}
-          mr="$3"
-        />
-        <Text color="white" fontSize="$5" numberOfLines={1}>
-          {episode.title}
-        </Text>
-      </XStack>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("PodcastEpisodeScreen", { episodeId: episode.id })}
+      >
+        <XStack items="center" mb="$4">
+          <SafeImage
+            uri={
+              episode.coverImage
+            }
+            width={60}
+            height={60}
+            borderRadius={4}
+            mr="$3"
+          />
+          <Text color="white" fontSize="$5" numberOfLines={1}>
+            {episode.title}
+          </Text>
+        </XStack>
+      </TouchableOpacity>
 
       <YStack flex={1}>
         <Text color="rgba(255,255,255,0.7)" fontSize="$3" numberOfLines={3}>
