@@ -1,15 +1,18 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { Dimensions, TouchableOpacity, Alert, Image } from "react-native";
-import { YStack, XStack, Text } from "tamagui";
-import { Plus, ListPlus, QrCode, CircleDot, User } from "@tamagui/lucide-icons";
+import { Dimensions, TouchableOpacity, Alert } from "react-native";
+import { YStack, XStack, Text, Button } from "tamagui";
+import { Plus, ListPlus, QrCode, CircleDot, User, Clock, X } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Song } from "../../types/song";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import SafeImage from "../SafeImage";
+import Toast from "react-native-toast-message";
+import { useAppSelector } from "../../store";
+import { addTrackToQ, cancelSleepTimer, setSleepTimerAsync } from "../../services/playerService";
 
 interface Feature {
   key: string;
@@ -18,12 +21,13 @@ interface Feature {
   action: () => void;
   visibleOnScreens: string[];
 }
+
 interface SongBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   selectedSong: Song | null;
   navigation?: NativeStackNavigationProp<RootStackParamList>;
-  screenType?: "home" | "artist" | "album";
+  screenType?: "home" | "artist" | "album" | "playing";
 }
 
 const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
@@ -35,12 +39,23 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const screenHeight = Dimensions.get("window").height;
+  const [showTimerOptions, setShowTimerOptions] = useState(false);
+  const { sleepTimer } = useAppSelector((state: { player: any; }) => state.player);
 
   const snapPoints = ["80%"];
   const sheetHeight =
-    screenType === "home" ? screenHeight * 0.35 : screenHeight * 0.3;
+    screenType === "home" || showTimerOptions ? screenHeight * 0.35 : screenHeight * 0.3;
 
-  // Xử lý các hành động bên trong component
+  // Calculate remaining time for sleep timer
+  const getTimeLeft = () => {
+    if (!sleepTimer) return null;
+    const timeLeftMs = sleepTimer - Date.now();
+    if (timeLeftMs <= 0) return null;
+    const minutes = Math.ceil(timeLeftMs / 60000);
+    return `${minutes} phút`;
+  };
+
+  // Handle actions within the component
   const handleAddToPlaylist = () => {
     if (selectedSong) {
       Alert.alert("Success", `Added "${selectedSong.title}" to playlist`);
@@ -49,13 +64,58 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
     }
   };
 
-  const handleAddToQueue = () => {
-    if (selectedSong) {
-      Alert.alert("Success", `Added "${selectedSong.title}" to queue`);
+  const handleAddToQueue = async () => {
+  if (!selectedSong) {
+    Toast.show({
+      type: "error",
+      text1: "No song selected",
+      position: "bottom",
+      visibilityTime: 2000,
+    });
+    return;
+  }
+
+  if (!selectedSong.audioUrl || !selectedSong.title) {
+    Toast.show({
+      type: "error",
+      text1: "Invalid song data",
+      position: "bottom",
+      visibilityTime: 2000,
+    });
+    return;
+  }
+
+  try {
+    const track = {
+      id: selectedSong.id || `song-${selectedSong.title}`,
+      url: selectedSong.audioUrl,
+      title: selectedSong.title,
+      artist: selectedSong.artistId || "Unknown Artist",
+      artwork:
+        selectedSong.coverImage || "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f6eefc406626c4c6f14215919",
+      duration: selectedSong.duration || 0,
+    };
+
+    await addTrackToQ(track);
+    
+     if (track) {
+      Alert.alert("Success", `Added "${track.title}" to queue`);
     } else {
       Alert.alert("Error", "No song selected");
     }
-  };
+    
+    onClose();
+    
+  } catch (error) {
+    console.error("Add to Queue Error:", error);
+    Toast.show({
+      type: "error",
+      text1: "Failed to add song to queue",
+      position: "bottom",
+      visibilityTime: 2000,
+    });
+  }
+};
 
   const handleShowSpotifyCode = () => {
     if (selectedSong) {
@@ -91,14 +151,36 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
     }
   };
 
-  // Cấu hình các chức năng
+  const handleSetTimer = (minutes: number) => {
+    setSleepTimerAsync(minutes);
+    setShowTimerOptions(false);
+    Toast.show({
+      type: "success",
+      text1: `Hẹn giờ đã được đặt cho ${minutes} phút`,
+      position: "bottom",
+      visibilityTime: 2000,
+    });
+  };
+
+  const handleCancelTimer = () => {
+    cancelSleepTimer();
+    setShowTimerOptions(false);
+    Toast.show({
+      type: "success",
+      text1: "Hẹn giờ đã bị hủy",
+      position: "bottom",
+      visibilityTime: 2000,
+    });
+  };
+
+  // Configure features
   const featureConfig: Feature[] = [
     {
       key: "addToPlaylist",
       label: "Add to Playlist",
       icon: <Plus size="$2" color="white" />,
       action: handleAddToPlaylist,
-      visibleOnScreens: ["home", "artist", "album"],
+      visibleOnScreens: ["home", "artist", "album", "playing"],
     },
     {
       key: "addToQueue",
@@ -126,7 +208,14 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
       label: "Show Spotify Code",
       icon: <QrCode size="$2" color="white" />,
       action: handleShowSpotifyCode,
-      visibleOnScreens: ["home", "artist", "album"],
+      visibleOnScreens: ["home", "artist", "album", "playing"],
+    },
+    {
+      key: "setTimer",
+      label: `Hẹn giờ ${sleepTimer ? `(${getTimeLeft()})` : ""}`,
+      icon: <Clock size="$2" color="white" />,
+      action: () => setShowTimerOptions(true),
+      visibleOnScreens: ["playing"],
     },
   ];
 
@@ -135,6 +224,7 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
       bottomSheetRef.current?.expand();
     } else {
       bottomSheetRef.current?.close();
+      setShowTimerOptions(false); 
     }
   }, [isOpen]);
 
@@ -154,6 +244,7 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
     (index: number) => {
       if (index === -1) {
         onClose();
+        setShowTimerOptions(false);
       }
     },
     [onClose]
@@ -178,52 +269,90 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
           height: sheetHeight,
         }}
       >
-        <YStack gap="$4">
-          {selectedSong && (
-            <XStack
-              items="center"
-              gap="$3"
-              pr="$2"
-              borderBottomWidth={1}
-              borderBottomColor="gray"
-            >
-              <XStack p="$3" gap="$3">
-                <SafeImage
-                  uri={selectedSong.coverImage}
-                  width={50}
-                  height={50}
-                  borderRadius={8}
-                />
-                <YStack flex={1}>
-                  <Text fontSize={15} fontWeight="300" color="white">
-                    {selectedSong.title || "Unknown Title"}
-                  </Text>
-                  <Text
-                    fontSize={13}
-                    fontWeight="300"
-                    color="rgba(255, 255, 255, 0.7)"
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    Song • by {selectedSong.artist || "Unknown Artist"}
-                  </Text>
-                </YStack>
-              </XStack>
+        {showTimerOptions && screenType === "playing" ? (
+          <YStack gap="$4">
+            <XStack justify="space-between" items="center">
+              <Text fontSize="$6" color="white" fontWeight="600">
+                Chọn thời gian hẹn giờ
+              </Text>
+              <Button
+                icon={<X size="$2" color="white" />}
+                bg="transparent"
+                onPress={() => setShowTimerOptions(false)}
+              />
             </XStack>
-          )}
-          {featureConfig
-            .filter((feature) => feature.visibleOnScreens.includes(screenType))
-            .map((feature) => (
-              <TouchableOpacity key={feature.key} onPress={feature.action}>
+            {[5, 15, 30, 45, 60].map((minutes) => (
+              <TouchableOpacity
+                key={minutes}
+                onPress={() => handleSetTimer(minutes)}
+              >
                 <XStack items="center" gap="$3">
-                  {feature.icon}
+                  <Clock size="$2" color="white" />
                   <Text fontSize="$5" color="white">
-                    {feature.label}
+                    {minutes} phút
                   </Text>
                 </XStack>
               </TouchableOpacity>
             ))}
-        </YStack>
+            {sleepTimer && (
+              <TouchableOpacity onPress={handleCancelTimer}>
+                <XStack items="center" gap="$3">
+                  <X size="$2" color="red" />
+                  <Text fontSize="$5" color="red">
+                    Hủy hẹn giờ
+                  </Text>
+                </XStack>
+              </TouchableOpacity>
+            )}
+          </YStack>
+        ) : (
+          <YStack gap="$4">
+            {selectedSong && (
+              <XStack
+                items="center"
+                gap="$3"
+                pr="$2"
+                borderBottomWidth={1}
+                borderBottomColor="gray"
+              >
+                <XStack p="$3" gap="$3">
+                  <SafeImage
+                    uri={selectedSong.coverImage}
+                    width={50}
+                    height={50}
+                    borderRadius={8}
+                  />
+                  <YStack flex={1}>
+                    <Text fontSize={15} fontWeight="300" color="white">
+                      {selectedSong.title || "Unknown Title"}
+                    </Text>
+                    <Text
+                      fontSize={13}
+                      fontWeight="300"
+                      color="rgba(255, 255, 255, 0.7)"
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      Song • by {selectedSong.artist || "Unknown Artist"}
+                    </Text>
+                  </YStack>
+                </XStack>
+              </XStack>
+            )}
+            {featureConfig
+              .filter((feature) => feature.visibleOnScreens.includes(screenType))
+              .map((feature) => (
+                <TouchableOpacity key={feature.key} onPress={feature.action}>
+                  <XStack items="center" gap="$3">
+                    {feature.icon}
+                    <Text fontSize="$5" color="white">
+                      {feature.label}
+                    </Text>
+                  </XStack>
+                </TouchableOpacity>
+              ))}
+          </YStack>
+        )}
       </BottomSheetView>
     </BottomSheet>
   );
