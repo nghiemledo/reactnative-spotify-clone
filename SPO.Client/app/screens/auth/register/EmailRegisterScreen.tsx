@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { YStack, XStack, Button, Text } from "tamagui";
 import { TouchableOpacity } from "react-native";
-import { InputComponent } from "../../../components/InputComponent";
-import { DatePickerComponent } from "../../../components/DatePickerComponent";
+import { InputComponent } from "../../../components/Register/InputComponent";
+import { DatePickerComponent } from "../../../components/Register/DatePickerComponent"; 
 import { GenderSelectionComponent } from "../../../components/auth/GenderSelectionComponent";
 import { TermsAndPreferencesComponent } from "../../../components/auth/TermsAndPreferencesComponent";
 import { ArrowLeft } from "@tamagui/lucide-icons";
