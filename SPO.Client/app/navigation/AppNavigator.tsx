@@ -21,6 +21,7 @@ import AddSongPlaylistScreen from "../screens/playlists/AddSongPlaylistScreen";
 import UpdateSongPlaylistScreen from "../screens/playlists/UpdateSongPlaylistScreen";
 import SearchInPlaylistScreen from "../screens/playlists/SearchInPlaylistScreen";
 import ShareSongScreen from "../screens/ShareSongScreen";
+import CreatePlaylistScreen from "../screens/playlists/CreatePlaylistScreen";
 // import ScanScreen from "../screens/ScanScreen";
 
 const Stack = createStackNavigator();
@@ -44,11 +45,12 @@ export type RootStackParamList = {
     type: "artist" | "podcast";
     selectedIds: string[];
   };
-  DetailPlaylist: undefined;
-  AddToPlaylist: { songId?: number; currentPlaylistId?: number };
-  AddSongPlaylist: undefined;
-  updateSongPlaylist: undefined;
+  DetailPlaylist: { id: string };
+  AddToPlaylist: { songId?: string; currentPlaylistId?: string };
+  AddSongPlaylist: {playlistId: string };
+  updateSongPlaylist: {playlistId: string };
   SearchInPlaylist: { Items: Song[] };
+  CreatePlaylist: undefined;
 };
 
 export default function AppNavigator() {
@@ -145,6 +147,11 @@ export default function AppNavigator() {
         <Stack.Screen
           name="search"
           component={SearchScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="CreatePlaylist"
+          component={CreatePlaylistScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
