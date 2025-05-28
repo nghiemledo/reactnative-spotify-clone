@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { XStack, YStack, Text, Button } from "tamagui";
-import { MoreVertical } from "@tamagui/lucide-icons";
+import { MoreVertical, X } from "@tamagui/lucide-icons";
 import { TouchableOpacity, Animated, Easing } from "react-native";
 import SafeImage from "../SafeImage";
 import { Song } from "../../types/song";
@@ -19,7 +19,8 @@ interface SongItemProps {
   screen: string;
   getArtistName?: (artistId: string | undefined) => string;
   onSongPress?: (song: Song) => void;
-  onMorePress?: (song: Song) => void; // Thêm prop onMorePress
+  onMorePress?: (song: Song) => void;
+  onRemovePress?: (songId: string) => void;
   isPlaying?: boolean;
   navigation?: NativeStackNavigationProp<RootStackParamList>;
 }
@@ -35,6 +36,7 @@ export const SongItem: React.FC<SongItemProps> = ({
   getArtistName,
   onSongPress,
   onMorePress,
+  onRemovePress,
   isPlaying: propIsPlaying = false,
   navigation,
 }) => {
@@ -62,7 +64,13 @@ export const SongItem: React.FC<SongItemProps> = ({
 
   const handleMorePress = () => {
     if (onMorePress) {
-      onMorePress(song); // Gọi callback để thông báo HomeScreen
+      onMorePress(song);
+    }
+  };
+
+  const handleRemovePress = () => {
+    if (onRemovePress && song.id) {
+      onRemovePress(song.id);
     }
   };
 
@@ -135,13 +143,18 @@ export const SongItem: React.FC<SongItemProps> = ({
   if (!song || !song.title || !song.audioUrl) {
     return (
       <XStack items="center" justify="space-between" py="$2">
-        <Text color="white">Dữ liệu bài hát không hợp lệ</Text>
+        <Text color="white">Invalid song data</Text>
       </XStack>
     );
   }
 
   return (
-    <XStack items="center" justify="space-between" py="$2" my="$1.5">
+    <XStack
+      items="center"
+      justify="space-between"
+      py="$2"
+      my={screen === "queue" ? "$2" : "$1.5"}
+    >
       <TouchableOpacity style={{ flex: 1 }} onPress={handlePressSong}>
         <XStack items="center" gap="$3" flex={1}>
           {showIndex && (
@@ -201,7 +214,7 @@ export const SongItem: React.FC<SongItemProps> = ({
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {song.title || "Không có tiêu đề"}
+              {song.title || "Unknown Title"}
             </Text>
             {showArtistName && getArtistName && (
               <Text
@@ -209,19 +222,32 @@ export const SongItem: React.FC<SongItemProps> = ({
                 color="rgba(255,255,255,0.7)"
                 numberOfLines={1}
               >
-                {getArtistName(song.artistId) || "Nghệ sĩ không xác định"}
+                {getArtistName(song.artistId) || "Unknown Artist"}
               </Text>
             )}
           </YStack>
         </XStack>
       </TouchableOpacity>
-      <Button
-        bg="transparent"
-        size="$3"
-        p={0}
-        onPress={handleMorePress}
-        icon={<MoreVertical size={20} color="#b3b3b3" />}
-      />
+      <XStack gap="$2">
+        {screen === "queue" && (
+          <Button
+            bg="transparent"
+            size="$2"
+            p={0}
+            onPress={handleRemovePress}
+            icon={<X size={20} color="#b3b3b3" />}
+          />
+        )}
+        {screen !== "queue" && (
+          <Button
+            bg="transparent"
+            size="$3"
+            p={0}
+            onPress={handleMorePress}
+            icon={<MoreVertical size={20} color="#b3b3b3" />}
+          />
+        )}
+      </XStack>
     </XStack>
   );
 };
