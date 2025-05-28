@@ -5,14 +5,26 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { Dimensions, TouchableOpacity, Alert } from "react-native";
 import { YStack, XStack, Text, Button } from "tamagui";
-import { Plus, ListPlus, QrCode, CircleDot, User, Clock, X } from "@tamagui/lucide-icons";
+import {
+  Plus,
+  ListPlus,
+  QrCode,
+  CircleDot,
+  User,
+  Clock,
+  X,
+} from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Song } from "../../types/song";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import SafeImage from "../SafeImage";
 import Toast from "react-native-toast-message";
 import { useAppSelector } from "../../store";
-import { addTrackToQ, cancelSleepTimer, setSleepTimerAsync } from "../../services/playerService";
+import {
+  addTrackToQ,
+  cancelSleepTimer,
+  setSleepTimerAsync,
+} from "../../services/playerService";
 
 interface Feature {
   key: string;
@@ -40,11 +52,15 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
   const bottomSheetRef = useRef<BottomSheet>(null);
   const screenHeight = Dimensions.get("window").height;
   const [showTimerOptions, setShowTimerOptions] = useState(false);
-  const { sleepTimer } = useAppSelector((state: { player: any; }) => state.player);
+  const { sleepTimer } = useAppSelector(
+    (state: { player: any }) => state.player
+  );
 
   const snapPoints = ["80%"];
   const sheetHeight =
-    screenType === "home" || showTimerOptions ? screenHeight * 0.35 : screenHeight * 0.3;
+    screenType === "home" || showTimerOptions
+      ? screenHeight * 0.35
+      : screenHeight * 0.3;
 
   // Calculate remaining time for sleep timer
   const getTimeLeft = () => {
@@ -65,57 +81,37 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
   };
 
   const handleAddToQueue = async () => {
-  if (!selectedSong) {
-    Toast.show({
-      type: "error",
-      text1: "No song selected",
-      position: "bottom",
-      visibilityTime: 2000,
-    });
-    return;
-  }
-
-  if (!selectedSong.audioUrl || !selectedSong.title) {
-    Toast.show({
-      type: "error",
-      text1: "Invalid song data",
-      position: "bottom",
-      visibilityTime: 2000,
-    });
-    return;
-  }
-
-  try {
-    const track = {
-      id: selectedSong.id || `song-${selectedSong.title}`,
-      url: selectedSong.audioUrl,
-      title: selectedSong.title,
-      artist: selectedSong.artistId || "Unknown Artist",
-      artwork:
-        selectedSong.coverImage || "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f6eefc406626c4c6f14215919",
-      duration: selectedSong.duration || 0,
-    };
-
-    await addTrackToQ(track);
-    
-     if (track) {
-      Alert.alert("Success", `Added "${track.title}" to queue`);
-    } else {
-      Alert.alert("Error", "No song selected");
+    if (!selectedSong || !selectedSong.audioUrl || !selectedSong.title) {
+      Toast.show({
+        type: "error",
+        text1: "Dữ liệu bài hát không hợp lệ",
+        position: "bottom",
+      });
+      return;
     }
-    
-    onClose();
-    
-  } catch (error) {
-    console.error("Add to Queue Error:", error);
-    Toast.show({
-      type: "error",
-      text1: "Failed to add song to queue",
-      position: "bottom",
-      visibilityTime: 2000,
-    });
-  }
-};
+
+    try {
+      const track = {
+        id: selectedSong.id || `song-${selectedSong.title}`,
+        url: selectedSong.audioUrl,
+        title: selectedSong.title,
+        artist: selectedSong.artistId || "Unknown Artist",
+        artwork: selectedSong.coverImage,
+        duration: selectedSong.duration || 0,
+      };
+
+      await addTrackToQ(track);
+      Alert.alert("Success", `Added "${track.title}" to queue`);
+      onClose();
+    } catch (err) {
+      console.error(err);
+      Toast.show({
+        type: "error",
+        text1: "Failed to add song to queue",
+        position: "bottom",
+      });
+    }
+  };
 
   const handleShowSpotifyCode = () => {
     if (selectedSong) {
@@ -224,7 +220,7 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
       bottomSheetRef.current?.expand();
     } else {
       bottomSheetRef.current?.close();
-      setShowTimerOptions(false); 
+      setShowTimerOptions(false);
     }
   }, [isOpen]);
 
@@ -340,7 +336,9 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
               </XStack>
             )}
             {featureConfig
-              .filter((feature) => feature.visibleOnScreens.includes(screenType))
+              .filter((feature) =>
+                feature.visibleOnScreens.includes(screenType)
+              )
               .map((feature) => (
                 <TouchableOpacity key={feature.key} onPress={feature.action}>
                   <XStack items="center" gap="$3">
