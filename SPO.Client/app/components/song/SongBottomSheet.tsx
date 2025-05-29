@@ -13,7 +13,10 @@ import {
   User,
   Clock,
   X,
-  Heart, // Thêm icon cho Add to Liked Songs
+  Heart,
+  Share2,
+  Radio,
+  FileText,
 } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Song } from "../../types/song";
@@ -35,13 +38,20 @@ interface Feature {
   visibleOnScreens: string[];
 }
 
+interface SongWithPlaylist extends Song {
+  playlistItemId?: string;
+  playlistId?: string;
+}
+
 interface SongBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedSong: Song | null;
+  selectedSong: SongWithPlaylist | null;
   navigation?: NativeStackNavigationProp<RootStackParamList>;
-  screenType?: "home" | "artist" | "album" | "playing" | "detailPlaylist" | "search"; // Thêm search
-  onSelectOption?: (option: string) => void; // Đã có prop để xử lý hành động
+  screenType?: "home" | "artist" | "album" | "playing" | "detailPlaylist" | "search";
+  sortedItems?: SongWithPlaylist[];
+  setSortedItems?: (items: SongWithPlaylist[]) => void;
+  deletePlaylistItem?: (id: string) => Promise<void>;
 }
 
 const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
@@ -50,14 +60,14 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
   selectedSong,
   navigation,
   screenType = "home",
-  onSelectOption,
+  sortedItems,
+  setSortedItems,
+  deletePlaylistItem,
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const screenHeight = Dimensions.get("window").height;
   const [showTimerOptions, setShowTimerOptions] = useState(false);
-  const { sleepTimer } = useAppSelector(
-    (state: { player: any }) => state.player
-  );
+  const { sleepTimer } = useAppSelector((state: { player: any }) => state.player);
 
   const snapPoints = ["80%"];
   const sheetHeight =
@@ -77,11 +87,29 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
   // Handle actions within the component
   const handleAddToPlaylist = () => {
     if (selectedSong) {
-      if (onSelectOption) {
-        onSelectOption("addToPlaylist");
-      } else {
-        Alert.alert("Success", `Added "${selectedSong.title}" to playlist`);
+      if (!navigation) {
+        Alert.alert("Error", "Navigation is not available");
+        return;
       }
+      navigation.navigate("AddToPlaylist", { songId: selectedSong.id || "" });
+      onClose();
+    } else {
+      Alert.alert("Error", "No song selected");
+    }
+  };
+
+  const handleAddToOtherPlaylist = () => {
+    if (selectedSong) {
+      if (!navigation) {
+        Alert.alert("Error", "Navigation is not available");
+        return;
+      }
+      console.log(`Add ${selectedSong.title} to another playlist`);
+      navigation.navigate("AddToPlaylist", {
+        songId: selectedSong.id,
+        currentPlaylistId: selectedSong.playlistId,
+      });
+      onClose();
     } else {
       Alert.alert("Error", "No song selected");
     }
@@ -108,11 +136,12 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
       };
 
       await addTrackToQ(track);
-      if (onSelectOption) {
-        onSelectOption("addToQueue");
-      } else {
-        Alert.alert("Success", `Added "${track.title}" to queue`);
-      }
+      console.log(`Add ${selectedSong.title} to queue`);
+      Toast.show({
+        type: "success",
+        text1: `Added "${track.title}" to queue`,
+        position: "bottom",
+      });
       onClose();
     } catch (err) {
       console.error(err);
@@ -126,13 +155,12 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
 
   const handleShowSpotifyCode = () => {
     if (selectedSong) {
-      if (onSelectOption) {
-        onSelectOption("showSpotifyCode");
-      } else {
-        navigation?.navigate("shareQrSong", {
-          song: selectedSong,
-        });
+      if (!navigation) {
+        Alert.alert("Error", "Navigation is not available");
+        return;
       }
+      navigation.navigate("shareQrSong", { song: selectedSong });
+      onClose();
     } else {
       Alert.alert("Error", "No song selected");
     }
@@ -144,12 +172,10 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
       return;
     }
     if (selectedSong?.albumId) {
-      if (onSelectOption) {
-        onSelectOption("goToAlbum");
-      } else {
-        navigation.navigate("Album", { id: selectedSong.albumId });
-      }
+      navigation.navigate("Album", { id: selectedSong.albumId });
+      onClose();
     } else {
+      console.log("No album information available");
       Alert.alert("Error", "No album information available");
     }
   };
@@ -160,13 +186,53 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
       return;
     }
     if (selectedSong?.artistId) {
-      if (onSelectOption) {
-        onSelectOption("goToArtist");
-      } else {
-        navigation.navigate("Artist", { id: selectedSong.artistId });
-      }
+      navigation.navigate("Artist", { id: selectedSong.artistId });
+      onClose();
     } else {
+      console.log("No artist information available");
       Alert.alert("Error", "No artist information available");
+    }
+  };
+
+  const handleShare = () => {
+    if (selectedSong) {
+      console.log(`Share ${selectedSong.title}`);
+      Toast.show({
+        type: "success",
+        text1: `Shared "${selectedSong.title}"`,
+        position: "bottom",
+      });
+      onClose();
+    } else {
+      Alert.alert("Error", "No song selected");
+    }
+  };
+
+  const handleGoToSongRadio = () => {
+    if (selectedSong) {
+      console.log(`Go to song radio for ${selectedSong.title}`);
+      Toast.show({
+        type: "info",
+        text1: `Navigating to song radio for "${selectedSong.title}"`,
+        position: "bottom",
+      });
+      onClose();
+    } else {
+      Alert.alert("Error", "No song selected");
+    }
+  };
+
+  const handleViewSongCredits = () => {
+    if (selectedSong) {
+      console.log(`View credits for ${selectedSong.title}`);
+      Toast.show({
+        type: "info",
+        text1: `Viewing credits for "${selectedSong.title}"`,
+        position: "bottom",
+      });
+      onClose();
+    } else {
+      Alert.alert("Error", "No song selected");
     }
   };
 
@@ -192,18 +258,46 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
     });
   };
 
-  const handleRemoveFromPlaylist = () => {
-    if (selectedSong && onSelectOption) {
-      onSelectOption("removeFromThisPlaylist");
-    } else {
+  const handleRemoveFromPlaylist = async () => {
+    if (!selectedSong) {
       Alert.alert("Error", "No song selected");
+      return;
     }
+
+    if (sortedItems && setSortedItems) {
+      setSortedItems(sortedItems.filter((item) => item.id !== selectedSong.id));
+    }
+
+    if (selectedSong.playlistItemId && deletePlaylistItem) {
+      try {
+        await deletePlaylistItem(selectedSong.playlistItemId);
+        Toast.show({
+          type: "success",
+          text1: `Removed "${selectedSong.title}" from playlist`,
+          position: "bottom",
+        });
+      } catch (error) {
+        console.error("Error removing song from playlist:", error);
+        Toast.show({
+          type: "error",
+          text1: "Failed to remove song from playlist",
+          position: "bottom",
+        });
+      }
+    }
+
+    onClose();
   };
 
-  // Thêm handler cho Add to Liked Songs
   const handleAddToLikedSongs = () => {
-    if (selectedSong && onSelectOption) {
-      onSelectOption("addToLikedSongs");
+    if (selectedSong) {
+      Toast.show({
+        type: "success",
+        text1: "Added to liked songs",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+      onClose();
     } else {
       Alert.alert("Error", "No song selected");
     }
@@ -212,7 +306,7 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
   // Configure features
   const featureConfig: Feature[] = [
     {
-      key: "addToLikedSongs", // Thêm tùy chọn từ SongOptionsBottomSheet
+      key: "addToLikedSongs",
       label: "Add to Liked Songs",
       icon: <Heart size="$2" color="white" />,
       action: handleAddToLikedSongs,
@@ -223,14 +317,21 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
       label: "Add to Playlist",
       icon: <Plus size="$2" color="white" />,
       action: handleAddToPlaylist,
-      visibleOnScreens: ["home", "artist", "album", "playing", "detailPlaylist", "search"], // Thêm search
+      visibleOnScreens: ["home", "artist", "album", "playing", "detailPlaylist", "search"],
+    },
+    {
+      key: "addToOtherPlaylist",
+      label: "Add to Other Playlist",
+      icon: <Plus size="$2" color="white" />,
+      action: handleAddToOtherPlaylist,
+      visibleOnScreens: ["detailPlaylist"],
     },
     {
       key: "addToQueue",
       label: "Add to Queue",
       icon: <ListPlus size="$2" color="white" />,
       action: handleAddToQueue,
-      visibleOnScreens: ["home", "artist", "album", "detailPlaylist", "search"], // Thêm search
+      visibleOnScreens: ["home", "artist", "album", "detailPlaylist", "search"],
     },
     {
       key: "goToAlbum",
@@ -244,14 +345,35 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
       label: "Go to Artist",
       icon: <User size="$2" color="white" />,
       action: handleGoToArtist,
-      visibleOnScreens: ["home", "album", "detailPlaylist", "search"], // Thêm search
+      visibleOnScreens: ["home", "album", "detailPlaylist", "search"],
     },
     {
       key: "showSpotifyCode",
       label: "Show Spotify Code",
       icon: <QrCode size="$2" color="white" />,
       action: handleShowSpotifyCode,
-      visibleOnScreens: ["home", "artist", "album", "playing", "detailPlaylist", "search"], // Thêm search
+      visibleOnScreens: ["home", "artist", "album", "playing", "detailPlaylist", "search"],
+    },
+    {
+      key: "share",
+      label: "Share",
+      icon: <Share2 size="$2" color="white" />,
+      action: handleShare,
+      visibleOnScreens: ["detailPlaylist"],
+    },
+    {
+      key: "goToSongRadio",
+      label: "Go to Song Radio",
+      icon: <Radio size="$2" color="white" />,
+      action: handleGoToSongRadio,
+      visibleOnScreens: ["detailPlaylist"],
+    },
+    {
+      key: "viewSongCredits",
+      label: "View Song Credits",
+      icon: <FileText size="$2" color="white" />,
+      action: handleViewSongCredits,
+      visibleOnScreens: ["detailPlaylist"],
     },
     {
       key: "removeFromThisPlaylist",
@@ -390,9 +512,7 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
               </XStack>
             )}
             {featureConfig
-              .filter((feature) =>
-                feature.visibleOnScreens.includes(screenType)
-              )
+              .filter((feature) => feature.visibleOnScreens.includes(screenType))
               .map((feature) => (
                 <TouchableOpacity key={feature.key} onPress={feature.action}>
                   <XStack items="center" gap="$3">

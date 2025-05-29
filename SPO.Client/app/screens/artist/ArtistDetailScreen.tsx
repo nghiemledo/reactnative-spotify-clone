@@ -25,11 +25,13 @@ import {
   addTrackToQ,
   setPlayerQueue,
 } from "../../services/playerService";
-import { store } from "../../store";
+import { store, useAppSelector } from "../../store";
 import {
   setCurrentTrack,
   setQueue as setReduxQueue,
 } from "../../store/playerSlice";
+import AdComponent from "../../components/AdComponent";
+import { useFollowArtistMutation } from "../../services/AuthService";
 
 // Định nghĩa type cho navigation với RootStackParamList
 type ArtistScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -45,6 +47,9 @@ export default function ArtistDetailScreen({
   const [isAdded, setIsAdded] = useState(false);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
+  const [showAd, setShowAd] = useState(false);
+  const userId = useAppSelector((state) => state.auth.user?.id);
+  const [followArtist, { isLoading: isFollowLoading }] = useFollowArtistMutation()
 
   const {
     data: songs,
@@ -96,15 +101,38 @@ export default function ArtistDetailScreen({
     });
   }, [navigation]);
 
-  const handleAddButtonPress = useCallback(() => {
-    setIsAdded((prev) => !prev);
-    Toast.show({
-      type: "success",
-      text1: isAdded ? "OK, you unfollowing" : "OK, you're following",
-      position: "bottom",
-      visibilityTime: 2000,
-    });
-  }, [isAdded]);
+  const handleAddButtonPress = useCallback(async () => {
+    if (!userId) {
+      Toast.show({
+        type: "error",
+        text1: "Vui lòng đăng nhập để theo dõi nghệ sĩ",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+      return;
+    }
+
+    try {
+      await followArtist({ UserId: userId, ArtistId: route.params.id }).unwrap();
+      setIsAdded((prev) => !prev);
+      Toast.show({
+        type: "success",
+        text1: isAdded ? "Đã hủy theo dõi nghệ sĩ" : "Đã theo dõi nghệ sĩ",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+      console.log({ userId, artistId: route.params.id });
+      
+    } catch (error) {
+      console.error("Follow artist failed:", error);
+      Toast.show({
+        type: "error",
+        text1: "Không thể theo dõi/hủy theo dõi nghệ sĩ",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+    }
+  }, [userId, route.params.id, isAdded, followArtist]);
 
   const handleMorePress = (song: Song) => {
     setSelectedSong(song);
@@ -123,6 +151,7 @@ export default function ArtistDetailScreen({
 
   // Hàm xử lý khi nhấn nút Play
   const handlePlayAll = async () => {
+    setShowAd(true);
     if (!artistSongs || artistSongs.length === 0) {
       Toast.show({
         type: "error",
@@ -130,6 +159,7 @@ export default function ArtistDetailScreen({
         position: "bottom",
         visibilityTime: 2000,
       });
+
       return;
     }
 
@@ -142,7 +172,7 @@ export default function ArtistDetailScreen({
         artist: song.artistId || "Nghệ sĩ không xác định",
         artwork:
           song.coverImage ||
-          "https://via.placeholder.com/300?text=Không+có+hình+ảnh",
+          "https://via.placeholder.com/300?text=Khôngcóhìnhảnh",
         duration: song.duration || 0,
       }));
 
@@ -349,8 +379,13 @@ export default function ArtistDetailScreen({
                 fontSize={12}
                 px="$4"
                 onPress={handleAddButtonPress}
+                disabled={isFollowLoading}
               >
-                {isAdded ? "Following" : "Follow"}
+                {isFollowLoading
+                  ? "Loading..."
+                  : isAdded
+                  ? "Following"
+                  : "Follow"}
               </Button>
               {/* <Button
                 bg="transparent"
@@ -470,6 +505,18 @@ export default function ArtistDetailScreen({
         screenType="artist"
       />
       <Toast />
+      {showAd && (
+        <AdComponent
+          onClose={() => setShowAd(false)} // Ẩn AdComponent khi quảng cáo đóng
+          onReward={() => {
+            console.log("🎉 Người dùng đã nhận thưởng từ quảng cáo!");
+            setShowAd(false);
+          }}
+        />
+      )}
     </YStack>
   );
+}
+function useFollowArtistByUserID(): [any, { isLoading: any }] {
+  throw new Error("Function not implemented.");
 }

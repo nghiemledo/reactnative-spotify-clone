@@ -1,6 +1,6 @@
 import { baseRestApi } from "./api";
 import { setCredentials, logout } from "../store/authSlice";
-import { UserCredential, UserInfo } from "../types/user";
+import { FollowArtistRequest, FollowPodcastRequest, UpdateUserProfile, UserCredential, UserInfo } from "../types/user";
 import { useAppSelector, RootState } from "../store";
 import { ApiResponse } from "../types/apiResponse";
 
@@ -114,6 +114,63 @@ export const authServices = baseRestApi.injectEndpoints({
         }
       },
     }),
+
+    updateUserProfile: builder.mutation<ApiResponse<UserInfo>, UpdateUserProfile>({
+      query: (user) => ({
+        url: `${entity}`,
+        method: "PUT",
+        body: user,
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {          
+          await queryFulfilled;
+        } catch (error) {
+          console.error("Update user profile failed:", error);
+        }
+      },
+    }),
+    followArtist: builder.mutation<ApiResponse<null>, FollowArtistRequest>({
+      query: (request) => ({
+        url: `${entity}/follow-artist`,
+        method: "POST",
+        body: request,
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error("Follow artist failed:", error);
+        }
+      },
+    }),
+    followPodcast: builder.mutation<ApiResponse<null>, FollowPodcastRequest>({
+      query: (request) => ({
+        url: `${entity}/follow-podcast`,
+        method: "POST",
+        body: request,
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error("Follow Podcast failed:", error);
+        }
+      },
+    }),
+    // getFollowedArtists: builder.query<ApiResponse<FollowedArtistResponse[]>, string>({
+    //   query: (userId) => ({
+    //     url: `${entity}/followed-artists`,
+    //     method: "GET",
+    //     params: { userId },
+    //   }),
+    //   async onQueryStarted(_, { queryFulfilled }) {
+    //     try {
+    //       await queryFulfilled;
+    //     } catch (error) {
+    //       console.error("Get followed artists failed:", error);
+    //     }
+    //   },
+    // }),
   }),
   overrideExisting: true, 
 });
@@ -124,4 +181,7 @@ export const {
   useRefreshTokenMutation,
   useLogoutMutation,
   useGetUserByIdQuery,
+  useUpdateUserProfileMutation,
+  useFollowArtistMutation,
+  useFollowPodcastMutation,
 } = authServices;

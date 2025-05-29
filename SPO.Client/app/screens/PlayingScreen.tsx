@@ -42,25 +42,17 @@ const PlayingScreen = () => {
   const [isPlayingSheetOpen, setIsPlayingSheetOpen] = useState(false);
   const [skipCount, setSkipCount] = useState(0);
   const [showAd, setShowAd] = useState(false);
-  const [lastAdTime, setLastAdTime] = useState(0);
   const { position, duration } = useProgress(1000);
   const {
     data: artists,
     isLoading: isArtistsLoading,
     error: artistsError,
   } = useGetArtistsQuery();
-  const MIN_AD_INTERVAL = 5 * 60 * 1000; // 5 phút
 
   const getArtistName = (artistId: string | undefined) => {
     if (!artistId) return "Unknown Artist";
     const artist = artists?.data?.find((a: Artist) => a.id === artistId);
     return artist?.name || "Unknown Artist";
-  };
-
-  // Kiểm tra xem có thể hiển thị quảng cáo không
-  const canShowAd = () => {
-    const currentTime = Date.now();
-    return currentTime - lastAdTime >= MIN_AD_INTERVAL;
   };
 
   // Xử lý khi giá trị slider thay đổi
@@ -72,7 +64,7 @@ const PlayingScreen = () => {
   // Xử lý nút Next
   const handleSkipNext = async () => {
     try {
-      if (skipCount >= 4 && canShowAd()) {
+      if (skipCount >= 2) {
         setShowAd(true);
       } else {
         setSkipCount(skipCount + 1);
@@ -86,7 +78,7 @@ const PlayingScreen = () => {
   // Xử lý nút Previous
   const handleSkipPrevious = async () => {
     try {
-      if (skipCount >= 4 && canShowAd()) {
+      if (skipCount >= 2) {
         setShowAd(true);
       } else {
         setSkipCount(skipCount + 1);
@@ -111,14 +103,12 @@ const PlayingScreen = () => {
   // Xử lý khi quảng cáo đóng
   const handleAdClose = () => {
     setShowAd(false);
-    setLastAdTime(Date.now());
   };
 
   // Xử lý khi nhận thưởng từ quảng cáo
   const handleAdReward = () => {
     setSkipCount(0); // Reset số lần skip
     setShowAd(false);
-    setLastAdTime(Date.now());
   };
 
   // Xử lý trường hợp không có bài hát
@@ -269,7 +259,7 @@ const PlayingScreen = () => {
             icon={<Shuffle size="$2" color={shuffle ? "#15803d" : "#fff"} />}
             bg="transparent"
             circular
-            // onPress={() => dispatch(toggleShuffle())}
+            onPress={toggleShuffle}
             chromeless
           />
           <Button
@@ -297,7 +287,7 @@ const PlayingScreen = () => {
                     <Play size="$4" color="#fff" />
                   )
                 }
-                // onPress={() => dispatch(togglePlayback())}
+                onPress={togglePlayback}
                 bg="$green9"
                 circular
                 size="$6"

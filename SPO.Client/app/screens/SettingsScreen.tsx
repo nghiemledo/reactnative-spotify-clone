@@ -118,7 +118,7 @@ export default function SettingsScreen({
   ];
 
   return (
-    <YStack flex={1} bg="black">
+    <YStack flex={1} bg="black" pb={60}>
       {/* Header */}
       <XStack
         items="center"

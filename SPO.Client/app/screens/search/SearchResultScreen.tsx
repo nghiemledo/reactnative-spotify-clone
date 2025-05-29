@@ -258,27 +258,7 @@ const SearchResultScreen = () => {
     ),
   };
 
-  const handlePress = (id: string) => {
-    setLikedItems((prev) => {
-      const isLiked = prev[id];
-      const song = combinedData.find(
-        (item) => item.id === id && item.type === "song"
-      ) as SongSearch;
-      if (!isLiked && song) {
-        setSelectedSong(song);
-        Toast.show({
-          type: "success",
-          text1: "Added to liked songs",
-          position: "bottom",
-          visibilityTime: 2000,
-          autoHide: true,
-        });
-      } else {
-        setSelectedSong(null);
-      }
-      return { ...prev, [id]: !isLiked };
-    });
-  };
+ 
 
   const handleSearchSubmit = () => {
     setSearchQuery(searchValue);
@@ -304,35 +284,6 @@ const SearchResultScreen = () => {
   const handleCloseSongOptionsBottomSheet = () => {
     setIsSongOptionsOpen(false);
     setSelectedSong(null);
-  };
-
-  const handleSongOptionSelect = (option: string) => {
-    if (!selectedSong) return;
-    switch (option) {
-      case "addToLikedSongs":
-        handlePress(selectedSong?.id || "");
-        break;
-      case "addToPlaylist":
-        navigation.navigate("AddToPlaylist", { songId: selectedSong.id || "" });
-        break;
-      case "addToQueue":
-        console.log(`Add ${selectedSong.title} to queue`); // Cập nhật console log
-        break;
-      case "goToArtist":
-        if (selectedSong.artistId) {
-          navigation.navigate("Artist", { id: selectedSong.artistId });
-        } else {
-          console.log(`No artist ID for ${selectedSong.artist}`);
-        }
-        break;
-      case "showSpotifyCode":
-        navigation.navigate("shareQrSong", { song: selectedSong }); // Cập nhật navigation
-        break;
-      default:
-        console.log(`Unhandled option: ${option}`);
-        break;
-    }
-    handleCloseSongOptionsBottomSheet();
   };
 
   const handleClearTab = () => {
@@ -529,7 +480,6 @@ const SearchResultScreen = () => {
             selectedSong={selectedSong}
             navigation={navigation}
             screenType="search"
-            onSelectOption={handleSongOptionSelect}
           />
         </View>
       )}

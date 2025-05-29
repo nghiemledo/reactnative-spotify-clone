@@ -12,9 +12,10 @@ import { Search } from "@tamagui/lucide-icons";
 import { GreatPicks } from "./GreatPicks";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
-import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
-import { SearchStackParamList } from "../../navigation/SearchNavigator";
 import { RootStackParamList } from "../../navigation/AppNavigator";
+import { useFollowArtistMutation, useFollowPodcastMutation } from "../../services/AuthService";
+import { FollowArtistRequest } from "../../types/user";
+import { useAppSelector } from "../../store";
 
 type SelectionProps<T> = {
   data: T[];
@@ -44,7 +45,16 @@ export const Selection = <T extends { id: string }>({
   isCircular = false,
   type,
 }: SelectionProps<T>) => {
-  const [selectedItems, setSelectedItems] = useState<string[]>(route.params?.selectedIds || []);
+  const [selectedItems, setSelectedItems] = useState<string[]>(
+    route.params?.selectedIds || []
+  );
+  const userId = useAppSelector((state) => state.auth.user?.id);
+
+  const [followArtist, { isLoading: isFollowing, error: followError }] =
+    useFollowArtistMutation();
+    const [followPodcast, { isLoading: isPodcastFollowing, error: followPodcastError }] =
+    useFollowPodcastMutation();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const toggleSelection = (itemId: string) => {
     setSelectedItems((prev) =>
@@ -54,12 +64,65 @@ export const Selection = <T extends { id: string }>({
     );
   };
 
-  const handleDone = () => {
+  const handleDone = async () => {
     if (selectedItems.length === 0) {
       console.log("Please select at least one item.");
+      setErrorMessage("Please select at least one artist.");
       return;
     }
-    setShowGreatPicks(true);
+
+    if (type === "artist") {
+      if (!userId) {
+        setErrorMessage("User ID is not available");
+        return;
+      }
+      try {
+        // Create an array of followArtist mutation promises
+        const followArtistPromises = selectedItems.map((artistId) =>
+          followArtist({
+            ArtistId: artistId,
+            UserId: userId,
+          }).unwrap()
+        )
+
+        // Execute all follow requests concurrently using Promise.all
+        await Promise.all(followArtistPromises);
+
+        // If successful, show GreatPicks and navigate back
+        setShowGreatPicks(true);
+        console.log('Following artists completed');
+        
+      } catch (error) {
+        console.error("Failed to follow artists:", error);
+        setErrorMessage("Failed to follow artists. Please try again.");
+      }
+    } else if (type === "podcast") {
+      if (!userId) {
+        setErrorMessage("User ID is not available");
+        return;
+      }
+      try {
+        const followPodcastPromises = selectedItems.map((showId) =>
+          followPodcast({
+            ShowId: showId,
+            UserId: userId,
+          }).unwrap()
+        );
+
+        // Execute all follow requests concurrently using Promise.all
+        await Promise.all(followPodcastPromises);
+
+        // If successful, show GreatPicks and navigate back
+        setShowGreatPicks(true);
+        console.log('Following podcasts completed');
+        
+      } catch (error) {
+        console.error("Failed to follow podcasts:", error);
+        setErrorMessage("Failed to follow podcasts. Please try again.");
+      }
+    } else {
+      setShowGreatPicks(true);
+    }
   };
 
   const [showGreatPicks, setShowGreatPicks] = useState(false);
@@ -82,7 +145,7 @@ export const Selection = <T extends { id: string }>({
   }, [route.params?.selectedIds]);
 
   const handleSearch = () => {
-    navigation.navigate("SearchLibraryScreen", { type, selectedIds: selectedItems });
+    navigation.navigate("SearchResult", {});
   };
 
   if (showGreatPicks) {
@@ -106,6 +169,11 @@ export const Selection = <T extends { id: string }>({
         <H3 fontWeight="bold" color="white" mb="$3">
           {title}
         </H3>
+        {errorMessage && (
+          <Text color="red" mb="$3">
+            {errorMessage}
+          </Text>
+        )}
         <XStack
           bg="#fff"
           rounded="$4"
@@ -131,7 +199,12 @@ export const Selection = <T extends { id: string }>({
         <FlatList
           data={data}
           renderItem={({ item, index }) =>
-            renderItem(item, index, selectedItems.includes(item.id), toggleSelection)
+            renderItem(
+              item,
+              index,
+              selectedItems.includes(item.id),
+              toggleSelection
+            )
           }
           keyExtractor={keyExtractor}
           numColumns={3}
@@ -153,16 +226,16 @@ export const Selection = <T extends { id: string }>({
             zIndex: 10,
           }}
         >
-          <TouchableOpacity onPress={handleDone}>
+          <TouchableOpacity onPress={handleDone} disabled={isFollowing}>
             <Text
               p="$3"
-              bg="white"
-              color="#000"
+              bg={isFollowing ? "#888" : "white"}
+              color="#000" 
               fontWeight="bold"
               rounded={20}
               px="$5"
             >
-              Done
+              {isFollowing ? "Following..." : "Done"}
             </Text>
           </TouchableOpacity>
         </MotiView>

@@ -24,6 +24,8 @@ import { PodcastEpisode, PodcastShow } from "../../types/podcast";
 import SafeImage from "../../components/SafeImage";
 import { PodcastEpisodeItem } from "../../components/podcast/PodcastEpisodeItem";
 import { RootStackParamList } from "../../navigation/AppNavigator";
+import { useAppSelector } from "../../store";
+import { useFollowPodcastMutation } from "../../services/AuthService";
 
 type PodcastShowRouteProp = RouteProp<HomeStackParamList, "PodcastShow">;
 
@@ -33,8 +35,12 @@ export default function PodcastShowScreen() {
   const route = useRoute<PodcastShowRouteProp>();
   const { showId } = route.params || {};
   const scrollY = useRef(new Animated.Value(0)).current;
+  const [isAdded, setIsAdded] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [activeTab, setActiveTab] = useState<"Episodes" | "About">("Episodes");
+  const userId = useAppSelector((state) => state.auth.user?.id);
+  const [followPodcast, { isLoading: isFollowLoading }] =
+    useFollowPodcastMutation();
 
   const {
     data: showData,
@@ -69,6 +75,25 @@ export default function PodcastShowScreen() {
       }),
     [scrollY]
   );
+
+  const handleAddButtonPress = useCallback(async () => {
+    if (!userId) {
+      console.log("");
+
+      return;
+    }
+
+    try {
+      await followPodcast({
+        UserId: userId,
+        ShowId: route.params.showId,
+      }).unwrap();
+      setIsAdded((prev) => !prev);
+      console.log({ UserId: userId, ShowId: route.params.showId });
+    } catch (error) {
+      console.error("Follow artist failed:", error);
+    }
+  }, [userId, route.params.showId, isAdded, followPodcast]);
 
   const handleScroll = useCallback(
     Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
@@ -204,18 +229,22 @@ export default function PodcastShowScreen() {
           {/* Nút điều khiển */}
           <XStack items="center" mb="$4">
             <Button
-              bg="transparent"
-              rounded={50}
+              mr={15}
               borderWidth={1}
-              borderColor="#fff"
+              borderColor="#b3b3b3"
+              bg="transparent"
+              color="white"
+              fontWeight="bold"
+              fontSize={12}
               px="$4"
-              py="$2"
-              mr="$3"
-              onPress={handleFollowToggle}
+              onPress={handleAddButtonPress}
+              disabled={isFollowLoading}
             >
-              <Text color="white" fontSize="$4">
-                {isFollowing ? "Following" : "Follow"}
-              </Text>
+              {isFollowLoading
+                ? "Loading..."
+                : isAdded
+                ? "Following"
+                : "Follow"}
             </Button>
             <Button chromeless p={0} mr="$3">
               <Bell size={24} color="white" />

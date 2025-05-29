@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { useGetPodcastShowsQuery } from "../../services/PodcastService";
 
 type Podcast = {
   id: string;
@@ -39,11 +38,6 @@ const SearchLibraryScreen = () => {
     isLoading: isArtistsLoading,
     error: artistsError,
   } = useGetArtistsQuery();
-    const {
-    data: podcasts,
-    isLoading: isPodcastsLoading,
-    error: podcastsError,
-  } = useGetPodcastShowsQuery();
   const { width, height } = Dimensions.get("window");
   const [searchValue, setSearchValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,14 +45,10 @@ const SearchLibraryScreen = () => {
 
   const normalize = (s: string) => s.trim().toLowerCase();
 
+  const initialPodcasts: Podcast[] = []; // TODO: Replace with actual podcast data source
+  
   const data: Item[] =
-    type === "artist"
-      ? artists?.data || []
-      : (podcasts?.data || []).map((podcast) => ({
-          ...podcast,
-          type: "podcast",
-        }));
-
+      type === "artist" ? artists?.data || [] : initialPodcasts;
 
   const filteredData =
     searchQuery.trim() === ""
