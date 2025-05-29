@@ -1,13 +1,9 @@
 import React, { useState } from "react";
 import { YStack, Button, Text } from "tamagui";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
 import QueueBottomSheet from "../components/queue/QueueBottomSheet";
-
-type QueueScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "Queue"
->;
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../navigation/AppNavigator";
 
 // Định nghĩa interface QueueItem
 interface QueueItem {
@@ -38,11 +34,9 @@ const initialQueueItems: QueueItem[] = [
   },
 ];
 
-export default function QueueScreen({
-  navigation,
-}: {
-  navigation: QueueScreenNavigationProp;
-}) {
+const QueueScreen = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [currentSongId, setCurrentSongId] = useState<string | null>("1");
   const [isPlaying, setIsPlaying] = useState(false);
@@ -74,13 +68,13 @@ export default function QueueScreen({
   };
 
   return (
-    <YStack flex={1} alignItems="center" justifyContent="center" padding="$4">
-      <Text fontSize={20} fontWeight="bold" marginBottom="$4">
+    <YStack flex={1} items="center" justify="center" p="$4">
+      <Text fontSize={20} fontWeight="bold" mb="$4">
         Queue Screen
       </Text>
       <Button
         size="$4"
-        backgroundColor="#1DB954"
+        bg="#1DB954"
         color="black"
         onPress={handleOpenBottomSheet}
       >
@@ -100,4 +94,6 @@ export default function QueueScreen({
       />
     </YStack>
   );
-}
+};
+
+export default QueueScreen;

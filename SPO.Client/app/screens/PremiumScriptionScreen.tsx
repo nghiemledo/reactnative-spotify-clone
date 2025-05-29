@@ -11,26 +11,17 @@ import {
   ListPlus,
   Star,
 } from "@tamagui/lucide-icons";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { LinearGradient } from "@tamagui/linear-gradient";
 import { PremiumStackParamList } from "../navigation/PremiumNavigator";
 import { useCreatePaymentMutation } from "../services/paymentService";
 import { PaymentMethod } from "../types/payment";
 import { useAppSelector, RootState } from "../store";
 import { PaymentRequest } from "../services/paymentService";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 
-type PremiumSubscriptionScreenNavigationProp = NativeStackNavigationProp<
-  PremiumStackParamList,
-  "Premium"
->;
-
-type PremiumSubscriptionScreenProps = {
-  navigation: PremiumSubscriptionScreenNavigationProp;
-};
-
-export default function PremiumSubscriptionScreen({
-  navigation,
-}: PremiumSubscriptionScreenProps) {
+ const PremiumSubscriptionScreen=()=> {
+    const navigation =
+      useNavigation<NavigationProp<PremiumStackParamList>>();
   const scrollY = useRef(new Animated.Value(0)).current;
   const [isProcessingIndividual, setIsProcessingIndividual] = useState(false);
   const [isProcessingStudent, setIsProcessingStudent] = useState(false);
@@ -578,3 +569,5 @@ export default function PremiumSubscriptionScreen({
     </YStack>
   );
 }
+
+export default PremiumSubscriptionScreen;
