@@ -5,6 +5,7 @@ import { Play, PlusCircle } from "@tamagui/lucide-icons";
 import { PodcastShow } from "../../types/podcast";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParamList } from "../../navigation/HomeNavigator";
+import { it } from "react-native-paper-dates";
 
 interface PodcastShowItemProps {
   item: PodcastShow;
@@ -12,6 +13,8 @@ interface PodcastShowItemProps {
 }
 
 export const PodcastShowItem = ({ item, navigation }: PodcastShowItemProps) => {
+  console.log("long", item);
+  
   return (
     <YStack
       mr={20}

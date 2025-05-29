@@ -140,7 +140,7 @@ export const SongItem: React.FC<SongItemProps> = ({
     }
   }, [isPlaying]);
 
-  if (!song || !song.title || !song.audioUrl) {
+  if (!song || !song.title ) {
     return (
       <XStack items="center" justify="space-between" py="$2">
         <Text color="white">Invalid song data</Text>
