@@ -19,12 +19,14 @@ import PinnedHeader from "../../components/search/PinnedHeader";
 import BrowseAll from "../../components/search/BrowseAll";
 import { useNavigation } from "@react-navigation/native";
 import { useGetGenresQuery } from "../../services/GenreService";
+import { useAppSelector } from "../../store";
 
 export default function SearchScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const headerHeight = 160;
   const navigation =
     useNavigation<NativeStackNavigationProp<SearchStackParamList>>();
+  const user = useAppSelector((state) => state.auth.user);
 
   const {
     data: genreData,
@@ -99,32 +101,25 @@ export default function SearchScreen() {
         <XStack items="center" justify="space-between" mt="$5">
           <XStack items="center">
             <Avatar circular size="$3">
-              <AvatarImage src="https://i.pravatar.cc/150?img=3" />
-              <AvatarFallback
-                bg="pink"
-                flexDirection="row"
-                justify="center"
-                items="center"
-              >
-                <Text fontWeight="bold" color="black" fontSize="$5">
-                  L
+              <AvatarImage src={user?.urlAvatar} />
+              <Avatar.Fallback>
+                <Text fontWeight="bold" color="white" fontSize="$8">
+                  {user?.fullName?.charAt(0).toUpperCase()}
                 </Text>
-              </AvatarFallback>
+              </Avatar.Fallback>
             </Avatar>
             <Text fontWeight="bold" px="$4" color="white" fontSize="$8">
               Search
             </Text>
           </XStack>
           <TouchableOpacity onPress={() => navigation.navigate("ScanScreen")}>
-          {/* <TouchableOpacity> */}
+            {/* <TouchableOpacity> */}
             <Camera color="white" size="$1.5" />
           </TouchableOpacity>
         </XStack>
 
         <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("SearchResult", { })
-          }
+          onPress={() => navigation.navigate("SearchResult", {})}
         >
           <View
             width="100%"

@@ -178,18 +178,13 @@ const LibraryScreen = () => {
         <XStack items="center" justify="space-between" mt="$5">
           <XStack items="center">
             <Avatar circular size="$3">
-              <AvatarImage src="https://i.pravatar.cc/150?img=3" />
-              <AvatarFallback
-                bg="pink"
-                flexDirection="row"
-                justifyContent="center"
-                alignItems="center"
-              >
-                <Text fontWeight="bold" color="black" fontSize="$5">
-                  L
-                </Text>
-              </AvatarFallback>
-            </Avatar>
+                          <AvatarImage src={user?.urlAvatar} />
+                          <Avatar.Fallback>
+                            <Text fontWeight="bold" color="white" fontSize="$8">
+                              {user?.fullName?.charAt(0).toUpperCase()}
+                            </Text>
+                          </Avatar.Fallback>
+                        </Avatar>
             <Text fontWeight="bold" px="$4" color="white" fontSize="$8">
               Your Library
             </Text>
