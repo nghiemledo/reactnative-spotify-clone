@@ -28,6 +28,7 @@ namespace SPO.Infrastructure.Extensions
             services.AddScoped<IPodcastCategoryRepository, PodcastCategoryRepository>();
             services.AddScoped<IPodcastShowRepository, PodcastShowRepository>();
             services.AddScoped<IPodcastEpisodeRepository, PodcastEpisodeRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
 
         }
     }
