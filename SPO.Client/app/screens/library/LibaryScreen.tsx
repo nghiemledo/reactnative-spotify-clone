@@ -45,8 +45,7 @@ interface AuthState {
 const tabTypes = [
   { id: 1, name: "Playlists" },
   { id: 2, name: "Podcasts" },
-  { id: 3, name: "Albums" },
-  { id: 4, name: "Artists" },
+  { id: 3, name: "Artists" },
 ];
 
 const LibraryScreen = () => {

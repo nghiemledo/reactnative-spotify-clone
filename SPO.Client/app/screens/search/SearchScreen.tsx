@@ -14,10 +14,9 @@ import {
   H5,
 } from "tamagui";
 import { Camera, Search } from "@tamagui/lucide-icons";
-import { FlatList, Animated, TouchableOpacity } from "react-native";
+import { Animated, TouchableOpacity } from "react-native";
 import PinnedHeader from "../../components/search/PinnedHeader";
 import BrowseAll from "../../components/search/BrowseAll";
-import { RootStackParamList } from "../../navigation/AppNavigator";
 import { useNavigation } from "@react-navigation/native";
 import { useGetGenresQuery } from "../../services/GenreService";
 
@@ -85,7 +84,7 @@ export default function SearchScreen() {
           zIndex: 10,
           backgroundColor: "#000",
           paddingHorizontal: 12,
-          paddingTop: 24,
+          // paddingTop: 24,
           transform: [
             {
               translateY: scrollY.interpolate({
@@ -124,7 +123,7 @@ export default function SearchScreen() {
 
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate({ name: "SearchResult", params: {} })
+            navigation.navigate("SearchResult", { })
           }
         >
           <View

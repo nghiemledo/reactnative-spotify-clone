@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { YStack, XStack, Button, Text } from "tamagui";
 import { TouchableOpacity } from "react-native";
 import { InputComponent } from "../../../components/Register/InputComponent";
-import { DatePickerComponent } from "../../../components/Register/DatePickerComponent"; 
+import { DatePickerComponent } from "../../../components/Register/DatePickerComponent";
 import { GenderSelectionComponent } from "../../../components/auth/GenderSelectionComponent";
 import { TermsAndPreferencesComponent } from "../../../components/auth/TermsAndPreferencesComponent";
 import { ArrowLeft } from "@tamagui/lucide-icons";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StatusBar } from "react-native";
 import { z } from "zod";
 import { SplashStackParamList } from "../../../navigation/SplashNavigator";
@@ -203,13 +202,6 @@ const EmailRegisterScreen = () => {
     }
   };
 
-  // Hiển thị lỗi từ API nếu có
-  // useEffect(() => {
-  //   if (error) {
-  //     alert(error);
-  //     dispatch(setError(null));
-  //   }
-  // }, [error, dispatch]);
 
   return (
     <YStack flex={1} bg="#000">
@@ -246,7 +238,7 @@ const EmailRegisterScreen = () => {
 
         <XStack flex={1} justify="center">
           <Text fontSize="$4" fontWeight="bold" color="white" text="center">
-            Tạo tài khoản
+            create account
           </Text>
         </XStack>
 
@@ -307,7 +299,7 @@ const EmailRegisterScreen = () => {
           // disabled={step === 5 && (!isTermsValid || loading)}
         >
           <Text color="#fff" fontSize="$4" fontWeight="bold">
-            {step === inputConfigs.length - 1 ? "Tạo tài khoản" : "Tiếp"}
+            {step === inputConfigs.length - 1 ? "create account" : "Next"}
           </Text>
         </Button>
       </YStack>

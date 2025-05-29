@@ -8,6 +8,7 @@ import { userReducer } from "./user/user.slice";
 import { playlistReducer } from "./playlist/playlist.slice";
 import { podcastCategoryReducer } from "./podcast-category/podcast-category.slice";
 import { podcastShowReducer } from "./podcast-show/podcast-show.slice";
+import { podcastEpisodeReducer } from "./podcast-episode/podcast-episode.slice";
 
 export const store = configureStore({
     reducer: {
@@ -19,6 +20,7 @@ export const store = configureStore({
         playlist: playlistReducer,
         podcastCategory: podcastCategoryReducer,
         podcastShow: podcastShowReducer,
+        podcastEpisode: podcastEpisodeReducer
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({ serializableCheck: false }),

@@ -8,7 +8,6 @@ import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
 import { PlaylistsScreen } from "../screens/playlists/PlaylistsScreen";
 import { EditProfileScreen } from "../screens/profile/EditProfileScreen";
 import AlbumScreen from "../screens/AlbumScreen";
-import { Artist } from "../../admin/src/types/artist.type";
 import ArtistDetailScreen from "../screens/artist/ArtistDetailScreen";
 import { Song } from "../types/song";
 // import ShareSongScreen from "../screens/ShareSongScreen";
@@ -19,7 +18,6 @@ import ArtistSelectionScreen from "../screens/library/ArtistSelectionScreen";
 import SearchLibraryScreen from "../screens/library/SearchLibraryScreen";
 import AddSongPlaylistScreen from "../screens/playlists/AddSongPlaylistScreen";
 import UpdateSongPlaylistScreen from "../screens/playlists/UpdateSongPlaylistScreen";
-import SearchInPlaylistScreen from "../screens/playlists/SearchInPlaylistScreen";
 import ShareSongScreen from "../screens/ShareSongScreen";
 import CreatePlaylistScreen from "../screens/playlists/CreatePlaylistScreen";
 // import ScanScreen from "../screens/ScanScreen";
@@ -45,11 +43,10 @@ export type RootStackParamList = {
     type: "artist" | "podcast";
     selectedIds: string[];
   };
-  DetailPlaylist: { id: string };
+  DetailPlaylist: { id: string }; 
   AddToPlaylist: { songId?: string; currentPlaylistId?: string };
   AddSongPlaylist: {playlistId: string };
   updateSongPlaylist: {playlistId: string };
-  SearchInPlaylist: { Items: Song[] };
   CreatePlaylist: undefined;
 };
 
@@ -133,11 +130,7 @@ export default function AppNavigator() {
           component={UpdateSongPlaylistScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="SearchInPlaylist"
-          component={SearchInPlaylistScreen}
-          options={{ headerShown: false }}
-        />
+        
         <Stack.Screen
           name="shareQrSong"
           component={ShareSongScreen}

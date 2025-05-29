@@ -8,8 +8,7 @@ const tabTypes = [
   { id: 1, name: "All" },
   { id: 2, name: "Songs" },
   { id: 3, name: "Artists" },
-  { id: 4, name: "Albums" },
-  { id: 5, name: "Playlists" },
+  { id: 4, name: "Podcasts" },
 ];
 
 interface TabsProps {

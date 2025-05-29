@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axiosClient from "@/configs/api.config";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { DELETE_USER, GET_USER_BY_ID, GET_USERS, POST_USER, PUT_USER } from "./user.constants";
+import { DELETE_USER, GET_USER_BY_ID, GET_USERS, PATCH_USER_LOCK_OUT, POST_USER, PUT_USER } from "./user.constants";
 import { User } from "@/types/user.type";
 
 export const getUserData = createAsyncThunk(GET_USERS, async (_, { signal, rejectWithValue }) => {
@@ -55,8 +55,8 @@ export const putUserData = createAsyncThunk(PUT_USER, async (body: User, thunkAP
     return response.data.data
 });
 
-export const putUserLockOut = createAsyncThunk(PUT_USER, async (body: { id: string, lockOutEnabled: boolean }, thunkAPI) => {
-    const response = await axiosClient.put(`/user`, body, {
+export const patchUserLockOut = createAsyncThunk(PATCH_USER_LOCK_OUT, async (body: { id: string, lockOutEnabled: boolean }, thunkAPI) => {
+    const response = await axiosClient.patch(`/user`, body, {
         signal: thunkAPI.signal
     });
     return response.data.data

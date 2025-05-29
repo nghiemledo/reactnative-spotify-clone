@@ -29,6 +29,17 @@ export const artistServices = baseRestApi.injectEndpoints({
       }),
       providesTags: (result, error, id) => [{ type: Artist_TAG, id }],
     }),
+    searchArtists: builder.query<{ data: Artist[]; message: string }, string>({
+      query: (keyword = "") => ({
+        url: `${entity}?keyword=${encodeURIComponent(keyword)}`,
+        method: "GET",
+      }),
+      transformResponse: (response: ApiResponse<Artist[]>) => ({
+        data: response.data,
+        message: response.message,
+      }),
+      providesTags: [{ type: Artist_TAG, id: "SEARCH" }],
+    }),
   }),
 });
 export const {
@@ -36,5 +47,7 @@ export const {
   useLazyGetArtistsQuery,
   useGetArtistByIdQuery,
   useLazyGetArtistByIdQuery,
+  useSearchArtistsQuery,
+  useLazySearchArtistsQuery,
   usePrefetch: artistPrefetch,
 } = artistServices;

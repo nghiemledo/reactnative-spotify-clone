@@ -13,6 +13,10 @@ import {
   User,
   Clock,
   X,
+  Heart,
+  Share2,
+  Radio,
+  FileText,
 } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Song } from "../../types/song";
@@ -34,12 +38,20 @@ interface Feature {
   visibleOnScreens: string[];
 }
 
+interface SongWithPlaylist extends Song {
+  playlistItemId?: string;
+  playlistId?: string;
+}
+
 interface SongBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedSong: Song | null;
+  selectedSong: SongWithPlaylist | null;
   navigation?: NativeStackNavigationProp<RootStackParamList>;
-  screenType?: "home" | "artist" | "album" | "playing" | "playlist";
+  screenType?: "home" | "artist" | "album" | "playing" | "detailPlaylist" | "search";
+  sortedItems?: SongWithPlaylist[];
+  setSortedItems?: (items: SongWithPlaylist[]) => void;
+  deletePlaylistItem?: (id: string) => Promise<void>;
 }
 
 const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
@@ -48,13 +60,14 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
   selectedSong,
   navigation,
   screenType = "home",
+  sortedItems,
+  setSortedItems,
+  deletePlaylistItem,
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const screenHeight = Dimensions.get("window").height;
   const [showTimerOptions, setShowTimerOptions] = useState(false);
-  const { sleepTimer } = useAppSelector(
-    (state: { player: any }) => state.player
-  );
+  const { sleepTimer } = useAppSelector((state: { player: any }) => state.player);
 
   const snapPoints = ["80%"];
   const sheetHeight =
@@ -74,7 +87,29 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
   // Handle actions within the component
   const handleAddToPlaylist = () => {
     if (selectedSong) {
-      Alert.alert("Success", `Added "${selectedSong.title}" to playlist`);
+      if (!navigation) {
+        Alert.alert("Error", "Navigation is not available");
+        return;
+      }
+      navigation.navigate("AddToPlaylist", { songId: selectedSong.id || "" });
+      onClose();
+    } else {
+      Alert.alert("Error", "No song selected");
+    }
+  };
+
+  const handleAddToOtherPlaylist = () => {
+    if (selectedSong) {
+      if (!navigation) {
+        Alert.alert("Error", "Navigation is not available");
+        return;
+      }
+      console.log(`Add ${selectedSong.title} to another playlist`);
+      navigation.navigate("AddToPlaylist", {
+        songId: selectedSong.id,
+        currentPlaylistId: selectedSong.playlistId,
+      });
+      onClose();
     } else {
       Alert.alert("Error", "No song selected");
     }
@@ -101,7 +136,12 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
       };
 
       await addTrackToQ(track);
-      Alert.alert("Success", `Added "${track.title}" to queue`);
+      console.log(`Add ${selectedSong.title} to queue`);
+      Toast.show({
+        type: "success",
+        text1: `Added "${track.title}" to queue`,
+        position: "bottom",
+      });
       onClose();
     } catch (err) {
       console.error(err);
@@ -115,9 +155,12 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
 
   const handleShowSpotifyCode = () => {
     if (selectedSong) {
-      navigation?.navigate("shareQrSong", {
-        song: selectedSong,
-      });
+      if (!navigation) {
+        Alert.alert("Error", "Navigation is not available");
+        return;
+      }
+      navigation.navigate("shareQrSong", { song: selectedSong });
+      onClose();
     } else {
       Alert.alert("Error", "No song selected");
     }
@@ -130,7 +173,9 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
     }
     if (selectedSong?.albumId) {
       navigation.navigate("Album", { id: selectedSong.albumId });
+      onClose();
     } else {
+      console.log("No album information available");
       Alert.alert("Error", "No album information available");
     }
   };
@@ -142,8 +187,52 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
     }
     if (selectedSong?.artistId) {
       navigation.navigate("Artist", { id: selectedSong.artistId });
+      onClose();
     } else {
+      console.log("No artist information available");
       Alert.alert("Error", "No artist information available");
+    }
+  };
+
+  const handleShare = () => {
+    if (selectedSong) {
+      console.log(`Share ${selectedSong.title}`);
+      Toast.show({
+        type: "success",
+        text1: `Shared "${selectedSong.title}"`,
+        position: "bottom",
+      });
+      onClose();
+    } else {
+      Alert.alert("Error", "No song selected");
+    }
+  };
+
+  const handleGoToSongRadio = () => {
+    if (selectedSong) {
+      console.log(`Go to song radio for ${selectedSong.title}`);
+      Toast.show({
+        type: "info",
+        text1: `Navigating to song radio for "${selectedSong.title}"`,
+        position: "bottom",
+      });
+      onClose();
+    } else {
+      Alert.alert("Error", "No song selected");
+    }
+  };
+
+  const handleViewSongCredits = () => {
+    if (selectedSong) {
+      console.log(`View credits for ${selectedSong.title}`);
+      Toast.show({
+        type: "info",
+        text1: `Viewing credits for "${selectedSong.title}"`,
+        position: "bottom",
+      });
+      onClose();
+    } else {
+      Alert.alert("Error", "No song selected");
     }
   };
 
@@ -169,42 +258,129 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
     });
   };
 
+  const handleRemoveFromPlaylist = async () => {
+    if (!selectedSong) {
+      Alert.alert("Error", "No song selected");
+      return;
+    }
+
+    if (sortedItems && setSortedItems) {
+      setSortedItems(sortedItems.filter((item) => item.id !== selectedSong.id));
+    }
+
+    if (selectedSong.playlistItemId && deletePlaylistItem) {
+      try {
+        await deletePlaylistItem(selectedSong.playlistItemId);
+        Toast.show({
+          type: "success",
+          text1: `Removed "${selectedSong.title}" from playlist`,
+          position: "bottom",
+        });
+      } catch (error) {
+        console.error("Error removing song from playlist:", error);
+        Toast.show({
+          type: "error",
+          text1: "Failed to remove song from playlist",
+          position: "bottom",
+        });
+      }
+    }
+
+    onClose();
+  };
+
+  const handleAddToLikedSongs = () => {
+    if (selectedSong) {
+      Toast.show({
+        type: "success",
+        text1: "Added to liked songs",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+      onClose();
+    } else {
+      Alert.alert("Error", "No song selected");
+    }
+  };
+
   // Configure features
   const featureConfig: Feature[] = [
+    {
+      key: "addToLikedSongs",
+      label: "Add to Liked Songs",
+      icon: <Heart size="$2" color="white" />,
+      action: handleAddToLikedSongs,
+      visibleOnScreens: ["search"],
+    },
     {
       key: "addToPlaylist",
       label: "Add to Playlist",
       icon: <Plus size="$2" color="white" />,
       action: handleAddToPlaylist,
-      visibleOnScreens: ["home", "artist", "album", "playing"],
+      visibleOnScreens: ["home", "artist", "album", "playing", "detailPlaylist", "search"],
+    },
+    {
+      key: "addToOtherPlaylist",
+      label: "Add to Other Playlist",
+      icon: <Plus size="$2" color="white" />,
+      action: handleAddToOtherPlaylist,
+      visibleOnScreens: ["detailPlaylist"],
     },
     {
       key: "addToQueue",
       label: "Add to Queue",
       icon: <ListPlus size="$2" color="white" />,
       action: handleAddToQueue,
-      visibleOnScreens: ["home", "artist", "album", "playlist"]
+      visibleOnScreens: ["home", "artist", "album", "detailPlaylist", "search"],
     },
     {
       key: "goToAlbum",
       label: "Go to Album",
       icon: <CircleDot size="$2" color="white" />,
       action: handleGoToAlbum,
-      visibleOnScreens: ["home", "artist", "playlist"],
+      visibleOnScreens: ["home", "artist", "detailPlaylist"],
     },
     {
       key: "goToArtist",
       label: "Go to Artist",
       icon: <User size="$2" color="white" />,
       action: handleGoToArtist,
-      visibleOnScreens: ["home", "album", "playlist"],
+      visibleOnScreens: ["home", "album", "detailPlaylist", "search"],
     },
     {
       key: "showSpotifyCode",
       label: "Show Spotify Code",
       icon: <QrCode size="$2" color="white" />,
       action: handleShowSpotifyCode,
-      visibleOnScreens: ["home", "artist", "album", "playing", "playlist"],
+      visibleOnScreens: ["home", "artist", "album", "playing", "detailPlaylist", "search"],
+    },
+    {
+      key: "share",
+      label: "Share",
+      icon: <Share2 size="$2" color="white" />,
+      action: handleShare,
+      visibleOnScreens: ["detailPlaylist"],
+    },
+    {
+      key: "goToSongRadio",
+      label: "Go to Song Radio",
+      icon: <Radio size="$2" color="white" />,
+      action: handleGoToSongRadio,
+      visibleOnScreens: ["detailPlaylist"],
+    },
+    {
+      key: "viewSongCredits",
+      label: "View Song Credits",
+      icon: <FileText size="$2" color="white" />,
+      action: handleViewSongCredits,
+      visibleOnScreens: ["detailPlaylist"],
+    },
+    {
+      key: "removeFromThisPlaylist",
+      label: "Remove from This Playlist",
+      icon: <X size="$2" color="red" />,
+      action: handleRemoveFromPlaylist,
+      visibleOnScreens: ["detailPlaylist"],
     },
     {
       key: "setTimer",
@@ -336,14 +512,15 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
               </XStack>
             )}
             {featureConfig
-              .filter((feature) =>
-                feature.visibleOnScreens.includes(screenType)
-              )
+              .filter((feature) => feature.visibleOnScreens.includes(screenType))
               .map((feature) => (
                 <TouchableOpacity key={feature.key} onPress={feature.action}>
                   <XStack items="center" gap="$3">
                     {feature.icon}
-                    <Text fontSize="$5" color="white">
+                    <Text
+                      fontSize="$5"
+                      color={feature.key === "removeFromThisPlaylist" ? "red" : "white"}
+                    >
                       {feature.label}
                     </Text>
                   </XStack>

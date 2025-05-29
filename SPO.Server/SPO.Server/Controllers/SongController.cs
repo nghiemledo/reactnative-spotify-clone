@@ -25,6 +25,14 @@ namespace SPO.Server.Controllers
             return Ok(await Result<List<Song>>.SuccessAsync(result.ToList()));
         }
 
+        [HttpGet]
+        [Route("trending")]
+        public async Task<ActionResult> TrendingSongsGet()
+        {
+            var result = await _repository.GetAllTrendingAsync();
+            return Ok(await Result<List<Song>>.SuccessAsync(result.ToList()));
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult> SongGet(string id)
         {

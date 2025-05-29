@@ -17,6 +17,7 @@ import ManageViewGenre from '@/pages/admin/genre/view';
 import AdminPage from '@/pages/admin/index';
 import ManagePlaylist from '@/pages/admin/playlist';
 import ManageAddPlaylist from '@/pages/admin/playlist/add';
+import ManageEditPlayist from '@/pages/admin/playlist/edit';
 import ManageReportsPlaylist from '@/pages/admin/playlist/reports';
 import ManagePodcastCategories from '@/pages/admin/podcast/category';
 import ManageAddPodcastCategory from '@/pages/admin/podcast/category/add';
@@ -79,6 +80,7 @@ const privateRoutes = [
 
     { path: `${privatePrefix}/playlists`, component: ManagePlaylist },
     { path: `${privatePrefix}/playlists/add`, component: ManageAddPlaylist },
+    { path: `${privatePrefix}/playlists/:id/edit`, component: ManageEditPlayist },
     { path: `${privatePrefix}/playlists/reports`, component: ManageReportsPlaylist },
 
     { path: `${privatePrefix}/podcast-categories`, component: ManagePodcastCategories },

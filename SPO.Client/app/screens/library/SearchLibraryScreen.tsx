@@ -9,10 +9,8 @@ import {
   FlatList,
   ScrollView,
   TouchableOpacity,
-  Keyboard,
   ActivityIndicator,
 } from "react-native";
-import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 
@@ -28,62 +26,6 @@ type Podcast = {
 
 type Item = Artist | Podcast;
 
-const initialPodcasts: Podcast[] = [
-  {
-    id: "1",
-    title: "#28 - người lớn và áp lực 'xây dựng hình ảnh'",
-    creator: "Giang cơ Radio",
-    description:
-      "Dec 1, 2023 • 15min • Minh là Giang, mình là người lớn và mình muốn nói về áp lực 'xây dựng hình ảnh'.",
-    coverImage:
-      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    createdAt: "2023-12-01T00:00:00Z",
-    type: "podcast",
-  },
-  {
-    id: "2",
-    title: "#29 - Tự do trong tâm trí",
-    creator: "Giang cơ Radio",
-    description:
-      "Jan 15, 2024 • 20min • Minh là Giang, hôm nay chúng ta nói về tự do và cách tìm kiếm nó trong tâm trí.",
-    coverImage:
-      "https://images.pexels.com/photos/531880/pexels-photo-531880.jpeg",
-    createdAt: "2024-01-15T00:00:00Z",
-    type: "podcast",
-  },
-  {
-    id: "3",
-    title: "Sống chậm lại, nghĩ khác đi",
-    creator: "Sống Tích Cực",
-    description:
-      "Feb 10, 2024 • 25min • Một hành trình khám phá giá trị của việc sống chậm và suy ngẫm.",
-    coverImage:
-      "https://images.pexels.com/photos/206359/pexels-photo-206359.jpeg",
-    createdAt: "2024-02-10T00:00:00Z",
-    type: "podcast",
-  },
-  {
-    id: "4",
-    title: "Câu chuyện khởi nghiệp",
-    creator: "Startup Vibes",
-    description:
-      "Mar 5, 2024 • 30min • Những câu chuyện thực tế từ các nhà khởi nghiệp trẻ.",
-    coverImage:
-      "https://images.pexels.com/photos/3184297/pexels-photo-3184297.jpeg",
-    createdAt: "2024-03-05T00:00:00Z",
-    type: "podcast",
-  },
-];
-
-// type SearchLibraryScreenNavigationProp = NativeStackNavigationProp<
-//   LibraryStackParamList,
-//   "SearchLibaryScreen"
-// >;
-
-// interface SearchLibraryScreenProps {
-//   navigation: SearchLibraryScreenNavigationProp;
-//   route: { params: { type: "artist" | "podcast"; selectedIds?: string[] } };
-// }
 
 const SearchLibraryScreen = () => {
   const navigation =
@@ -103,8 +45,10 @@ const SearchLibraryScreen = () => {
 
   const normalize = (s: string) => s.trim().toLowerCase();
 
+  const initialPodcasts: Podcast[] = []; // TODO: Replace with actual podcast data source
+  
   const data: Item[] =
-    type === "artist" ? artists?.data || [] : initialPodcasts;
+      type === "artist" ? artists?.data || [] : initialPodcasts;
 
   const filteredData =
     searchQuery.trim() === ""
