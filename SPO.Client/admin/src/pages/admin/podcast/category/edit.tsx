@@ -1,3 +1,4 @@
+import Loading from '@/components/loading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -85,7 +86,7 @@ const ManageEditPodcastCategory: React.FC = () => {
             <Card>
                 <CardContent className="pt-6">
                     {loading ? (
-                        <div>Loading...</div>
+                        <Loading />
                     ) : (
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                             <div className="space-y-2">
