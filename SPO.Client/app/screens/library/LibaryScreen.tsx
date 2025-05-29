@@ -1,6 +1,4 @@
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useRef, useState, useEffect } from "react";
-import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 import {
   Avatar,
   AvatarFallback,
@@ -13,8 +11,6 @@ import {
 } from "tamagui";
 import {
   ArrowUpDown,
-  LayoutGrid,
-  List,
   Plus,
   Search,
   X,
@@ -26,7 +22,7 @@ import SortBottomSheet from "../../components/library/SortBottomSheet";
 import { MotiView } from "moti";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/AppNavigator";
-import { useGetPlaylistsByUserIdQuery } from "../../services/playlistServices"; // Import new API hook
+import { useGetPlaylistsByUserIdQuery } from "../../services/playlistServices"; 
 import { UserInfo } from "../../types/user";
 import { useSelector } from "react-redux";
 
@@ -55,24 +51,17 @@ const tabTypes = [
 
 const LibraryScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const user = useSelector((state: { auth: AuthState }) => state.auth.user); // Get user from Redux
-  const userId = user?.id; // Extract userId
-  const {
-    data: playlistData,
-    isLoading,
-    error,
-  } = useGetPlaylistsByUserIdQuery(userId || "", { skip: !userId }); // Fetch playlists by userId
-
+  const user = useSelector((state: { auth: AuthState }) => state.auth.user);
+  const userId = user?.id;
+  const { data: playlistData } = useGetPlaylistsByUserIdQuery(userId || "");
   const scrollY = useRef(new Animated.Value(0)).current;
   const headerHeight = 160;
   const [isCreateBottomSheetOpen, setIsCreateBottomSheetOpen] = useState(false);
   const [isSortBottomSheetOpen, setIsSortBottomSheetOpen] = useState(false);
   const [sortedData, setSortedData] = useState<Data[]>([]);
   const [sortOption, setSortOption] = useState<string>("recents");
-  const [isGrid, setIsGrid] = useState(true);
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
 
-  // Map API data to Data format
   useEffect(() => {
     if (playlistData?.data) {
       const mappedData: Data[] = playlistData.data.map((playlist) => ({
@@ -81,7 +70,7 @@ const LibraryScreen = () => {
         name: playlist.title,
         image:
           playlist.coverImage ||
-          "https://images.unsplash.com/photo-1507838153414-b4b713384a76", // Fallback image
+          "https://images.unsplash.com/photo-1507838153414-b4b713384a76", 
         createdAt: playlist.createdAt,
         creator: playlist.userId,
         artists: [],
@@ -90,11 +79,7 @@ const LibraryScreen = () => {
     }
   }, [playlistData]);
 
-  const toggleIcon = () => {
-    setIsGrid((prev) => !prev);
-  };
 
-  // Handlers for CreateBottomSheet
   const handleOpenCreateBottomSheet = () => {
     setIsCreateBottomSheetOpen(true);
   };
@@ -103,7 +88,6 @@ const LibraryScreen = () => {
     setIsCreateBottomSheetOpen(false);
   };
 
-  // Handlers for SortBottomSheet
   const handleOpenSortBottomSheet = () => {
     setIsSortBottomSheetOpen(true);
   };
@@ -158,7 +142,6 @@ const LibraryScreen = () => {
     setSortedData(sorted);
   };
 
-  // Update handleItems to pass playlist id
   const handleItems = (type: string, id: string) => {
     if (type === "playlist") {
       navigation.navigate("DetailPlaylist", { id });
@@ -169,21 +152,6 @@ const LibraryScreen = () => {
     setSelectedTab(null);
   };
 
-  if (!userId) {
-    return <Text color="white">Please log in to view your playlists.</Text>;
-  }
-
-  if (isLoading) {
-    return <Text color="white">Loading...</Text>;
-  }
-
-  if (error) {
-    return (
-      <Text color="white">
-        Failed to load playlists: {JSON.stringify(error)}
-      </Text>
-    );
-  }
 
   return (
     <YStack flex={1} bg="#000" px="$3" pt="$15">

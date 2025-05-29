@@ -6,12 +6,10 @@ import {
   Button,
   H3,
   Input,
-  Image,
   Avatar,
 } from "tamagui";
 import { FlatList, ScrollView, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useDispatch } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
@@ -46,10 +44,8 @@ import { useLazyGetSongByIdQuery } from "../../services/SongService";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useGetUserByIdQuery } from "../../services/AuthService";
-import {
-  useGetArtistByIdQuery,
-  useLazyGetArtistByIdQuery,
-} from "../../services/ArtistService";
+import { useLazyGetArtistByIdQuery } from "../../services/ArtistService";
+import { SongItem } from "../../components/song/SongItem";
 
 interface SongWithPlaylist extends Song {
   playlistItemId?: string;
@@ -77,15 +73,17 @@ const DetailPlaylistScreen = () => {
   const [selectedSortOption, setSelectedSortOption] = useState("customerOrder");
   const [sortedItems, setSortedItems] = useState<SongWithPlaylist[]>([]);
   const [isSongOptionsOpen, setIsSongOptionsOpen] = useState(false);
-  const [selectedSong, setSelectedSong] = useState<SongWithPlaylist | null>(null);
+  const [selectedSong, setSelectedSong] = useState<SongWithPlaylist | null>(
+    null
+  );
   const [isPlaylistOptionsOpen, setIsPlaylistOptionsOpen] = useState(false);
-  dayjs.extend(relativeTime);
+  const screenWidth = Dimensions.get("window").width;
 
   const [triggerGetSongById] = useLazyGetSongByIdQuery();
   const [triggerGetArtistById] = useLazyGetArtistByIdQuery();
   const [deletePlaylist] = useDeletePlaylistMutation();
-  const [deletePlaylistItem, { isLoading: isDeleting }] =
-    useDeletePlaylistItemMutation();
+  const [deletePlaylistItem] = useDeletePlaylistItemMutation();
+  dayjs.extend(relativeTime);
 
   useEffect(() => {
     if (playlistItemsData?.data?.length) {
@@ -102,7 +100,7 @@ const DetailPlaylistScreen = () => {
                 ...result.data,
                 createdAt: item.createdAt,
                 artist: artist.data?.data.name,
-                playlistItemId: item.id
+                playlistItemId: item.id,
               };
             } catch (error) {
               console.error(
@@ -123,7 +121,6 @@ const DetailPlaylistScreen = () => {
     }
   }, [playlistItemsData]);
 
-  // Animation interpolations
   const navbarBackground = scrollY.interpolate({
     inputRange: [190, 220],
     outputRange: ["rgba(0, 0, 0, 0)", "rgba(51, 51, 51, 1)"],
@@ -141,8 +138,6 @@ const DetailPlaylistScreen = () => {
     outputRange: [1, 0],
     extrapolate: "clamp",
   });
-
-  const screenWidth = Dimensions.get("window").width;
 
   const imageSize = {
     width: scrollY.interpolate({
@@ -163,13 +158,6 @@ const DetailPlaylistScreen = () => {
     extrapolate: "clamp",
   });
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
-  }, [navigation]);
-
-  // Sort songs
   useEffect(() => {
     if (songs.length > 0) {
       let sorted = [...songs];
@@ -204,7 +192,6 @@ const DetailPlaylistScreen = () => {
     if (!selectedSong) return;
     switch (option) {
       case "addToOtherPlaylist":
-        console.log(`Add ${selectedSong.title} to another playlist`);
         navigation.navigate("AddToPlaylist", {
           songId: selectedSong.id,
           currentPlaylistId: id,
@@ -246,7 +233,6 @@ const DetailPlaylistScreen = () => {
   const handleSelectPlaylistOption = async (option: string) => {
     switch (option) {
       case "addToThisPlaylist":
-        console.log("Navigate to add songs to this playlist");
         navigation.navigate("AddSongPlaylist", { playlistId: id });
         break;
       case "editPlaylist":
@@ -639,57 +625,23 @@ const DetailPlaylistScreen = () => {
                 </XStack>
               </Button>
             </XStack>
-
-            <FlatList
-              data={sortedItems}
-              keyExtractor={(item, index) => `${item.id || "song"}-${index}`}
-              scrollEnabled={false}
-              renderItem={({ item }) => (
-                <TouchableOpacity>
-                  <XStack items="center" justify="space-between" py="$2">
-                    <XStack items="center" gap="$3" flex={1}>
-                      <Image
-                        source={{
-                          uri:
-                            item.coverImage ||
-                            "https://images.unsplash.com/photo-1507838153414-b4b713384a76",
-                        }}
-                        width={50}
-                        height={50}
-                        rounded={8}
-                      />
-                      <YStack flex={1}>
-                        <Text fontSize={15} fontWeight="300" color="white">
-                          {item.title}
-                        </Text>
-                        <Text fontSize={13} color="white" opacity={0.7}>
-                          {item.artist}
-                        </Text>
-                      </YStack>
-                    </XStack>
-                    <Button
-                      bg="transparent"
-                      p={0}
-                      onPress={() => {
-                        setSelectedSong(item);
-                        setIsSongOptionsOpen(true);
-                      }}
-                      icon={
-                        <EllipsisVertical
-                          size="$2"
-                          color="white"
-                          strokeWidth={1}
-                        />
-                      }
-                      pressStyle={{
-                        bg: "transparent",
-                        borderBlockColor: "transparent",
-                      }}
-                    />
-                  </XStack>
-                </TouchableOpacity>
-              )}
-            />
+            {sortedItems?.map((item: Song, index: number) => (
+              <SongItem
+                key={item.id || `song-${item.title}`}
+                song={item}
+                index={index}
+                showIndex={false}
+                showImage={true}
+                showArtistName={true}
+                imageSize={60}
+                getArtistName={() => item.artist || ""}
+                screen="home"
+                onMorePress={() => {
+                  setSelectedSong(item);
+                  setIsSongOptionsOpen(true);
+                }}
+              />
+            ))}
           </YStack>
         </ScrollView>
       )}

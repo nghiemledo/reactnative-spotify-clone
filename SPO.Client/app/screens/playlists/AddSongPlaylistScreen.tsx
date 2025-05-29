@@ -1,21 +1,7 @@
 import { memo, useState } from "react";
-import {
-  YStack,
-  XStack,
-  Button,
-  Text,
-  View,
-  Input,
-  ScrollView,
-  Image,
-} from "tamagui";
+import { YStack, XStack, Button, Text, View, ScrollView, Image } from "tamagui";
 import { TouchableOpacity, StatusBar, FlatList } from "react-native";
-import {
-  ArrowLeft,
-  CircleCheck,
-  CirclePlus,
-  Search,
-} from "@tamagui/lucide-icons";
+import { ArrowLeft, CircleCheck, CirclePlus } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import Toast, { BaseToastProps } from "react-native-toast-message";
@@ -25,10 +11,10 @@ import { useGetSongsQuery } from "../../services/SongService";
 import {
   useAddPlaylistItemMutation,
   useGetPlaylistItemsQuery,
-} from "../../services/playlistItemServices"; // Thêm import
+} from "../../services/playlistItemServices";
 
 const toastConfig = {
-  success: ({ text1, text2 }: BaseToastProps) => (
+  success: ({ text1 }: BaseToastProps) => (
     <View
       style={{
         flexDirection: "row",
@@ -57,21 +43,11 @@ const AddSongPlaylistScreen = () => {
   const route = useRoute<any>();
   const { playlistId } = route.params || {};
 
-  const {
-    data: songsData,
-    isLoading: isSongsLoading,
-    error: songsError,
-  } = useGetSongsQuery();
-  // Thêm useGetPlaylistItemsQuery để lấy danh sách mục của danh sách phát
-  const {
-    data: playlistItemsData,
-    isLoading: isItemsLoading,
-    error: itemsError,
-  } = useGetPlaylistItemsQuery({ playlistId });
+  const { data: songsData } = useGetSongsQuery();
+  const { data: playlistItemsData } = useGetPlaylistItemsQuery({ playlistId });
   const [addPlaylistItem] = useAddPlaylistItemMutation();
   const [likedItems, setLikedItems] = useState<{ [key: string]: boolean }>({});
 
-  // Tạo Set chứa các songId đã tồn tại trong danh sách phát
   const existingSongIds = new Set(
     playlistItemsData?.data
       ?.filter((item) => item.playlistId === playlistId)
@@ -101,7 +77,6 @@ const AddSongPlaylistScreen = () => {
       return;
     }
 
-    // Kiểm tra nếu bài hát đã tồn tại trong danh sách phát
     if (existingSongIds.has(songId)) {
       Toast.show({
         type: "success",
@@ -140,18 +115,6 @@ const AddSongPlaylistScreen = () => {
       return { ...prev, [songId]: !isLiked };
     });
   };
-
-  if (isSongsLoading || isItemsLoading) {
-    return <Text color="white">Loading...</Text>;
-  }
-
-  if (songsError || itemsError) {
-    return (
-      <Text color="white">
-        Failed to load data: {JSON.stringify(songsError || itemsError)}
-      </Text>
-    );
-  }
 
   if (!songsData?.data) {
     return <Text color="white">No songs found</Text>;
