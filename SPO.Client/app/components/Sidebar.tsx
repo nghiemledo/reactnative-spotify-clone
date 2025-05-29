@@ -1,6 +1,12 @@
 import React from "react";
-import { YStack, XStack, Text, Avatar } from "tamagui";
-import { User, Volume2, BarChart2, Info } from "@tamagui/lucide-icons";
+import { YStack, XStack, Text, Avatar, AvatarImage } from "tamagui";
+import {
+  User,
+  Volume2,
+  BarChart2,
+  Info,
+  Settings,
+} from "@tamagui/lucide-icons";
 import { StatusBar, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -33,13 +39,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navigation }) => {
           borderBottomWidth={1}
           borderBottomColor="#333"
         >
-          <Avatar circular size="$5">
-            <Avatar.Image
-              accessibilityLabel="User Avatar"
-              src={user?.urlAvatar}
-              alt="User Avatar"
-            />
-            <Avatar.Fallback backgroundColor="$blue10" />
+          <Avatar circular size="$3">
+            <AvatarImage src={user?.urlAvatar} />
+            <Avatar.Fallback>
+              <Text fontWeight="bold" color="white" fontSize="$8">
+                {user?.fullName?.charAt(0).toUpperCase()}
+              </Text>
+            </Avatar.Fallback>
           </Avatar>
           <YStack ml={12}>
             <Text color="white" fontSize={16} fontWeight="bold">
@@ -57,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navigation }) => {
         title="What's new"
         onPress={() => {
           onClose();
-          navigation.navigate("WhatsNew");
+          // navigation.navigate("WhatsNew");
         }}
       />
       <SidebarItem
@@ -65,11 +71,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navigation }) => {
         title="Recents"
         onPress={() => {
           onClose();
-          navigation.navigate("Recents");
+          // navigation.navigate("Recents");
         }}
       />
       <SidebarItem
-        icon={<User color="#fff" size={24} />}
+        icon={<Settings color="#fff" size={24} />}
         title="Settings and privacy"
         onPress={() => {
           onClose();

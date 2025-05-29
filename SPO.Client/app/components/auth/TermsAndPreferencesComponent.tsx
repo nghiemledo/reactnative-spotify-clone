@@ -14,7 +14,7 @@ export const TermsAndPreferencesComponent: React.FC<TermsAndPreferencesComponent
   const [noMarketing, setNoMarketing] = useState(false);
   const [shareData, setShareData] = useState(false);
 
-  // Cập nhật validation khi checkbox thay đổi
+  // Update validation when checkbox changes
   React.useEffect(() => {
     onValidationChange(noMarketing || shareData);
   }, [noMarketing, shareData, onValidationChange]);
@@ -31,12 +31,12 @@ export const TermsAndPreferencesComponent: React.FC<TermsAndPreferencesComponent
     );
   };
 
-  // Hàm xử lý giá trị checked để chỉ lấy boolean
+  // Handle checked value to only take boolean
   const handleCheckedChange = (
     setState: React.Dispatch<React.SetStateAction<boolean>>
   ) => (checked: CheckedState) => {
     if (checked === "indeterminate") {
-      setState(false); // hoặc xử lý theo logic của bạn
+      setState(false); // or handle according to your logic
     } else {
       setState(checked);
     }
@@ -45,28 +45,25 @@ export const TermsAndPreferencesComponent: React.FC<TermsAndPreferencesComponent
   return (
     <YStack mt="$4" items="flex-start" gap={"$3"} height={"50%"}>
       <Text color="#fff" fontSize="$1" fontWeight={"bold"}>
-        Bằng việc nhấn vào "Tạo tài khoản", bạn đồng ý với Điều khoản sử dụng
-        và Chính sách quyền riêng tư của chúng tôi.
+        By clicking "Create Account", you agree to our Terms of Use and Privacy Policy.
       </Text> 
       <TouchableOpacity onPress={openTerms}>
         <Text style={{ color: "#1DB954", fontSize: 12, fontWeight: "bold" }}>
-          Điều khoản sử dụng
+          Terms of Use
         </Text>
       </TouchableOpacity>
 
       <Text color="#fff" fontSize="$1" fontWeight={"bold"}>
-        Để tìm hiểu thêm về các chức năng của chúng tôi, sử dụng, chia sẻ và
-        bảo vệ dữ liệu cá nhân của bạn, vui lòng xem chính sách quyền riêng tư
-        của chúng tôi.
+        To learn more about how we use, share, and protect your personal data, please review our Privacy Policy.
       </Text>
       <TouchableOpacity onPress={openPrivacy}>
         <Text style={{ color: "#1DB954", fontSize: 12, fontWeight: "bold" }}>
-          Chính sách quyền riêng tư
+          Privacy Policy
         </Text>
       </TouchableOpacity>
       <XStack items="center" justify="space-between" width="100%">
         <Text color="#fff" fontSize="$1" fontWeight="bold" flex={1} mr={"$3"}>
-          Tôi không muốn nhận tin nhắn tiếp thị từ ứng dụng này.
+          I do not want to receive marketing messages from this app.
         </Text>
         <Checkbox
           size="$4"
@@ -88,7 +85,7 @@ export const TermsAndPreferencesComponent: React.FC<TermsAndPreferencesComponent
       </XStack>
       <XStack items="center" justify="space-between" width="100%">
         <Text color="#fff" fontSize="$1" fontWeight="bold" flex={1} mr={"$3"}>
-          Chia sẻ dữ liệu đăng ký của tôi với các nhà cung cấp nội dung chúng tôi nhằm mục đích tiếp thị.
+          Share my registration data with our content providers for marketing purposes.
         </Text>
         <Checkbox
           size="$4"

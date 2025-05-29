@@ -1,23 +1,34 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import TabNavigator from "./TabNavigator";
-import AlbumScreen from "../screens/AlbumScreen";
-import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
-import ArtistScreen from "../screens/ArtistDetailScreen";
-import SettingsScreen from "../screens/SettingsScreen";
 import SearchScreen from "../screens/search/SearchScreen";
+import ScanScreen from "../screens/ScanScreen";
+import GenreScreen from "../screens/GenreScreen";
 import SearchResultScreen from "../screens/search/SearchResultScreen";
 
 const Stack = createStackNavigator();
+
 export type SearchStackParamList = {
-  Search: undefined;
-  SearchResult: { q: string };
+  SearchScreen: undefined;
+  ScanScreen: undefined;
+  Genre: { id: string };
+  SearchResult: { toastMessages?: string[] };
 };
+
 export default function SearchNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Search"
+        name="SearchScreen"
         component={SearchScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ScanScreen"
+        component={ScanScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Genre"
+        component={GenreScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

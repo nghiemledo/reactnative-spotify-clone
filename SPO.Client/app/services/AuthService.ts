@@ -1,8 +1,26 @@
 import { baseRestApi } from "./api";
 import { setCredentials, logout } from "../store/authSlice";
-import { UserCredential, UserInfo } from "../types/user";
+import { FollowArtistRequest, FollowPodcastRequest, UpdateUserProfile, UserCredential, UserInfo } from "../types/user";
 import { useAppSelector, RootState } from "../store";
 import { ApiResponse } from "../types/apiResponse";
+
+// Định nghĩa response types dựa trên DTO từ backend
+export interface FollowedArtistResponse {
+  errorCode?: number | null;
+  errorMessage?: string | null;
+  id?: string | null;
+  name?: string | null;
+  followedAt?: string | null; // DateTimeOffset được ánh xạ thành string trong TypeScript
+}
+
+export interface FollowedPodcastResponse {
+  errorCode: number;
+  errorMessage?: string | null;
+  id?: string | null;
+  title?: string | null;
+  creator?: string | null;
+  followedAt?: string | null; // DateTimeOffset được ánh xạ thành string
+}
 
 interface AuthResponse {
   token: string;
@@ -10,6 +28,27 @@ interface AuthResponse {
   user: any;
   status: boolean;
   role: string;
+}
+
+interface SearchResponse {
+  artists: Array<{
+    id: string;
+    name: string;
+    coverImage: string;
+  }>;
+  songs: Array<{
+    id: string;
+    title: string;
+    artistId: string;
+    artistName: string;
+    coverImage: string;
+  }>;
+  shows: Array<{
+    id: string;
+    title: string;
+    creator: string;
+    coverImage: string;
+  }>;
 }
 
 const entity = "user";
@@ -101,7 +140,105 @@ export const authServices = baseRestApi.injectEndpoints({
         }
       },
     }),
+    getUserById: builder.query<ApiResponse<UserInfo>, string>({
+      query: (id) => ({
+        url: `${entity}/${id}`,
+        method: "GET",
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error("Get user by ID failed:", error);
+        }
+      },
+    }),
+    updateUserProfile: builder.mutation<ApiResponse<UserInfo>, UpdateUserProfile>({
+      query: (user) => ({
+        url: `${entity}`,
+        method: "PUT",
+        body: user,
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error("Update user profile failed:", error);
+        }
+      },
+    }),
+    followArtist: builder.mutation<ApiResponse<null>, FollowArtistRequest>({
+      query: (request) => ({
+        url: `${entity}/follow-artist`,
+        method: "POST",
+        body: request,
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error("Follow artist failed:", error);
+        }
+      },
+    }),
+    followPodcast: builder.mutation<ApiResponse<null>, FollowPodcastRequest>({
+      query: (request) => ({
+        url: `${entity}/follow-podcast`,
+        method: "POST",
+        body: request,
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error("Follow Podcast failed:", error);
+        }
+      },
+    }),
+    search: builder.query<ApiResponse<SearchResponse>, { query: string; limit?: number }>({
+      query: ({ query, limit = 10 }) => ({
+        url: `${entity}/search`,
+        method: "GET",
+        params: { q: query, limit },
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error("Search failed:", error);
+        }
+      },
+    }),
+    getFollowedArtists: builder.query<ApiResponse<FollowedArtistResponse[]>, string>({
+      query: (userId) => ({
+        url: `${entity}/followed-artists`,
+        method: "GET",
+        params: { userId },
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error("Get followed artists failed:", error);
+        }
+      },
+    }),
+    getFollowedPodcasts: builder.query<ApiResponse<FollowedPodcastResponse[]>, string>({
+      query: (userId) => ({
+        url: `${entity}/followed-podcasts`,
+        method: "GET",
+        params: { userId },
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error("Get followed podcasts failed:", error);
+        }
+      },
+    }),
   }),
+  overrideExisting: true,
 });
 
 export const {
@@ -109,4 +246,11 @@ export const {
   useRegisterMutation,
   useRefreshTokenMutation,
   useLogoutMutation,
+  useGetUserByIdQuery,
+  useUpdateUserProfileMutation,
+  useFollowArtistMutation,
+  useFollowPodcastMutation,
+  useSearchQuery,
+  useGetFollowedArtistsQuery,
+  useGetFollowedPodcastsQuery,
 } = authServices;

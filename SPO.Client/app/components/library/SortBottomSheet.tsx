@@ -3,13 +3,14 @@ import { Dimensions, TouchableOpacity } from "react-native";
 import { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { YStack, XStack, Text } from "tamagui";
-import { ListMusic, Users, Music2, Check } from "@tamagui/lucide-icons";
+import { ListMusic, Users, Music2, Check, UserSquare } from "@tamagui/lucide-icons";
 
 interface SortBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectOption: (option: string) => void;
-  selectedOption: string; 
+  selectedOption: string;
+  context?: string; // Optional context prop to determine which options to show
 }
 
 const SortBottomSheet: React.FC<SortBottomSheetProps> = ({
@@ -17,9 +18,10 @@ const SortBottomSheet: React.FC<SortBottomSheetProps> = ({
   onClose,
   onSelectOption,
   selectedOption,
+  context,
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = ["35%"];
+  const snapPoints = ["50%"];
 
   const renderBackdrop = useCallback(
     (props: any) => (
@@ -44,28 +46,53 @@ const SortBottomSheet: React.FC<SortBottomSheetProps> = ({
     }
   }, [isOpen]);
 
-  const options = [
-    {
-      title: "Recents",
-      icon: ListMusic,
-      value: "recents",
-    },
-    {
-      title: "Recently added",
-      icon: Users,
-      value: "recentlyAdded",
-    },
-    {
-      title: "Alphabetical",
-      icon: Music2,
-      value: "alphabetical",
-    },
-    {
-      title: "Creator",
-      icon: Music2,
-      value: "creator",
-    },
-  ];
+  // Define options based on context
+  const options =
+    context === "detailPlaylist"
+      ? [
+          {
+            title: "Customer Order",
+            icon: ListMusic,
+            value: "customerOrder",
+          },
+          {
+            title: "Title",
+            icon: Music2,
+            value: "title",
+          },
+          {
+            title: "Artist",
+            icon: UserSquare,
+            value: "artist",
+          },
+          {
+            title: "Recently Added",
+            icon: Users,
+            value: "recentlyAdded",
+          },
+        ]
+      : [
+          {
+            title: "Recents",
+            icon: ListMusic,
+            value: "recents",
+          },
+          {
+            title: "Recently added",
+            icon: Users,
+            value: "recentlyAdded",
+          },
+          {
+            title: "Alphabetical",
+            icon: Music2,
+            value: "alphabetical",
+          },
+          {
+            title: "Creator",
+            icon: Music2,
+            value: "creator",
+          },
+        ];
 
   return (
     <BottomSheet
@@ -90,7 +117,7 @@ const SortBottomSheet: React.FC<SortBottomSheetProps> = ({
           pb="$2"
           borderBottomWidth={1}
         >
-           Sort by
+          Sort by
         </Text>
         <YStack gap="$5" mt="$2" px="$3">
           {options.map((option) => (
@@ -100,6 +127,7 @@ const SortBottomSheet: React.FC<SortBottomSheetProps> = ({
             >
               <XStack items="center" justify="space-between">
                 <XStack items="center" gap="$3">
+                  <option.icon color="white" size={24} />
                   <Text color="white" fontSize={16}>
                     {option.title}
                   </Text>

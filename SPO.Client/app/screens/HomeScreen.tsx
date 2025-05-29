@@ -8,30 +8,36 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { YStack, XStack, Text, Button, Avatar } from "tamagui";
-import { useGetSongsQuery } from "../services/SongService";
+import { YStack, XStack, Text, Button, Avatar, Spinner } from "tamagui";
+import {
+  useGetSongsQuery,
+  useGetTrendingSongsQuery,
+} from "../services/SongService";
 import { useGetAlbumsQuery } from "../services/AlbumService";
 import { useGetArtistsQuery } from "../services/ArtistService";
 import { Album } from "../types/album";
 import { Artist } from "../types/artist";
 import { Song } from "../types/song";
 import Sidebar from "../components/Sidebar";
-import { SectionHelper } from "../components/SectionHelper";
-import SafeImage from "../components/SafeImage";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../navigation/AppNavigator";
-import { Section } from "../types/section";
+import { HomeStackParamList } from "../navigation/HomeNavigator";
 import { useAppSelector } from "../store";
 import { AlbumItem } from "../components/AlbumItem";
-import { SongItem } from "../components/SongItem";
 import { ArtistItem } from "../components/ArtistItem";
-import { PodcastItem } from "../components/PodcastItem";
-import { HomeStackParamList } from "../navigation/HomeNavigator";
+import { SongItem } from "../components/song/SongItem";
+import Toast from "react-native-toast-message";
+import SongBottomSheet from "../components/song/SongBottomSheet";
+import { playSong } from "../services/playerService";
+import {
+  useGetPodcastCategoriesQuery,
+  useGetPodcastShowsQuery,
+} from "../services/PodcastService";
+import { PodcastShowItem } from "../components/podcast/PodcastShowItem";
+import { PodcastShow } from "../types/podcast";
 
-// Dữ liệu mẫu cho Podcasts
 const relaxationItems = [
   {
-    id: "1",
+    id: 1,
     title: "#28 - người lớn và áp lực 'xây dựng hình ảnh'",
     creator: "Giang cơ Radio",
     description:
@@ -39,17 +45,17 @@ const relaxationItems = [
     coverImage:
       "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
     createdAt: "2023-12-01T00:00:00Z",
-    type: "podcast",
+    categoryId: 1,
   },
   {
-    id: "2",
+    id: 2,
     title: "'Dùng đốt, ở trong đó đã có lửa' - P8/ NHẬT KÝ ĐĂNG TH...",
     creator: "Nằm nghe đọc truyện - Hathaya",
     description: "Episode về hành trình vượt khó.",
     coverImage:
       "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
     createdAt: "2023-12-02T00:00:00Z",
-    type: "podcast",
+    categoryId: 1,
   },
 ];
 
@@ -61,6 +67,8 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const scrollY = useRef(new Animated.Value(0)).current;
   const [selectedButton, setSelectedButton] = useState("All");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const user = useAppSelector((state) => state.auth.user);
   const sidebarAnim = useRef(
     new Animated.Value(-Dimensions.get("window").width * 0.75)
@@ -71,18 +79,22 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     isLoading: isAlbumsLoading,
     error: albumsError,
   } = useGetAlbumsQuery();
-
   const {
     data: artists,
     isLoading: isArtistsLoading,
     error: artistsError,
   } = useGetArtistsQuery();
-
   const {
     data: songs,
     isLoading: isSongsLoading,
     error: songsError,
-  } = useGetSongsQuery();
+  } = useGetTrendingSongsQuery();
+
+  const {
+    data: podcastShows,
+    isLoading: isPodcastShowsLoading,
+    error: podcastShowsError,
+  } = useGetPodcastShowsQuery();
 
   const toggleSidebar = () => {
     Animated.timing(sidebarAnim, {
@@ -92,11 +104,16 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     }).start();
     setIsSidebarOpen(!isSidebarOpen);
   };
-  const hanldeNavigation = <T extends keyof HomeStackParamList>(
+
+  const handleNavigation = <T extends keyof HomeStackParamList>(
     screen: T,
     params?: HomeStackParamList[T]
   ) => {
-    navigation.navigate({ name: screen as any, params });
+    if (params !== undefined) {
+      navigation.navigate(screen as any, params);
+    } else {
+      navigation.navigate(screen as any);
+    }
   };
 
   const handleButtonPress = (button: string) => {
@@ -109,79 +126,34 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     return artist?.name || "Unknown Artist";
   };
 
-  // Render item cho Podcasts
+  const handleMorePress = (song: Song) => {
+    setSelectedSong(song);
+    setIsBottomSheetOpen(true);
+  };
 
   const renderArtistItem = ({ item }: { item: Artist }) => (
-    <ArtistItem item={item}/>
-  );
-
-  // Render item cho Albums
-  const renderAlbumItem = ({ item }: { item: Album }) => (
-    <AlbumItem
-      hanldeNavigation={hanldeNavigation}
-      item={item}
-      getArtistName={getArtistName}
+    <ArtistItem
+      artist={item}
+      onPress={() => handleNavigation("Artist", { id: item.id })}
     />
   );
 
-  // Render item cho Songs
-  const renderSongItem = ({ item }: { item: Song }) => (
-    <SongItem item={item} getArtistName={getArtistName} />
+  const renderAlbumItem = ({ item }: { item: Album }) => (
+    <AlbumItem
+      album={item}
+      getArtistName={getArtistName}
+      showDate={false}
+      onPress={() => handleNavigation("Album", { id: item.id })}
+    />
   );
 
-  const renderRelaxationItem = ({ item }: { item: any }) => (
-    <PodcastItem item={item}/>
+  const renderPodcastShowItem = ({ item }: { item: PodcastShow }) => (
+    <PodcastShowItem item={item} navigation={navigation} />
   );
-
-  // Tạo sections cho FlatList
-  const sections: Section[] = [
-    {
-      id: "artists",
-      type: "horizontal",
-      title: "Popular Artists",
-      data: artists?.data,
-      loading: isArtistsLoading,
-      error: artistsError ? "Error loading artists" : null,
-      renderItem: renderArtistItem,
-    },
-    {
-      id: "albums",
-      type: "horizontal",
-      title: "New Albums",
-      data: albums?.data,
-      loading: isAlbumsLoading,
-      error: albumsError ? "Error loading albums" : null,
-      renderItem: renderAlbumItem,
-    },
-    {
-      id: "songs",
-      type: "vertical",
-      title: "Trending Songs",
-      data: songs?.data,
-      loading: isSongsLoading,
-      error: songsError ? "Error loading songs" : null,
-      renderItem: renderSongItem,
-    },
-    {
-      id: "relaxation",
-      type: "vertical",
-      title: "Podcasts",
-      data: relaxationItems,
-      renderItem: renderRelaxationItem,
-    },
-  ];
-
-  const filteredSections = sections.filter((section) => {
-    if (selectedButton === "All") return true;
-    if (selectedButton === "Music" && section.id !== "relaxation") return true;
-    if (selectedButton === "Podcasts" && section.id === "relaxation")
-      return true;
-    return false;
-  });
 
   return (
-    <YStack flex={1} bg="rgb(25, 27, 31)" pl={20}>
-      {/* Sidebar */}
+    <YStack flex={1} bg="#111111">
+      <StatusBar barStyle="light-content" />
       <Animated.View
         style={{
           width: Dimensions.get("window").width * 0.75,
@@ -189,7 +161,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           position: "absolute",
           top: 0,
           bottom: 0,
-          zIndex: 10,
+          zIndex: 1000,
         }}
       >
         <Sidebar
@@ -199,7 +171,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         />
       </Animated.View>
 
-      {/* Nội dung chính */}
       <Animated.View
         style={{
           flex: 1,
@@ -211,10 +182,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
               }),
             },
           ],
+          zIndex: 0,
         }}
       >
-        {/* Header */}
-        <XStack items="center" py={10} mt={StatusBar.currentHeight || 0} z={1}>
+        <XStack items="center" py={10} pl="$4">
           <TouchableOpacity onPress={toggleSidebar}>
             <Avatar circular size="$4">
               <Avatar.Image
@@ -249,32 +220,118 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           ))}
         </XStack>
 
-        {/* Danh sách nội dung */}
-        <Animated.View
-          style={{
-            flex: 1,
-            opacity: sidebarAnim.interpolate({
-              inputRange: [-Dimensions.get("window").width * 0.75, 0],
-              outputRange: [1, 0.5],
-            }),
-          }}
+        <Animated.ScrollView
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
+          pointerEvents={isSidebarOpen ? "none" : "auto"}
+          contentContainerStyle={{ paddingBottom: 80 }}
         >
-          <FlatList
-            data={filteredSections}
-            renderItem={({ item }) => <SectionHelper item={item} />}
-            keyExtractor={(item) => item.id}
-            showsVerticalScrollIndicator={false}
-            scrollEventThrottle={16}
-            onScroll={Animated.event(
-              [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-              { useNativeDriver: false }
-            )}
-            pointerEvents={isSidebarOpen ? "none" : "auto"}
-            contentContainerStyle={{ paddingBottom: 80 }}
-          />
-        </Animated.View>
+          {(selectedButton === "All" || selectedButton === "Music") && (
+            <>
+              <YStack p="$4">
+                <Text fontSize={20} fontWeight="bold" color="white" mb="$3">
+                  Popular Artists
+                </Text>
+                {isArtistsLoading ? (
+                  <Spinner size="large" color="$green10" />
+                ) : artistsError ? (
+                  <Text color="white">Error loading artists</Text>
+                ) : (
+                  <FlatList
+                    data={artists?.data}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderArtistItem}
+                    contentContainerStyle={{ paddingRight: 16 }}
+                  />
+                )}
+              </YStack>
 
-        {/* Overlay khi sidebar mở */}
+              <YStack p="$4">
+                <Text fontSize={20} fontWeight="bold" color="white" mb="$3">
+                  New Albums
+                </Text>
+                {isAlbumsLoading ? (
+                  <Spinner size="large" color="$green10" />
+                ) : albumsError ? (
+                  <Text color="white">Error loading albums</Text>
+                ) : (
+                  <FlatList
+                    data={albums?.data}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderAlbumItem}
+                    contentContainerStyle={{ paddingRight: 16 }}
+                  />
+                )}
+              </YStack>
+            </>
+          )}
+
+          {(selectedButton === "All" || selectedButton === "Podcasts") && (
+            <YStack pl="$4">
+              <Text fontSize={20} fontWeight="bold" color="white" mb="$3">
+                Podcasts
+              </Text>
+              {isPodcastShowsLoading ? (
+                <Spinner size="large" color="$green10" />
+              ) : podcastShowsError ? (
+                <Text color="white">Error loading podcasts</Text>
+              ) : !podcastShows?.data || podcastShows.data.length === 0 ? (
+                <Text color="rgba(255,255,255,0.7)">No podcasts found</Text>
+              ) : (
+                <FlatList
+                  data={podcastShows?.data}
+                  showsVerticalScrollIndicator={false}
+                  keyExtractor={(item) => item.id}
+                  renderItem={renderPodcastShowItem}
+                  scrollEnabled={false}
+                />
+              )}
+            </YStack>
+          )}
+          {(selectedButton === "All" || selectedButton === "Music") && (
+            <>
+              <YStack py="$4" pl="$4">
+                <Text fontSize={20} fontWeight="bold" color="white" mb="$3">
+                  Trending Songs
+                </Text>
+                {isSongsLoading ? (
+                  <Spinner size="large" color="$green10" />
+                ) : songsError ? (
+                  <Text color="white">Error loading songs</Text>
+                ) : !songs?.data || songs.data.length === 0 ? (
+                  <Text color="rgba(255,255,255,0.7)">
+                    No trending songs found
+                  </Text>
+                ) : (
+                  <YStack pr="$4">
+                    {songs?.data.map((item: Song, index: number) => (
+                      <SongItem
+                        key={item.id || `song-${item.title}`}
+                        song={item}
+                        index={index}
+                        showIndex={false}
+                        showImage={true}
+                        showArtistName={true}
+                        imageSize={60}
+                        getArtistName={getArtistName}
+                        screen="home"
+                        onMorePress={handleMorePress}
+                      />
+                    ))}
+                  </YStack>
+                )}
+              </YStack>
+            </>
+          )}
+        </Animated.ScrollView>
+
         {isSidebarOpen && (
           <TouchableWithoutFeedback onPress={toggleSidebar}>
             <View
@@ -285,11 +342,23 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
                 right: 0,
                 bottom: 0,
                 backgroundColor: "rgba(0, 0, 0, 0.5)",
+                zIndex: 500,
               }}
             />
           </TouchableWithoutFeedback>
         )}
       </Animated.View>
+
+      <SongBottomSheet
+        isOpen={isBottomSheetOpen}
+        onClose={() => {
+          setIsBottomSheetOpen(false);
+          setSelectedSong(null);
+        }}
+        selectedSong={selectedSong}
+        navigation={navigation}
+        screenType="home"
+      />
     </YStack>
   );
 }

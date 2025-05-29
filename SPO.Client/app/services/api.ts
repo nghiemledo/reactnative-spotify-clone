@@ -73,6 +73,6 @@ const baseQueryWithReauth: BaseQueryFn<
 export const baseRestApi = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Song", "Album", "Artist", "Genre"],
+  tagTypes: ["Song", "Album", "Artist", "Genre", "PodcastShow", "PodcastEpisode", "PodcastCategory", "Playlist", "PlaylistItem"],
   endpoints: () => ({}),
 });

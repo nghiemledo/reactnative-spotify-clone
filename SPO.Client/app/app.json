@@ -1,5 +1,31 @@
 {
   "expo": {
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0",
+            "kotlinVersion": "1.8.22"
+          }
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-9256713212021306~7812929844"
+        }
+      ],
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermission": "Cho phép $(PRODUCT_NAME) truy cập camera để quét mã QR.",
+          "enableCodeScanner": true
+        }
+      ]
+    ],
     "name": "app",
     "slug": "app",
     "version": "1.0.0",
@@ -25,8 +51,9 @@
       "package": "com.truong1510.app",
       "permissions": [
         "android.permission.INTERNET",
+        "android.permission.CAMERA",
         "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
       ],
       "jsEngine": "hermes",
       "config": {
@@ -35,22 +62,37 @@
           "type": "mediaPlayback"
         }
       },
-      "kotlinVersion": "1.9.22",
+      "kotlinVersion": "1.8.22",
       "splash": {
         "backgroundColor": "#FFFFFF"
       },
       "gradleProps": {
         "org.gradle.jvmargs": "-Xmx4g -XX:MaxMetaspaceSize=1g"
-      }
+      },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "myapp",
+              "host": "truong1510.com",
+              "pathPrefix": "/success"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-      
     },
-    
+    "scheme": "myapp",
     "extra": {
       "eas": {
-        "projectId": "22179ceb-5dfa-4be1-9a96-323b018681e6"
+        "projectId": "7795495a-d7e4-4fc6-9967-9a4085108503"
       }
     }
   }

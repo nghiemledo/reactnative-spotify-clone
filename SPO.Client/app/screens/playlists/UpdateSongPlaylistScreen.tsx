@@ -1,150 +1,101 @@
-import { memo, useState } from "react";
-import {
-  YStack,
-  XStack,
-  Button,
-  Text,
-  View,
-  Input,
-  Image,
-  Dialog,
-} from "tamagui";
+import { memo, useState, useEffect } from "react";
+import { YStack, XStack, Button, Text, Input, Image, Dialog } from "tamagui";
 import { TouchableOpacity, StatusBar } from "react-native";
 import { ArrowLeft, CircleMinus, Menu } from "@tamagui/lucide-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/AppNavigator";
-import Toast, { BaseToastProps } from "react-native-toast-message";
 import DraggableFlatList, {
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  useGetPlaylistByIdQuery,
+  useUpdatePlaylistMutation,
+} from "../../services/playlistServices"; 
+import {
+  useDeletePlaylistItemMutation,
+  useGetPlaylistItemsQuery,
+} from "../../services/playlistItemServices";
+import { useLazyGetSongByIdQuery } from "../../services/SongService";
+import { Song } from "../../types/song";
+interface SongWithPlaylist extends Song {
+  playlistItemId?: string;
+}
 
-const songs = [
-  {
-    id: 1,
-    type: "artist",
-    name: "HieuThuHai",
-    image: "https://i.pravatar.cc/150?img=3",
-  },
-  {
-    id: 2,
-    type: "song",
-    name: "HieuThuHai",
-    artists: [
-      { id: 1, name: "MANBO" },
-      { id: 2, name: "obito" },
-    ],
-    image: "https://i.pravatar.cc/150?img=3",
-  },
-  {
-    id: 3,
-    type: "song",
-    name: "Hà Nội",
-    artists: [
-      { id: 1, name: "MANBO" },
-      { id: 2, name: "obito" },
-      { id: 3, name: "dangrangto" },
-      { id: 4, name: "tlinh" },
-      { id: 5, name: "mck" },
-    ],
-    image: "https://i.pravatar.cc/150?img=3",
-  },
-  {
-    id: 4,
-    type: "song",
-    name: "Hà Nội",
-    artists: [
-      { id: 1, name: "MANBO" },
-      { id: 2, name: "obito" },
-      { id: 3, name: "dangrangto" },
-      { id: 4, name: "tlinh" },
-      { id: 5, name: "mck" },
-    ],
-    image: "https://i.pravatar.cc/150?img=3",
-  },
-  {
-    id: 5,
-    type: "song",
-    name: "Hà Nội",
-    artists: [
-      { id: 1, name: "MANBO" },
-      { id: 2, name: "obito" },
-      { id: 3, name: "dangrangto" },
-      { id: 4, name: "tlinh" },
-      { id: 5, name: "mck" },
-    ],
-    image: "https://i.pravatar.cc/150?img=3",
-  },
-  {
-    id: 6,
-    type: "song",
-    name: "Hà Nội",
-    artists: [
-      { id: 1, name: "MANBO" },
-      { id: 2, name: "obito" },
-      { id: 3, name: "dangrangto" },
-      { id: 4, name: "tlinh" },
-      { id: 5, name: "mck" },
-    ],
-    image: "https://i.pravatar.cc/150?img=3",
-  },
-  {
-    id: 7,
-    type: "song",
-    name: "Hà Nội",
-    artists: [
-      { id: 1, name: "MANBO" },
-      { id: 2, name: "obito" },
-      { id: 3, name: "dangrangto" },
-      { id: 4, name: "tlinh" },
-      { id: 5, name: "mck" },
-    ],
-    image: "https://i.pravatar.cc/150?img=3",
-  },
-  {
-    id: 8,
-    type: "song",
-    name: "Hà Nội",
-    artists: [
-      { id: 1, name: "MANBO" },
-      { id: 2, name: "obito" },
-      { id: 3, name: "dangrangto" },
-      { id: 4, name: "tlinh" },
-      { id: 5, name: "mck" },
-    ],
-    image: "https://i.pravatar.cc/150?img=3",
-  },
-];
+const updateSongPlaylist = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<any>();
+  const { playlistId } = route.params;
 
-type updateSongPlaylistNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "updateSongPlaylist"
->;
+  const { data: playlistData } = useGetPlaylistByIdQuery(playlistId);
+  const { data: playlistItemsData } = useGetPlaylistItemsQuery({ playlistId });
+  const [triggerGetSongById] = useLazyGetSongByIdQuery();
+  const [updatePlaylist, { isLoading: isUpdating }] =
+    useUpdatePlaylistMutation();
 
-const updateSongPlaylist = ({
-  navigation,
-}: {
-  navigation: updateSongPlaylistNavigationProp;
-}) => {
-  const [playlistName, setPlaylistName] = useState<string>("My playlist");
-  const [songList, setSongList] = useState(songs);
-  const [description, setDescription] = useState<string>("");
+  const [playlistName, setPlaylistName] = useState<string>(
+    playlistData?.data?.title || "My playlist"
+  );
+  const [songList, setSongList] = useState<SongWithPlaylist[]>([]);
+  const [description, setDescription] = useState<string>(
+    playlistData?.data?.description || ""
+  );
   const [isEditingDescription, setIsEditingDescription] =
     useState<boolean>(false);
   const [openModal, setOpenModal] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>(
-    "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg"
+    playlistData?.data?.coverImage ||
+      "https://images.unsplash.com/photo-1507838153414-b4b713384a76"
   );
+  const [deletePlaylistItem, { isLoading: isDeleting }] =
+    useDeletePlaylistItemMutation();
 
-  const onDragEnd = ({ data }: { data: typeof songs }) => {
-    console.log("onDragEnd data:", JSON.stringify(data, null, 2));
+  useEffect(() => {
+    if (playlistItemsData?.data?.length) {
+      const fetchSongs = async () => {
+        const songPromises = playlistItemsData.data.map(async (item) => {
+          if (item.playlistId === playlistId) {
+            try {
+              const result = await triggerGetSongById(item.songId).unwrap();
+              return {
+                ...result.data,
+                createdAt: item.createdAt,
+                playlistItemId: item.id,
+              };
+            } catch (error) {
+              return null;
+            }
+          }
+        });
+
+        const fetchedSongs = await Promise.all(songPromises);
+        setSongList(fetchedSongs.filter(Boolean) as SongWithPlaylist[]);
+      };
+
+      fetchSongs();
+    }
+  }, [playlistItemsData, playlistId, triggerGetSongById]);
+
+  useEffect(() => {
+    if (playlistData?.data) {
+      setPlaylistName(playlistData.data.title || "My playlist");
+      setDescription(playlistData.data.description || "");
+      setImageUrl(
+        playlistData.data.coverImage ||
+          "https://images.unsplash.com/photo-1507838153414-b4b713384a76"
+      );
+    }
+  }, [playlistData]);
+
+  const onDragEnd = ({ data }: { data: Song[] }) => {
     const idSet = new Set(data.map((item) => item.id));
     if (idSet.size !== data.length) {
-      console.warn("Duplicate IDs detected in songList:", data);
       const fixedData = data.map((item, index) => ({
         ...item,
-        id: item.id ?? index + 1,
+        id: item.id ? String(item.id) : String(index + 1),
       }));
-      setSongList(fixedData);
+      setSongList(fixedData as Song[]);
     } else {
       setSongList(data);
     }
@@ -161,12 +112,36 @@ const updateSongPlaylist = ({
     setOpenModal(false);
   };
 
+  const handleSave = async () => {
+    if (!playlistId) {
+      console.error("Playlist ID is missing");
+      return;
+    }
+    if (!playlistData?.data?.userId) {
+      console.error("User ID is missing");
+      return;
+    }
+    try {
+      await updatePlaylist({
+        id: playlistId,
+        title: playlistName,
+        description: description || null,
+        coverImage: imageUrl || null,
+        userId: playlistData.data.userId,
+        isPublic: playlistData.data.isPublic || false,
+      }).unwrap();
+      navigation.goBack();
+    } catch (error) {
+      console.error("Failed to save playlist:", error);
+    }
+  };
+
   return (
     <YStack flex={1} bg="#111" px={24} pt={60}>
       <XStack
         position="absolute"
-        t={0}
-        l={0}
+        t={-30}
+        l={-10}
         r={0}
         height={100}
         items="center"
@@ -202,8 +177,8 @@ const updateSongPlaylist = ({
         </XStack>
 
         <XStack flex={1} justify="flex-end">
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text color="white">Save</Text>
+          <TouchableOpacity onPress={handleSave}>
+            <Text color="white">{isUpdating ? "Saving..." : "Save"}</Text>
           </TouchableOpacity>
         </XStack>
       </XStack>
@@ -213,7 +188,7 @@ const updateSongPlaylist = ({
         justify="center"
         self="center"
         mb="$5"
-        mt="$6"
+        mt="$2"
         p={0}
         onPress={() => console.log("long")}
       >
@@ -353,25 +328,48 @@ const updateSongPlaylist = ({
                       bg: "transparent",
                       borderBlockColor: "transparent",
                     }}
+                    onPress={async () => {
+                      try {
+                        if (item.playlistItemId) {
+                          await deletePlaylistItem(
+                            item.playlistItemId
+                          ).unwrap();
+                          setSongList((prev) =>
+                            prev.filter((song) => song.id !== item.id)
+                          );
+                        }
+                      } catch (error) {
+                        console.error("Failed to delete playlist item:", error);
+                      }
+                    }}
+                    disabled={isDeleting}
                   />
-                  <YStack flex={1}>
-                    <Text fontSize={15} fontWeight="300" color="white">
-                      {item.name}
-                    </Text>
-                    <Text
-                      fontSize={13}
-                      fontWeight="300"
-                      color="rgba(255, 255, 255, 0.7)"
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                    >
-                      {item.type}
-                      {item.artists
-                        ? " • " +
-                          item.artists.map((artist) => artist.name).join(", ")
-                        : ""}
-                    </Text>
-                  </YStack>
+                  <XStack items="center" gap="$3" flex={1}>
+                    <Image
+                      source={{
+                        uri:
+                          item.coverImage || "https://via.placeholder.com/150",
+                      }}
+                      width={50}
+                      height={50}
+                      rounded="$2"
+                      resizeMode="cover"
+                    />
+                    <YStack flex={1}>
+                      <Text fontSize={15} fontWeight="300" color="white">
+                        {item.title}
+                      </Text>
+                      <Text
+                        fontSize={13}
+                        fontWeight="300"
+                        color="rgba(255, 255, 255, 0.7)"
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {item.artist}
+                      </Text>
+                    </YStack>
+                  </XStack>
                 </XStack>
                 <Button
                   bg="transparent"

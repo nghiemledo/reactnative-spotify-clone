@@ -1,14 +1,8 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import React, { useEffect, useState } from "react";
-import Toast, { BaseToastProps } from "react-native-toast-message";
-import { Button, Image, Input, Text, View, XStack, YStack } from "tamagui";
-import {
-  ArrowLeft,
-  CircleCheck,
-  CirclePlus,
-  EllipsisVertical,
-  X,
-} from "@tamagui/lucide-icons";
+import React, { useState, useEffect } from "react";
+import Toast from "react-native-toast-message";
+import {  Input, Text, View, XStack, YStack } from "tamagui";
+import { ArrowLeft, X } from "@tamagui/lucide-icons";
 import {
   Dimensions,
   FlatList,
@@ -17,491 +11,398 @@ import {
   Keyboard,
   ActivityIndicator,
 } from "react-native";
-import { RootStackParamList } from "../types";
+import SongBottomSheet from "../../components/song/SongBottomSheet";
+import Tabs from "../../components/search/Tabs";
+import { ArtistItem } from "../../components/ArtistItem";
+import { SongItem } from "../../components/song/SongItem";
+import { RootStackParamList } from "../../navigation/AppNavigator";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { useSearchQuery } from "../../services/AuthService";
+import { Artist } from "../../types/artist";
+import { Song } from "../../types/song";
+import { PodcastShow } from "../../types/podcast";
+import { HomeStackParamList } from "../../navigation/HomeNavigator";
+import { PodcastShowItem } from "../../components/podcast/PodcastShowItem";
 
-interface Artist {
-  id: number;
-  type: "artist";
+// Define interfaces to match SearchResponse
+interface SearchArtist {
+  id: string;
   name: string;
-  image: string;
+  coverImage: string;
 }
 
-interface Song {
-  id: number;
-  type: "song";
-  name: string;
-  artists: { id: number; name: string }[];
-  image: string;
+interface SearchSong {
+  id: string;
+  title: string;
+  artistId: string;
+  artistName: string;
+  coverImage: string;
 }
 
-type Item = Artist | Song;
-const data = [
-  {
-    id: 1,
-    type: "artist",
-    name: "HieuThuHai",
-    image: "https://i.pravatar.cc/150?img=3",
-  },
-  {
-    id: 2,
-    type: "song",
-    name: "HieuThuHai",
-    artists: [
-      {
-        id: 1,
-        name: "MANBO",
-      },
-      {
-        id: 2,
-        name: "obito",
-      },
-    ],
-    image: "https://i.pravatar.cc/150?img=3",
-  },
-  {
-    id: 3,
-    type: "song",
-    name: "Hà Nội",
-    artists: [
-      {
-        id: 1,
-        name: "MANBO",
-      },
-      {
-        id: 2,
-        name: "obito",
-      },
-      {
-        id: 3,
-        name: "dangrangto",
-      },
-      {
-        id: 4,
-        name: "tlinh",
-      },
-      {
-        id: 5,
-        name: "mck",
-      },
-    ],
-    image: "https://i.pravatar.cc/150?img=3",
-  },
-];
+interface SearchPodcastShow {
+  id: string;
+  title: string;
+  creator: string;
+  coverImage: string;
+  categoryId?: string;
+}
 
-const dataType = [
-  { id: 1, name: "song" },
-  { id: 2, name: "song" },
-  { id: 3, name: "song" },
-  { id: 4, name: "song" },
-  { id: 5, name: "song" },
-];
-
-type SearchResultScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "searchresult"
->;
-
-export default function SearchResultScreen({
-  navigation,
-}: {
-  navigation: SearchResultScreenNavigationProp;
-}) {
+const SearchResultScreen = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const homeNavigation =
+    useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, "SearchResult">>();
   const { width, height } = Dimensions.get("window");
-  const [likedItems, setLikedItems] = useState<{ [key: number]: boolean }>({});
   const [searchValue, setSearchValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [isSearch, setIsSearch] = useState(false);
-  const [artist, setArtist] = useState<Artist | null>(null);
+  const [selectedTab, setSelectedTab] = useState<string | null>(null); 
+  const [toastQueue, setToastQueue] = useState<string[]>([]);
+  const [isSongOptionsOpen, setIsSongOptionsOpen] = useState(false);
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
 
-  const normalize = (s: string) => s.trim().toLowerCase();
+  const { data: searchData, isLoading: isSearchLoading } = useSearchQuery(
+    { query: searchQuery, limit: 10 },
+    { skip: !searchQuery }
+  );
 
-  const filteredData =
-    searchValue.trim() === "" && searchQuery.trim() === ""
+  // Debug log to check search query and data
+  useEffect(() => {
+    console.log("Search Query:", searchQuery);
+    console.log("Search Data:", searchData);
+  }, [searchQuery, searchData]);
+
+  // Normalize string for Vietnamese text (from first code)
+  const normalize = (s: string) => s?.trim().toLowerCase() || "";
+
+  // Filter functions for each category with null-safety (from first code)
+  const filterArtists = (artists: SearchArtist[]) =>
+    artists.filter((artist) =>
+      normalize(artist.name).includes(normalize(searchQuery))
+    );
+
+  const filterSongs = (songs: SearchSong[]) =>
+    songs.filter(
+      (song) =>
+        normalize(song.title).includes(normalize(searchQuery)) ||
+        normalize(song.artistName).includes(normalize(searchQuery))
+    );
+
+  const filterShows = (shows: SearchPodcastShow[]) =>
+    shows.filter((show) => normalize(show.title).includes(normalize(searchQuery)));
+
+  // Map and filter data for each category (from second code)
+  const filteredArtists =
+    !searchQuery.trim() ||
+    (selectedTab && selectedTab !== "All" && selectedTab !== "Artists")
       ? []
-      : data.filter((item) => {
-          if (searchQuery.trim() !== "") {
-            const needle = normalize(searchQuery);
-            if (normalize(item.name).includes(needle)) return true;
-            if (item.type === "song" && item.artists) {
-              return item.artists.some((artist) =>
-                normalize(artist.name).includes(needle)
-              );
-            }
-            return false;
-          }
+      : filterArtists(searchData?.data?.artists || []).map(
+          (artist) =>
+            ({
+              id: artist.id,
+              name: artist.name,
+              urlAvatar: artist.coverImage, // Map coverImage to urlAvatar
+              bio: "",
+              createdAt: "",
+              updatedAt: "",
+            } as Artist)
+        );
 
-          const needle = normalize(searchValue);
-          if (normalize(item.name).includes(needle)) return true;
-          if (item.type === "song" && item.artists) {
-            return item.artists.some((artist) =>
-              normalize(artist.name).includes(needle)
-            );
-          }
-          return false;
-        });
+  const filteredSongs =
+    !searchQuery.trim() ||
+    (selectedTab && selectedTab !== "All" && selectedTab !== "Songs")
+      ? []
+      : filterSongs(searchData?.data?.songs || []).map(
+          (song) =>
+            ({
+              id: song.id,
+              title: song.title,
+              coverImage: song.coverImage,
+              artistId: song.artistId,
+              artist: song.artistName,
+              duration: 0, // Default value since API doesn't provide
+              audioUrl: "", // Default value to bypass SongItem validation
+              createdAt: "",
+              updatedAt: "",
+            } as Song)
+        );
 
-  const toastConfig = {
-    success: ({ text1, text2 }: BaseToastProps) => (
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: "white",
-          padding: 12,
-          borderRadius: 10,
-          marginHorizontal: 16,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 2,
-        }}
-      >
-        <Image
-          source={{ uri: "https://i.pravatar.cc/150?img=3" }}
-          style={{ width: 24, height: 24, marginRight: 12 }}
-        />
-        <XStack style={{ flex: 1 }} justifyContent="space-between">
-          <Text fontSize="$3">{text1}</Text>
-          <Text
-            color="#1DB954"
-            fontWeight="bold"
-            onPress={() => navigation.goBack()}
-          >
-            Change
-          </Text>
-        </XStack>
-      </View>
-    ),
-  };
+  const filteredShows =
+    !searchQuery.trim() ||
+    (selectedTab && selectedTab !== "All" && selectedTab !== "Podcasts")
+      ? []
+      : filterShows(searchData?.data?.shows || []).map(
+          (show) =>
+            ({
+              id: show.id,
+              title: show.title,
+              creator: show.creator,
+              coverImage: show.coverImage,
+              categoryId: show.categoryId || "",
+              description: "", // Default value since API doesn't provide
+              createdAt: "",
+              updatedAt: "",
+            } as PodcastShow)
+        );
 
-  const handlePress = (id: number) => {
-    setLikedItems((prev) => {
-      const isLiked = prev[id];
-      if (!isLiked) {
-        Toast.show({
-          type: "success",
-          text1: "Added to liked songs",
-          position: "bottom",
-          visibilityTime: 2000,
-          autoHide: true,
-        });
-      }
-      return { ...prev, [id]: !isLiked };
-    });
-  };
+  // Debug filtered results
+  useEffect(() => {
+    console.log("Filtered Artists:", filteredArtists);
+    console.log("Filtered Songs:", filteredSongs);
+    console.log("Filtered Shows:", filteredShows);
+  }, [filteredArtists, filteredSongs, filteredShows]);
+
+  const hasResults =
+    filteredArtists.length > 0 ||
+    filteredSongs.length > 0 ||
+    filteredShows.length > 0;
+
+
+
 
   const handleSearchSubmit = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setSearchQuery(searchValue);
-      const needle = normalize(searchValue);
-
-      const matchedArtist = data.find(
-        (item) =>
-          item.type === "artist" && normalize(item.name).includes(needle)
-      );
-
-      if (matchedArtist) {
-        setArtist(matchedArtist as Artist);
-      } else {
-        setArtist(null);
-      }
-      setIsSearch(true);
-      setIsLoading(false);
-    }, 1500);
-
+    console.log("Submitting Search:", searchValue);
+    setSearchQuery(searchValue);
+    setIsSearch(true);
+    setSelectedTab(null); // Changed to null
     Keyboard.dismiss();
   };
 
   const handleInputFocus = () => {
     if (isSearch) {
-      setIsLoading(true);
       setIsSearch(false);
-      setArtist(null);
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 1500);
+      setSelectedTab(null); // Changed to null
+      setSearchQuery("");
+      setSearchValue("");
     }
   };
 
+  const handleOpenSongOptionsBottomSheet = (song: Song) => {
+    setSelectedSong(song);
+    setIsSongOptionsOpen(true);
+  };
+
+  const handleCloseSongOptionsBottomSheet = () => {
+    setIsSongOptionsOpen(false);
+    setSelectedSong(null);
+  };
+
+  const handleClearTab = () => {
+    setSelectedTab(null); // Changed to null
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      const toastMessages = route.params?.toastMessages;
+      if (toastMessages && Array.isArray(toastMessages)) {
+        setToastQueue(toastMessages);
+        navigation.setParams({ toastMessages: undefined });
+      }
+    });
+    return unsubscribe;
+  }, [navigation, route.params]);
+
+  useEffect(() => {
+    if (toastQueue.length > 0) {
+      const message = toastQueue[0];
+      Toast.show({
+        type: "success",
+        text1: message,
+        position: "bottom",
+        visibilityTime: 2000,
+        autoHide: true,
+        onHide: () => {
+          setToastQueue((prev) => prev.slice(1));
+        },
+      });
+    }
+  }, [toastQueue]);
+
   return (
-    <YStack flex={1} backgroundColor="#000">
+    <YStack flex={1} bg="#000">
       <View
-        style={{ position: "fixed" }}
-        width="100%"
-        borderRadius={7}
-        zIndex={1000}
-        alignItems="center"
-        paddingVertical="$1.5"
+        style={{ position: "fixed", top: 0, width: "100%", paddingTop: 0 }}
+        rounded={7}
+        z={1}
+        items="center"
         flexDirection="column"
       >
-        <XStack
-          paddingVertical="$2"
-          alignItems="center"
-          backgroundColor="rgba(256, 256, 256, 0.3)"
-          paddingTop="$7"
-          marginBottom="$2"
-        >
+        <XStack py="$1" items="center" mb="$2" bg="rgba(255, 255, 255, 0.3)">
           <Input
             size="$3.5"
             borderWidth={0}
-            borderRadius="$2"
-            backgroundColor="transparent"
+            rounded="$2"
+            bg="transparent"
             color="white"
             fontWeight="bold"
             placeholder="What do you want to listen to?"
             placeholderTextColor="rgba(255, 255, 255, 0.7)"
             flex={1}
-            margin="auto"
-            paddingLeft="$7"
+            pl="$7"
             value={searchValue}
             onChangeText={setSearchValue}
-            returnKeyType="search"
             onSubmitEditing={handleSearchSubmit}
-            onFocus={handleInputFocus} // Thêm onFocus
+            onFocus={handleInputFocus}
           />
-          <XStack
-            position="absolute"
-            left="$2"
-            top="$8"
-            alignItems="center"
-            pointerEvents="none"
-          >
-            <ArrowLeft size="$1" color="white" />
-          </XStack>
-          <XStack
-            position="absolute"
-            right="$3"
-            top="$8"
-            alignItems="center"
-            onPress={() => {
-              setSearchValue("");
-              setSearchQuery("");
-              setIsSearch(false);
-              setArtist(null);
-            }}
-          >
-            <X size="$1" color="white" />
-          </XStack>
-        </XStack>
-        {isSearch && (
-          <FlatList
-            data={dataType}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={{
-              paddingHorizontal: 10,
-              gap: 10,
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              left: 12,
+              top: 12,
               alignItems: "center",
             }}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <YStack
-                  backgroundColor="rgba(256, 256, 256, 0.3)"
-                  justifyContent="center"
-                  paddingHorizontal="$5"
-                  alignItems="center"
-                  paddingVertical="$2"
-                  borderRadius="$10"
-                >
-                  <Text
-                    color="white"
-                    fontWeight="bold"
-                    // marginTop={8}
-                    fontSize={16}
-                    alignSelf="center"
-                  >
-                    {item.name}
-                  </Text>
-                </YStack>
-              </TouchableOpacity>
-            )}
-          />
-        )}
+            onPress={() => navigation.goBack()}
+          >
+            <ArrowLeft size="$1" color="white" />
+          </TouchableOpacity>
+          {searchValue.length > 0 && (
+            <TouchableOpacity
+              style={{
+                position: "absolute",
+                right: 3,
+                top: 15,
+                alignItems: "center",
+              }}
+              onPress={() => {
+                setSearchValue("");
+                setSearchQuery("");
+                setIsSearch(false);
+                setSelectedTab(null); // Changed to null
+              }}
+            >
+              <X size="$1" color="white" />
+            </TouchableOpacity>
+          )}
+        </XStack>
       </View>
-      <YStack flex={1} backgroundColor="#000" paddingHorizontal="$3">
-        {isLoading ? (
-          <YStack flex={1} justifyContent="center" alignItems="center">
+      <Tabs
+        isSearch={isSearch}
+        selectedTab={selectedTab}
+        setSelectedTab={(tab) => {
+          console.log("Selected Tab:", tab);
+          setSelectedTab(tab);
+        }}
+        handleClearTab={handleClearTab}
+      />
+      <YStack flex={1} bg="#000" px="$3">
+        {isSearchLoading ? (
+          <YStack flex={1} justify="center" items="center">
             <ActivityIndicator size="large" color="#1DB954" />
           </YStack>
         ) : (
           <ScrollView scrollEventThrottle={16}>
-            {artist && (
-              <XStack
-                alignItems="center"
-                justifyContent="space-between"
-                paddingVertical="$2"
-              >
-                <XStack alignItems="center" gap="$3" flex={1} paddingRight="$2">
-                  <Image
-                    source={{ uri: artist.image }}
-                    width={50}
-                    height={50}
-                    borderRadius={100}
-                  />
-                  <YStack flex={1}>
-                    <Text fontSize={15} fontWeight="300" color="white">
-                      {artist.name}
-                    </Text>
-                    <Text
-                      fontSize={13}
-                      fontWeight="300"
-                      color="rgba(255, 255, 255, 0.7)"
-                    >
-                      {artist.type}
-                    </Text>
-                  </YStack>
-                </XStack>
-                <Button
-                  color="white"
-                  backgroundColor="transparent"
-                  borderColor="white"
-                  size="$3"
-                  borderRadius="$10"
-                >
-                  <Text color="white">Follow</Text>
-                </Button>
-              </XStack>
-            )}
-            {filteredData.length > 0 ? (
-              <FlatList
-                data={filteredData}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                  <TouchableOpacity>
-                    {item.type === "song" ? (
-                      <XStack
-                        alignItems="center"
-                        justifyContent="space-between"
-                        paddingVertical="$2"
+            {isSearch && hasResults ? (
+              <>
+                {(selectedTab === null || selectedTab === "Artists") && // Changed "All" to null
+                  filteredArtists.length > 0 && (
+                    <YStack mb="$4">
+                      <Text
+                        color="white"
+                        fontSize="$5"
+                        fontWeight="bold"
+                        mb="$2"
                       >
-                        <XStack
-                          alignItems="center"
-                          gap="$3"
-                          flex={1}
-                          paddingRight="$2"
-                        >
-                          <Image
-                            source={{ uri: item.image }}
-                            width={50}
-                            height={50}
-                            borderRadius={8}
-                          />
-                          <YStack flex={1}>
-                            <Text fontSize={15} fontWeight="300" color="white">
-                              {item.name}
-                            </Text>
-                            <Text
-                              fontSize={13}
-                              fontWeight="300"
-                              color="rgba(255, 255, 255, 0.7)"
-                              numberOfLines={1}
-                              ellipsizeMode="tail"
-                            >
-                              {item.type} •{" "}
-                              {item.artists
-                                ?.map((artist) => artist.name)
-                                .join(", ")}
-                            </Text>
-                          </YStack>
-                        </XStack>
-                        <XStack gap="$3">
-                          <Button
-                            backgroundColor="transparent"
-                            padding={0}
-                            icon={
-                              <EllipsisVertical
-                                size="$1"
-                                color="white"
-                                strokeWidth={1}
+                        Artists
+                      </Text>
+                      <FlatList
+                        data={filteredArtists}
+                        keyExtractor={(item) => item.id ?? ""}
+                        renderItem={({ item }) => {
+                          console.log("Rendering Artist:", item);
+                          return (
+                            <TouchableOpacity>
+                              <ArtistItem
+                                artist={item}
+                                onPress={() =>
+                                  navigation.navigate("Artist", { id: item.id })
+                                }
                               />
-                            }
-                            pressStyle={{
-                              backgroundColor: "transparent",
-                              borderBlockColor: "transparent",
-                            }}
-                          />
-                          <Button
-                            backgroundColor="transparent"
-                            padding={0}
-                            icon={
-                              likedItems[item.id] ? (
-                                <CircleCheck
-                                  size="$1"
-                                  color="white"
-                                  strokeWidth={1}
-                                  backgroundColor="#1DB954"
-                                  borderRadius="$10"
-                                  borderColor="#333"
-                                />
-                              ) : (
-                                <CirclePlus
-                                  size="$1"
-                                  color="white"
-                                  strokeWidth={1}
-                                />
-                              )
-                            }
-                            pressStyle={{
-                              backgroundColor: "transparent",
-                              borderBlockColor: "transparent",
-                            }}
-                            onPress={() => handlePress(item.id)}
-                          />
-                        </XStack>
-                      </XStack>
-                    ) : (
-                      <XStack
-                        alignItems="center"
-                        justifyContent="space-between"
-                        paddingVertical="$2"
+                            </TouchableOpacity>
+                          );
+                        }}
+                        scrollEnabled={false}
+                      />
+                    </YStack>
+                  )}
+                {(selectedTab === null || selectedTab === "Songs") && // Changed "All" to null
+                  filteredSongs.length > 0 && (
+                    <YStack mb="$4">
+                      <Text
+                        color="white"
+                        fontSize="$5"
+                        fontWeight="bold"
+                        mb="$2"
                       >
-                        <XStack
-                          alignItems="center"
-                          gap="$3"
-                          flex={1}
-                          paddingRight="$2"
-                        >
-                          <Image
-                            source={{ uri: item.image }}
-                            width={50}
-                            height={50}
-                            borderRadius={100}
-                          />
-                          <YStack flex={1}>
-                            <Text fontSize={15} fontWeight="300" color="white">
-                              {item.name}
-                            </Text>
-                            <Text
-                              fontSize={13}
-                              fontWeight="300"
-                              color="rgba(255, 255, 255, 0.7)"
-                            >
-                              {item.type}
-                            </Text>
-                          </YStack>
-                        </XStack>
-                      </XStack>
-                    )}
-                  </TouchableOpacity>
-                )}
-                scrollEnabled={false}
-              />
-            ) : searchQuery.trim() !== "" ? (
+                        Songs
+                      </Text>
+                      <FlatList
+                        data={filteredSongs}
+                        keyExtractor={(item) => item.id || ""}
+                        renderItem={({ item }) => {
+                          console.log("Rendering Song:", item);
+                          return (
+                            <TouchableOpacity>
+                              <SongItem
+                                song={item}
+                                showImage={true}
+                                showArtistName={true}
+                                getArtistName={() =>
+                                  item.artist || "Unknown Artist"
+                                }
+                                onMorePress={handleOpenSongOptionsBottomSheet}
+                                screen="search"
+                                navigation={navigation}
+                              />
+                            </TouchableOpacity>
+                          );
+                        }}
+                        scrollEnabled={false}
+                      />
+                    </YStack>
+                  )}
+                {(selectedTab === null || selectedTab === "Podcasts") && // Changed "All" to null
+                  filteredShows.length > 0 && (
+                    <YStack mb="$4">
+                      <Text
+                        color="white"
+                        fontSize="$5"
+                        fontWeight="bold"
+                        mb="$2"
+                      >
+                        Podcasts
+                      </Text>
+                      <FlatList
+                        data={filteredShows}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({ item }) => {
+                          console.log("Rendering Show:", item);
+                          return (
+                            <TouchableOpacity>
+                              <PodcastShowItem
+                                item={item}
+                                navigation={homeNavigation}
+                              />
+                            </TouchableOpacity>
+                          );
+                        }}
+                        scrollEnabled={false}
+                      />
+                    </YStack>
+                  )}
+              </>
+            ) : isSearch && !hasResults ? (
               <YStack
                 position="absolute"
-                top={height / 2}
-                left={width / 2 - 130}
-                alignItems="center"
+                t={height / 2}
+                l={width / 2 - 130}
+                items="center"
               >
                 <Text
                   fontWeight="bold"
                   color="white"
                   fontSize="$6"
-                  alignSelf="center"
+                  self="center"
                 >
                   No results found
                 </Text>
@@ -512,15 +413,15 @@ export default function SearchResultScreen({
             ) : (
               <YStack
                 position="absolute"
-                top={height / 2}
-                left={width / 2 - 130}
-                alignItems="center"
+                t={height / 2}
+                l={width / 2 - 130}
+                items="center"
               >
                 <Text
                   fontWeight="bold"
                   color="white"
                   fontSize="$6"
-                  alignSelf="center"
+                  self="center"
                 >
                   Play what you love
                 </Text>
@@ -532,7 +433,28 @@ export default function SearchResultScreen({
           </ScrollView>
         )}
       </YStack>
-      <Toast config={toastConfig} />
+      {isSongOptionsOpen && (
+        <View
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9999,
+            height: "100%",
+          }}
+        >
+          <SongBottomSheet
+            isOpen={isSongOptionsOpen}
+            onClose={handleCloseSongOptionsBottomSheet}
+            selectedSong={selectedSong}
+            navigation={navigation}
+            screenType="search"
+          />
+        </View>
+      )}
     </YStack>
   );
-}
+};
+
+export default SearchResultScreen;

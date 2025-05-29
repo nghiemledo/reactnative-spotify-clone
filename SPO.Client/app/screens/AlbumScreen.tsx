@@ -1,91 +1,88 @@
-import { Animated, Dimensions, StatusBar, View } from "react-native";
-import { YStack, XStack, Text, Image, Button } from "tamagui";
-import { FlatList, ScrollView, TouchableOpacity } from "react-native";
+import { Animated, Dimensions, StatusBar, View, FlatList } from "react-native";
+import { YStack, XStack, Text, Image, Button, Spinner } from "tamagui";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect, useRef, useMemo, useCallback, useState } from "react";
 import {
   ArrowLeft,
-  Globe,
   ArrowDownCircle,
   EllipsisVertical,
   Play,
-  Plus,
-  Search,
+  PlusCircle,
+  Shuffle,
+  CheckCircle,
 } from "@tamagui/lucide-icons";
 import { LinearGradient } from "@tamagui/linear-gradient";
-import { RootStackParamList } from "../navigation/AppNavigator";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { useGetAlbumByIdQuery } from "../services/AlbumService";
+import {
+  useGetAlbumByIdQuery,
+  useGetAlbumsQuery,
+} from "../services/AlbumService";
 import { useGetSongsQuery } from "../services/SongService";
+import { RootStackParamList } from "../navigation/AppNavigator";
+import { Album } from "../types/album";
+import { useGetArtistsQuery } from "../services/ArtistService";
+import { Artist } from "../types/artist";
+import Toast from "react-native-toast-message";
+import { Song } from "../types/song";
+import { SongItem } from "../components/song/SongItem";
+import { AlbumItem } from "../components/AlbumItem";
+import SongBottomSheet from "../components/song/SongBottomSheet";
+import { playSong, setPlayerQueue } from "../services/playerService";
 import { HomeStackParamList } from "../navigation/HomeNavigator";
-
-// Dữ liệu giả lập cho album và danh sách bài hát
-const albumData = {
-  id: "1",
-  title: "Đánh Đổi",
-  releaseDate: "10 Oct 2023",
-  coverImage:
-    "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  artistName: "Obito, Shiki",
-  totalSongs: 20,
-  totalDuration: "56 min",
-};
-
-const recommendedAlbums = [
-  {
-    id: "1",
-    title: "Hip-hop Việt",
-    artist: "HIEUTHUHAI, Dangrangto, Wxrdie, R...",
-    coverImage:
-      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    year: "2023",
-  },
-  {
-    id: 2,
-    title: "Best of Hip-hop Việt 2023",
-    artist: "HIEUTHUHAI, tlinh, RPT MCK, Andree Right Han...",
-    coverImage:
-      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    year: "2023",
-  },
-  {
-    id: "3",
-    title: "SOOI",
-    artist: "Vũ, DatKaa...",
-    coverImage:
-      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    year: "2023",
-  },
-];
+import { store } from "../store";
+import { setQueue as setReduxQueue } from "../store/playerSlice";
 
 type AlbumRouteProp = RouteProp<HomeStackParamList, "Album">;
 
+type AlbumScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 export default function AlbumScreen() {
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
+  const [isAdded, setIsAdded] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
-  const [search, setSearch] = useState("");
-  const navigation =
-    useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
+  const navigation = useNavigation<AlbumScreenNavigationProp>();
   const route = useRoute<AlbumRouteProp>();
-  const {
-    data: album,
-    isLoading,
-    error,
-  } = useGetAlbumByIdQuery(route.params.id);
+  const albumId = route.params?.id;
+
+  if (!albumId) {
+    return (
+      <YStack flex={1} justify="center" items="center">
+        <Text color="white">Lỗi: Không tìm thấy ID album</Text>
+        <Button onPress={() => navigation.goBack()} mt="$4">
+          Quay lại
+        </Button>
+      </YStack>
+    );
+  }
+
+  const { data: album, isLoading, error } = useGetAlbumByIdQuery(albumId);
   const {
     data: songs,
     isLoading: songsLoading,
     error: songsError,
   } = useGetSongsQuery();
+  const {
+    data: albums,
+    isLoading: isAlbumsLoading,
+    error: albumsError,
+  } = useGetAlbumsQuery();
+  const {
+    data: artists,
+    isLoading: isArtistsLoading,
+    error: artistsError,
+  } = useGetArtistsQuery();
 
-  useEffect(() => {
-    songs?.data.filter((item) => {
-      if (item.artistId === album?.data?.artistId) {
-        return item;
-      }
-    });
-  }, [songs]);
+  const filteredAlbums = albums?.data?.filter(
+    (item: Album) => item.id !== albumId
+  );
 
-  // Memoize interpolated values
+  const filteredSongs = useMemo(() => {
+    return (
+      songs?.data?.filter((item) => item.albumId === album?.data?.id) || []
+    );
+  }, [songs, album]);
+
   const navbarBackground = useMemo(
     () =>
       scrollY.interpolate({
@@ -106,16 +103,6 @@ export default function AlbumScreen() {
     [scrollY]
   );
 
-  const searchOpacity = useMemo(
-    () =>
-      scrollY.interpolate({
-        inputRange: [0, 100],
-        outputRange: [1, 0],
-        extrapolate: "clamp",
-      }),
-    [scrollY]
-  );
-
   const screenWidth = Dimensions.get("window").width;
 
   const imageSize = useMemo(
@@ -125,7 +112,7 @@ export default function AlbumScreen() {
         outputRange: [screenWidth * 0.5, screenWidth * 0.3],
         extrapolate: "clamp",
       }),
-    [scrollY, screenWidth]
+    [screenWidth]
   );
 
   const opacity = useMemo(
@@ -138,7 +125,6 @@ export default function AlbumScreen() {
     [scrollY]
   );
 
-  // Memoize handlers
   const handleScroll = useCallback(
     Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
       useNativeDriver: false,
@@ -150,13 +136,236 @@ export default function AlbumScreen() {
     navigation.goBack();
   }, [navigation]);
 
-  useEffect(() => {
-    // navigation.setOptions({
-    //   headerShown: false,
-    // });
+  const handleAddButtonPress = useCallback(() => {
+    setIsAdded((prev) => !prev);
+    Toast.show({
+      type: "success",
+      text1: isAdded ? "Đã xóa khỏi Thư viện" : "Đã thêm vào Thư viện",
+      position: "bottom",
+      visibilityTime: 2000,
+    });
+  }, [isAdded]);
 
+  const handleNavigation = <T extends keyof HomeStackParamList>(
+    screen: T,
+    params: HomeStackParamList[T]
+  ) => {
+    navigation.navigate(screen as any, params);
+  };
+
+  const getArtistName = (artistId: string | undefined) => {
+    if (!artistId) return "Nghệ sĩ không xác định";
+    const artist = artists?.data?.find((a: Artist) => a.id === artistId);
+    return artist?.name || "Nghệ sĩ không xác định";
+  };
+
+  const getArtistUrlAvatar = (artistId: string | undefined) => {
+    if (!artistId) return "https://via.placeholder.com/120";
+    const artist = artists?.data?.find((a: Artist) => a.id === artistId);
+    return artist?.urlAvatar || "https://via.placeholder.com/120";
+  };
+
+  const handleMorePress = (song: Song) => {
+    setSelectedSong(song);
+    setIsBottomSheetOpen(true);
+  };
+
+  // Hàm xử lý khi nhấn nút Play
+  const handlePlayAll = async () => {
+    if (!filteredSongs || filteredSongs.length === 0) {
+      Toast.show({
+        type: "error",
+        text1: "Không có bài hát nào để phát",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+      return;
+    }
+
+    try {
+      // Chuyển đổi filteredSongs thành định dạng Track
+      const tracks = filteredSongs
+        .filter((song) => song.audioUrl && song.title) // Lọc bài hát hợp lệ
+        .map((song: Song) => ({
+          id: song.id || `song-${song.title}`,
+          url: song.audioUrl || "",
+          title: song.title || "",
+          artist: song.artistId || "Nghệ sĩ không xác định",
+          artwork:
+            song.coverImage ||
+            "https://via.placeholder.com/300?text=Không+có+hình+ảnh",
+          duration: song.duration || 0,
+        }));
+
+      // Xóa hàng đợi hiện tại và thêm danh sách mới
+      store.dispatch(setReduxQueue(tracks));
+      await setPlayerQueue(tracks);
+
+      // Phát bài hát đầu tiên
+      const firstSong = filteredSongs[0];
+      await playSong(firstSong);
+
+      // Điều hướng đến màn hình Playing
+      navigation.navigate("Playing");
+      Toast.show({
+        type: "success",
+        text1: `Đang phát album: ${album?.data?.title || "album"}`,
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+    } catch (error) {
+      console.error("Lỗi khi phát tất cả bài hát:", error);
+      Toast.show({
+        type: "error",
+        text1: "Không thể phát danh sách bài hát",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+    }
+  };
+
+  const renderAlbumItem = ({ item }: { item: Album }) => (
+    <AlbumItem
+      album={item}
+      getArtistName={getArtistName}
+      showDate={false}
+      onPress={() => handleNavigation("Album", { id: item.id })}
+    />
+  );
+
+  const renderInfo = () => (
+    <YStack pt={16} pb={20}>
+      <XStack items="center" justify="center" mb={16}>
+        <View
+          style={{
+            borderRadius: 18,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.3,
+            shadowRadius: 16,
+            elevation: 8,
+          }}
+        >
+          <Animated.Image
+            source={{
+              uri: album?.data?.coverImage || "https://via.placeholder.com/300",
+            }}
+            style={{
+              width: imageSize,
+              height: imageSize,
+              borderRadius: 18,
+              opacity,
+            }}
+            resizeMode="cover"
+          />
+        </View>
+      </XStack>
+
+      <Text
+        fontSize={28}
+        width="90%"
+        fontWeight="bold"
+        color="white"
+        mb={4}
+        numberOfLines={1}
+      >
+        {album?.data?.title || "Đang tải..."}
+      </Text>
+      <XStack>
+        <Image
+          source={{ uri: getArtistUrlAvatar(album?.data?.artistId) }}
+          width={27}
+          height={27}
+          borderRadius={100}
+          marginInlineEnd={10}
+        />
+        <Text fontSize={15} color="#fff" fontWeight="bold" mb={10}>
+          {getArtistName(album?.data?.artistId)}
+        </Text>
+      </XStack>
+
+      <Text fontSize={16} color="rgba(255,255,255,0.8)" mb={4}>
+        Album •{" "}
+        {album?.data?.createdAt
+          ? new Date(album.data.createdAt).toLocaleDateString("vi-VN")
+          : "Không có ngày"}
+      </Text>
+
+      <XStack items="center" justify="space-between" mb={12}>
+        <XStack>
+          <Button
+            bg="transparent"
+            mr={20}
+            rounded={100}
+            p={0}
+            onPress={handleAddButtonPress}
+            icon={
+              isAdded ? (
+                <CheckCircle
+                  size={25}
+                  color="black"
+                  bg="#1DB954"
+                  rounded="$10"
+                />
+              ) : (
+                <PlusCircle size={25} color="#AAAAAA" />
+              )
+            }
+          />
+          <Button
+            mr={20}
+            bg="transparent"
+            rounded={100}
+            p={0}
+            icon={<ArrowDownCircle size={25} color="#AAAAAA" />}
+          />
+          <Button
+            bg="transparent"
+            rounded={100}
+            p={0}
+            icon={<EllipsisVertical size={25} color="#AAAAAA" />}
+          />
+        </XStack>
+        <XStack items="center">
+          <Button
+            bg="#1DB954"
+            rounded={100}
+            width={56}
+            height={56}
+            icon={<Play size={28} color="black" fill="black" />}
+            onPress={handlePlayAll} // Gắn hàm handlePlayAll
+          />
+        </XStack>
+      </XStack>
+    </YStack>
+  );
+
+  const renderAlbum = () => (
+    <YStack mt="$6" mb={70}>
+      <Text fontSize={20} fontWeight="bold" color="white" mb="$3">
+        You might also like
+      </Text>
+      {isAlbumsLoading ? (
+        <Spinner size="large" color="$green10" />
+      ) : albumsError ? (
+        <Text color="white">Error loading album list</Text>
+      ) : !filteredAlbums || filteredAlbums.length === 0 ? (
+        <Text color="rgba(255,255,255,0.7)">No other albums found</Text>
+      ) : (
+        <FlatList
+          data={filteredAlbums}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id}
+          renderItem={renderAlbumItem}
+          contentContainerStyle={{ paddingRight: 16 }}
+        />
+      )}
+    </YStack>
+  );
+
+  useEffect(() => {
     return () => {
-      // Cleanup animations if needed
       scrollY.stopAnimation();
     };
   }, [scrollY]);
@@ -166,7 +375,7 @@ export default function AlbumScreen() {
       p={0}
       m={0}
       flex={1}
-      colors={["#3a4a5a", "#000000"]}
+      colors={["#3a4a5a", "#111111"]}
       start={[0, 0]}
       end={[0, 0.5]}
     >
@@ -190,7 +399,6 @@ export default function AlbumScreen() {
         <View
           style={{
             flex: 1,
-            // paddingTop: StatusBar.currentHeight || 44,
             flexDirection: "row",
             alignItems: "center",
             paddingHorizontal: 10,
@@ -198,20 +406,19 @@ export default function AlbumScreen() {
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <TouchableOpacity onPress={handleGoBack}>
-              <Button
-                size="$8"
-                chromeless
-                icon={ArrowLeft}
-                color="#fff"
-                p={0}
-                bg="transparent"
-                pressStyle={{
-                  bg: "transparent",
-                  borderBlockColor: "transparent",
-                }}
-              />
-            </TouchableOpacity>
+            <Button
+              onPress={handleGoBack}
+              size="$8"
+              chromeless
+              icon={ArrowLeft}
+              color="#fff"
+              p={0}
+              bg="transparent"
+              pressStyle={{
+                bg: "transparent",
+                borderBlockColor: "transparent",
+              }}
+            />
             <Animated.Text
               style={{
                 color: "white",
@@ -221,211 +428,73 @@ export default function AlbumScreen() {
                 marginLeft: 8,
               }}
             >
-              {album?.data?.title}
+              {album?.data?.title || "Đang tải..."}
             </Animated.Text>
           </View>
-          {/* <XStack width={40} /> */}
         </View>
       </Animated.View>
 
-      <ScrollView scrollEventThrottle={16} onScroll={handleScroll}>
-        <YStack flex={1} p="$4">
-          {/* Search Bar */}
-          {/* <Animated.View style={{ opacity: searchOpacity }}>
-            <XStack mt={0} mb={20} items="center">
-              <Input
-                value={search}
-                onChangeText={setSearch}
-                size="$3.5"
-                borderWidth={0}
-                rounded={12}
-                bg="#23272b"
-                color="white"
-                placeholder="Find in playlist"
-                placeholderTextColor="rgba(255,255,255,0.7)"
-                flex={1}
-                m="auto"
-                style={{
-                  fontSize: 15,
-                  paddingLeft: 40,
-                  fontWeight: "bold",
-                  height: 44,
-                }}
-                focusStyle={{ borderWidth: 0, bg: "#2d3136" }}
-              />
-              <View
-                style={{
-                  position: "absolute",
-                  left: 16,
-                  top: 12,
-                  pointerEvents: "none",
-                }}
-              >
-                <Search size={20} color="rgba(255,255,255,0.7)" />
-              </View>
-              <Button bg="#23272b" rounded={12} ml={12} px={18} py={10}>
-                <Text color="white" fontWeight="bold">
-                  Sort
-                </Text>
-              </Button>
-            </XStack>
-          </Animated.View> */}
-
-          {/* Album Image */}
-          <XStack items="center" justify="center" mb={16}>
-            <View
-              style={{
-                borderRadius: 18,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.3,
-                shadowRadius: 16,
-                elevation: 8,
-              }}
-            >
-              <Animated.Image
-                source={{ uri: album?.data?.coverImage }}
-                style={{
-                  width: imageSize,
-                  height: imageSize,
-                  borderRadius: 18,
-                  opacity,
-                }}
-                resizeMode="cover"
-              />
-            </View>
-          </XStack>
-
-          {/* Title & Info */}
-          <Text
-            fontSize={28}
-            width="90%"
-            fontWeight="bold"
-            color="white"
-            mb={4}
-            numberOfLines={1}
-          >
-            {album?.data?.title}
-          </Text>
-          <Text fontSize={16} color="rgba(255,255,255,0.8)" mb={4}>
-            With {albumData.artistName}
-          </Text>
-          <Text color="rgba(255,255,255,0.7)" fontSize={13} mb={8}>
-            {albumData.totalSongs} saves • {albumData.totalDuration}
-          </Text>
-
-          {/* Control Buttons */}
-          <XStack items="center" justify="space-between" mb={12}>
-            <XStack gap={16}>
-              <Button
-                bg="rgba(255,255,255,0.05)"
-                rounded={100}
-                icon={
-                  <Image
-                    source={{ uri: albumData.coverImage }}
-                    width={28}
-                    height={28}
-                    borderRadius={8}
-                  />
-                }
-              />
-              <Button
-                bg="rgba(255,255,255,0.05)"
-                rounded={100}
-                icon={<Plus size={20} color="white" />}
-              />
-              <Button
-                bg="rgba(255,255,255,0.05)"
-                rounded={100}
-                icon={<ArrowDownCircle size={20} color="white" />}
-              />
-              <Button
-                bg="rgba(255,255,255,0.05)"
-                rounded={100}
-                icon={<EllipsisVertical size={20} color="white" />}
-              />
-            </XStack>
-            <Button
-              bg="#1DB954"
-              rounded={100}
-              width={56}
-              height={56}
-              icon={<Play size={28} color="black" fill="black" />}
-            />
-          </XStack>
-
-          {/* Song List */}
-          <YStack mt={8}>
-            {songs?.data?.map((item) => (
-              <XStack
-                key={item.id}
-                items="center"
-                justify="space-between"
-                py={10}
-              >
-                <XStack items="center" gap={12} flex={1}>
-                  <Image
-                    source={{ uri: item.coverImage }}
-                    width={48}
-                    height={48}
-                    borderRadius={8}
-                  />
-                  <YStack flex={1}>
-                    <Text fontSize={16} fontWeight="bold" color="white">
-                      {item.title}
-                    </Text>
-                    <Text fontSize={13} color="rgba(255,255,255,0.7)">
-                      {item?.artist || "Obito, Shiki"}
-                    </Text>
-                  </YStack>
-                </XStack>
-                <Text color="rgba(255,255,255,0.7)" fontSize={13} mr={12}>
-                  {item.duration}
-                </Text>
-                <Button
-                  bg="transparent"
-                  p={0}
-                  icon={<EllipsisVertical size={20} color="white" />}
-                  pressStyle={{
-                    bg: "transparent",
-                    borderBlockColor: "transparent",
-                  }}
-                />
-              </XStack>
-            ))}
-          </YStack>
-
-          {/* You might also like */}
-          <Text fontSize={20} fontWeight="bold" color="white" mt={32} mb={12}>
-            You might also like
-          </Text>
-          <FlatList
-            data={recommendedAlbums}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <YStack width={160} mr={16}>
-                  <Image
-                    source={{ uri: item.coverImage }}
-                    width={160}
-                    height={160}
-                    borderRadius={14}
-                  />
-                  <Text color="white" fontWeight="bold" mr={8} fontSize={16}>
-                    {item.title}
-                  </Text>
-                  <Text color="rgba(255,255,255,0.7)" fontSize={13}>
-                    {item.artist} {item.year && `• ${item.year}`}
-                  </Text>
-                </YStack>
-              </TouchableOpacity>
-            )}
-            scrollEnabled={true}
+      <FlatList
+        style={{ marginHorizontal: 16 }}
+        data={filteredSongs}
+        keyExtractor={(item, index) => item.id || `song-${index}`}
+        renderItem={({ item }) => (
+          <SongItem
+            song={item}
+            showIndex={false}
+            showImage={true}
+            showArtistName={true}
+            imageSize={48}
+            getArtistName={getArtistName}
+            onMorePress={handleMorePress}
+            onSongPress={async (song) => {
+              try {
+                await playSong(song);
+                navigation.navigate("Playing");
+                console.log("Bài hát được nhấn:", song.title);
+              } catch (error) {
+                console.error("Lỗi khi phát bài hát:", error);
+                Toast.show({
+                  type: "error",
+                  text1: "Không thể phát bài hát",
+                  position: "bottom",
+                  visibilityTime: 2000,
+                });
+              }
+            }}
+            screen={""}
           />
-        </YStack>
-      </ScrollView>
+        )}
+        ListHeaderComponent={renderInfo}
+        ListFooterComponent={renderAlbum}
+        scrollEventThrottle={16}
+        onScroll={handleScroll}
+        contentContainerStyle={{ paddingBottom: 70 }}
+        ListEmptyComponent={
+          songsLoading ? (
+            <Spinner size="large" color="$green10" />
+          ) : (
+            <Text color="rgba(255,255,255,0.7)">
+              {songsLoading
+                ? "Loading Songs..."
+                : "No songs found for this album"}
+            </Text>
+          )
+        }
+        showsVerticalScrollIndicator={false}
+      />
+
+      <Toast />
+      <SongBottomSheet
+        isOpen={isBottomSheetOpen}
+        onClose={() => {
+          setIsBottomSheetOpen(false);
+          setSelectedSong(null);
+        }}
+        selectedSong={selectedSong}
+        navigation={navigation as any}
+        screenType="album"
+      />
     </LinearGradient>
   );
 }

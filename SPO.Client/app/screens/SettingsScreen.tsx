@@ -1,11 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { YStack, XStack, Text, Button, ScrollView } from "tamagui";
 import { TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {
   ArrowLeft,
-  Search,
-  User,
   Music,
   Volume2,
   Lock,
@@ -14,13 +12,12 @@ import {
   Download,
   BarChart2,
   Info,
-  LogOut,
+  Loader,
 } from "@tamagui/lucide-icons";
-import { StatusBar } from "react-native";
-import { RootStackParamList } from "../navigation/AppNavigator";
 import { HomeStackParamList } from "../navigation/HomeNavigator";
 import { useAppDispatch } from "../store";
 import { logout } from "../store/authSlice";
+import AdComponent from "../components/AdComponent";
 
 // Settings Item Component
 const SettingsItem = ({
@@ -32,7 +29,7 @@ const SettingsItem = ({
   icon: React.ReactNode;
   title: string;
   subtitle: string;
-  onPress: () => void;
+  onPress?: () => void;
 }) => (
   <TouchableOpacity onPress={onPress}>
     <XStack items="flex-start" gap={16}>
@@ -60,81 +57,76 @@ export default function SettingsScreen({
   navigation: SettingsScreenNavigationProp;
 }) {
   const dispatch = useAppDispatch();
+  const [showAd, setShowAd] = useState(false);
   const settingsOptions = [
     {
       icon: <Music color="#fff" size={24} />,
       title: "Content and display",
       subtitle: "Canvas • Allow explicit content",
-      onPress: () => navigation.navigate("ContentAndDisplay"),
+      // onPress: () => navigation.navigate("ContentAndDisplay"),
     },
     {
       icon: <Volume2 color="#fff" size={24} />,
       title: "Playback",
       subtitle: "Gapless playback • Autoplay",
-      onPress: () => navigation.navigate("Playback"),
+      // onPress: () => navigation.navigate("Playback"),
     },
     {
       icon: <Lock color="#fff" size={24} />,
       title: "Privacy and social",
       subtitle: "Recently played artists • Followers and following",
-      onPress: () => navigation.navigate("PrivacyAndSocial"),
+      // onPress: () => navigation.navigate("PrivacyAndSocial"),
     },
     {
       icon: <Bell color="#fff" size={24} />,
       title: "Notifications",
       subtitle: "Push • Email",
-      onPress: () => navigation.navigate("Notifications"),
+      // onPress: () => navigation.navigate("Notifications"),
     },
     {
       icon: <Smartphone color="#fff" size={24} />,
       title: "Apps and devices",
       subtitle: "Google Maps • Spotify Connect control",
-      onPress: () => navigation.navigate("AppsAndDevices"),
+      // onPress: () => navigation.navigate("AppsAndDevices"),
     },
     {
       icon: <Download color="#fff" size={24} />,
       title: "Data-saving and offline",
       subtitle: "Data saver • Downloads over cellular",
-      onPress: () => navigation.navigate("DataSaving"),
+      // onPress: () => navigation.navigate("DataSaving"),
     },
     {
       icon: <BarChart2 color="#fff" size={24} />,
       title: "Media quality",
       subtitle: "Wi-Fi streaming quality • Cellular streaming quality",
-      onPress: () => navigation.navigate("MediaQuality"),
+      // onPress: () => navigation.navigate("MediaQuality"),
     },
     {
-      icon: <Info color="#fff" size={24} />,
+      icon: <Loader color="#fff" size={24} />,
       title: "Advertisements",
       subtitle: "Tailored ads",
-      onPress: () => navigation.navigate("Advertisements"),
+      onPress: () => {
+        setShowAd(true); // Hiển thị AdComponent khi nhấn
+      },
     },
     {
       icon: <Info color="#fff" size={24} />,
       title: "About",
       subtitle: "Version • Privacy Policy",
-      onPress: () => navigation.navigate("About"),
-    },
-    {
-      icon: <LogOut color="#fff" size={24} />,
-      title: "Logout",
-      subtitle: "",
-      onPress: () => {
-        dispatch(logout());
-        navigation.navigate("Login");
-      },
+      // onPress: () => navigation.navigate("About"),
     },
   ];
 
   return (
-    <YStack flex={1} bg="#111" pt={StatusBar.currentHeight}>
+    <YStack flex={1} bg="black" pb={60}>
       {/* Header */}
       <XStack
         items="center"
-        justify="space-between"
+        justify="center"
         px={16}
         height={60}
         bg="#222"
+        position="relative"
       >
         <Button
           chromeless
@@ -143,6 +135,8 @@ export default function SettingsScreen({
           color="white"
           bg="transparent"
           p={0}
+          position="absolute"
+          l={16}
           onPress={() => navigation.goBack()}
         />
         <Text color="white" fontSize={20} fontWeight="bold">
@@ -163,7 +157,7 @@ export default function SettingsScreen({
               px={20}
               py={5}
               mb={32}
-              onPress={() => navigation.navigate("Premium")}
+              // onPress={() => navigation.navigate("Premium")}
             >
               <Text color="#111" fontSize={12} fontWeight="bold">
                 Go Premium
@@ -183,12 +177,15 @@ export default function SettingsScreen({
             bg="#fff"
             rounded={24}
             height={38}
-            self={"center"}
+            self="center"
             mt={24}
             mb={40}
             px={20}
             py={5}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => {
+              dispatch(logout());
+              navigation.navigate("Login");
+            }}
           >
             <Text color="#111" fontSize={11} fontWeight="bold">
               Log out
@@ -196,6 +193,17 @@ export default function SettingsScreen({
           </Button>
         </YStack>
       </ScrollView>
+
+      {/* Hiển thị AdComponent khi showAd là true */}
+      {showAd && (
+        <AdComponent
+          onClose={() => setShowAd(false)} // Ẩn AdComponent khi quảng cáo đóng
+          onReward={() => {
+            console.log("🎉 Người dùng đã nhận thưởng từ quảng cáo!");
+            setShowAd(false);
+          }}
+        />
+      )}
     </YStack>
   );
 }

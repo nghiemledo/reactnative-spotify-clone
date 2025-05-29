@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { YStack, XStack, Button, Text } from "tamagui";
 import { TouchableOpacity } from "react-native";
-import { InputComponent } from "../../../components/InputComponent";
-import { DatePickerComponent } from "../../../components/DatePickerComponent";
+import { InputComponent } from "../../../components/Register/InputComponent";
+import { DatePickerComponent } from "../../../components/Register/DatePickerComponent";
 import { GenderSelectionComponent } from "../../../components/auth/GenderSelectionComponent";
 import { TermsAndPreferencesComponent } from "../../../components/auth/TermsAndPreferencesComponent";
 import { ArrowLeft } from "@tamagui/lucide-icons";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StatusBar } from "react-native";
 import { z } from "zod";
-import { SlpashStackParamList } from "../../../navigation/SplashNavigator";
+import { SplashStackParamList } from "../../../navigation/SplashNavigator";
 import { useRegisterMutation } from "../../../services/AuthService";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -25,18 +25,8 @@ const formSchema = z.object({
 type FormSchemaKeys = keyof typeof formSchema.shape;
 type PickObject = Partial<Record<FormSchemaKeys, true>>;
 
-type RegisterFormScreenNavigationProp = NativeStackNavigationProp<
-  SlpashStackParamList,
-  "EmailRegister"
->;
-
-interface RegisterFormScreenProps {
-  navigation: RegisterFormScreenNavigationProp;
-}
-
-export default function EmailRegisterScreen({
-  navigation,
-}: RegisterFormScreenProps) {
+const EmailRegisterScreen = () => {
+  const navigation = useNavigation<NavigationProp<SplashStackParamList>>();
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({
     email: "",
@@ -212,13 +202,6 @@ export default function EmailRegisterScreen({
     }
   };
 
-  // Hiển thị lỗi từ API nếu có
-  // useEffect(() => {
-  //   if (error) {
-  //     alert(error);
-  //     dispatch(setError(null));
-  //   }
-  // }, [error, dispatch]);
 
   return (
     <YStack flex={1} bg="#000">
@@ -255,7 +238,7 @@ export default function EmailRegisterScreen({
 
         <XStack flex={1} justify="center">
           <Text fontSize="$4" fontWeight="bold" color="white" text="center">
-            Tạo tài khoản
+            create account
           </Text>
         </XStack>
 
@@ -316,10 +299,12 @@ export default function EmailRegisterScreen({
           // disabled={step === 5 && (!isTermsValid || loading)}
         >
           <Text color="#fff" fontSize="$4" fontWeight="bold">
-            {step === inputConfigs.length - 1 ? "Tạo tài khoản" : "Tiếp"}
+            {step === inputConfigs.length - 1 ? "create account" : "Next"}
           </Text>
         </Button>
       </YStack>
     </YStack>
   );
-}
+};
+
+export default EmailRegisterScreen;

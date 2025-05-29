@@ -1,10 +1,9 @@
-// CardDataList.tsx
 import React from "react";
 import { FlatList, TouchableOpacity } from "react-native";
 import { Image, Text, XStack, YStack } from "tamagui";
 
 type Data = {
-  id: number;
+  id: string;
   type: string;
   name: string;
   image: string;
@@ -13,17 +12,17 @@ type Data = {
 
 type DataListProps = {
   data: Data[];
-  onItemPress?: (item: Data) => void; 
+  onItems?: (type: string, id: string) => void; // Cập nhật để nhận id
 };
 
-const DataList = ({ data, onItemPress }: DataListProps) => {
+const DataList = ({ data, onItems }: DataListProps) => {
   return (
     <FlatList
       data={data}
       scrollEnabled={false}
       keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => (
-        <TouchableOpacity onPress={() => onItemPress?.(item)}>
+        <TouchableOpacity onPress={() => onItems && onItems(item.type, item.id)}>
           <XStack items="center" justify="space-between" py="$2">
             <XStack items="center" gap="$3" flex={1} pr="$2">
               <Image
@@ -45,7 +44,7 @@ const DataList = ({ data, onItemPress }: DataListProps) => {
                 >
                   {item.type}
                   {item.artists
-                    ? "•" + item.artists.map((artist) => artist.name).join(", ")
+                    ?" "+ item.artists.map((artist) => artist.name).join(", ")
                     : ""}
                 </Text>
               </YStack>
