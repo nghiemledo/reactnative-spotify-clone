@@ -21,7 +21,7 @@ const SortBottomSheet: React.FC<SortBottomSheetProps> = ({
   context,
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = ["35%"];
+  const snapPoints = ["50%"];
 
   const renderBackdrop = useCallback(
     (props: any) => (

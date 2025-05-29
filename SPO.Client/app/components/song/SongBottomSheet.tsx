@@ -289,35 +289,15 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
     onClose();
   };
 
-  const handleAddToLikedSongs = () => {
-    if (selectedSong) {
-      Toast.show({
-        type: "success",
-        text1: "Added to liked songs",
-        position: "bottom",
-        visibilityTime: 2000,
-      });
-      onClose();
-    } else {
-      Alert.alert("Error", "No song selected");
-    }
-  };
 
   // Configure features
   const featureConfig: Feature[] = [
-    {
-      key: "addToLikedSongs",
-      label: "Add to Liked Songs",
-      icon: <Heart size="$2" color="white" />,
-      action: handleAddToLikedSongs,
-      visibleOnScreens: ["search"],
-    },
     {
       key: "addToPlaylist",
       label: "Add to Playlist",
       icon: <Plus size="$2" color="white" />,
       action: handleAddToPlaylist,
-      visibleOnScreens: ["home", "artist", "album", "playing", "detailPlaylist", "search"],
+      visibleOnScreens: ["home", "artist", "album", "playing", "search"],
     },
     {
       key: "addToOtherPlaylist",
