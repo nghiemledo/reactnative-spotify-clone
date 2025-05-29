@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { TouchableOpacity, View, StatusBar } from "react-native";
 import { Button, Text, XStack, YStack, Input, Dialog } from "tamagui";
 import { X, Save, Pencil, XCircle } from "@tamagui/lucide-icons";
@@ -6,6 +6,11 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Toast from "react-native-toast-message";
 import SafeImage from "../../components/SafeImage";
+import { useAppSelector } from "../../store";
+import {
+  useGetUserByIdQuery,
+  useUpdateUserProfileMutation,
+} from "../../services/AuthService";
 
 type RootStackParamList = {
   Profile: undefined;
@@ -13,28 +18,87 @@ type RootStackParamList = {
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-const userData = {
-  urlAvatar:
-    "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  name: "Trà Nguyễn Văn Nhựt",
-};
-
 export const EditProfileScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const [name, setName] = React.useState("Nguyễn Văn A");
-  const [urlAvatar, setUrlAvatar] = React.useState(userData.urlAvatar);
+  const user = useAppSelector((state) => state.auth.user);
+  const userId = useAppSelector((state) => state.auth.user?.id);
+
+  // Fetch user data at the top level
+  const { data: userData, refetch } = useGetUserByIdQuery(userId || "", {
+    skip: !userId,
+  });
+
+  // Initialize state with user data from Redux or API
+  const [firstName, setFirstName] = React.useState(user?.firstName || "");
+  const [lastName, setLastName] = React.useState(user?.lastName || "");
+  const [urlAvatar, setUrlAvatar] = React.useState(user?.urlAvatar || "");
   const [openModal, setOpenModal] = React.useState(false);
-  const [tempUrl, setTempUrl] = React.useState(urlAvatar);
+  const [tempUrl, setTempUrl] = React.useState(user?.urlAvatar || "");
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleSave = () => {
-    // TODO: Lưu thay đổi (tên và URL avatar) vào backend hoặc trạng thái toàn cục
-    console.log("Lưu thông tin:", { name, urlAvatar });
-    navigation.goBack();
+  const [updateUserProfile, { isLoading: isUpdating }] =
+    useUpdateUserProfileMutation();
+
+  // Update state when userData changes (e.g., after refetch)
+  useEffect(() => {
+    if (userData?.data) {
+      setFirstName(userData.data.firstName || "");
+      setLastName(userData.data.lastName || "");
+      setUrlAvatar(userData.data.urlAvatar || "");
+      setTempUrl(userData.data.urlAvatar || "");
+    }
+  }, [userData]);
+
+  const handleSave = async () => {
+    if (!userId) {
+      Toast.show({
+        type: "error",
+        text1: "Lỗi",
+        text2: "Không tìm thấy thông tin người dùng.",
+      });
+      return;
+    }
+
+    try {
+      // Update user profile
+      const res = await updateUserProfile({
+        Id: userId,
+        FirstName: firstName || "",
+        LastName: lastName || "",
+      }).unwrap();
+
+      console.log("res", res);
+
+      // Refetch user data to update the UI
+      await refetch();
+
+      Toast.show({
+        type: "success",
+        text1: "Thành công",
+        text2: "Cập nhật thông tin thành công!",
+      });
+      console.log(userData);
+      console.log(userId);
+      console.log(firstName);
+      console.log(lastName);
+
+      navigation.goBack();
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Lỗi",
+        text2: "Cập nhật thông tin thất bại. Vui lòng thử lại.",
+      });
+      console.error("Update profile error:", error);
+    }
   };
 
-  const handleClearName = () => {
-    setName("");
+  const handleClearFirstName = () => {
+    setFirstName("");
+  };
+
+  const handleClearLastName = () => {
+    setLastName("");
   };
 
   const isValidImageUrl = async (url: string) => {
@@ -49,7 +113,7 @@ export const EditProfileScreen = () => {
 
   const handleSaveImage = async () => {
     if (tempUrl && (await isValidImageUrl(tempUrl))) {
-      setUrlAvatar(tempUrl); // Cập nhật URL avatar
+      setUrlAvatar(tempUrl);
       setOpenModal(false);
     } else {
       Toast.show({
@@ -68,10 +132,10 @@ export const EditProfileScreen = () => {
           <X size={24} color="white" />
         </TouchableOpacity>
         <Text fontSize={18} fontWeight="bold" color="white">
-          EditProfile
+          Edit Profile
         </Text>
-        <TouchableOpacity onPress={handleSave}>
-          <Save size={24} color="white" />
+        <TouchableOpacity onPress={handleSave} disabled={isUpdating}>
+          <Save size={24} color={isUpdating ? "gray" : "white"} />
         </TouchableOpacity>
       </XStack>
 
@@ -86,7 +150,7 @@ export const EditProfileScreen = () => {
               height={140}
               rounded={100}
               bg="#333"
-              resizeMode="cover" // Sử dụng cover thay vì stretch
+              resizeMode="cover"
               onError={() => console.log("Image load error")}
             />
             <Button
@@ -155,36 +219,58 @@ export const EditProfileScreen = () => {
           </Dialog.Portal>
         </Dialog>
 
-        {/* Name Input */}
+        {/* FirstName Input */}
         <XStack items="center" px={16}>
           <Text color="#fff" fontSize={16} fontWeight="bold" mr={20}>
-            Name
+            First Name
           </Text>
           <Input
             flex={1}
-            placeholder="Tên của bạn"
+            placeholder="Your first name"
             placeholderTextColor="rgba(255,255,255,0.3)"
             color="white"
             bg="transparent"
             borderWidth={0}
-            value={name}
-            onChangeText={setName}
+            value={firstName}
+            onChangeText={setFirstName}
             fontSize={16}
           />
-          {name ? (
+          {firstName ? (
             <TouchableOpacity
-              onPress={handleClearName}
-              style={{
-                position: "absolute",
-                right: 10,
-                padding: 10,
-              }}
+              onPress={handleClearFirstName}
+              style={{ position: "absolute", right: 10, padding: 10 }}
             >
               <XCircle size={16} color="rgba(255,255,255,0.7)" />
             </TouchableOpacity>
           ) : null}
         </XStack>
-        <XStack height={1 / 5} width="100%" bg="rgba(255,255,255,0.5)" />
+        <XStack height={1} width="90%" bg="rgba(255,255,255,0.5)" />
+
+        {/* LastName Input */}
+        <XStack items="center" px={16}>
+          <Text color="#fff" fontSize={16} fontWeight="bold" mr={20}>
+            Last Name
+          </Text>
+          <Input
+            flex={1}
+            placeholder="Your last name"
+            placeholderTextColor="rgba(255,255,255,0.3)"
+            color="white"
+            bg="transparent"
+            borderWidth={0}
+            value={lastName}
+            onChangeText={setLastName}
+            fontSize={16}
+          />
+          {lastName ? (
+            <TouchableOpacity
+              onPress={handleClearLastName}
+              style={{ position: "absolute", right: 10, padding: 10 }}
+            >
+              <XCircle size={16} color="rgba(255,255,255,0.7)" />
+            </TouchableOpacity>
+          ) : null}
+        </XStack>
       </YStack>
     </YStack>
   );
