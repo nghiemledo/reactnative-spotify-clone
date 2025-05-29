@@ -20,5 +20,6 @@ namespace SPO.Domain.Entities.UserRoles
         public DateTime? LockoutEnd { get; set; }
         public bool? LockOutEnabled { get; set; }
         public int? AccessFailedCount { get; set; }
+        public bool IsPremium { get; set; } = false;
     }
 }
