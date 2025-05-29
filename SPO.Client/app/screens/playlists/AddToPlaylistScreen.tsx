@@ -5,8 +5,8 @@ import { Button, YStack, XStack, Text, Image } from "tamagui";
 import { ArrowLeft, Check, Heart, Menu } from "@tamagui/lucide-icons";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { Playlist } from "../../services/playlistServices"; // Import từ playlistServices
-import { PlaylistItem } from "../../services/playlistItemServices"; // Import PlaylistItem
+import { Playlist } from "../../services/playlistServices";
+import { PlaylistItem } from "../../services/playlistItemServices";
 import { useGetPlaylistsByUserIdQuery } from "../../services/playlistServices";
 import {
   useAddPlaylistItemMutation,
@@ -62,7 +62,7 @@ const AddToPlaylistScreen = () => {
 
   const filteredPlaylists = playlists.filter(
     (playlist) =>
-      playlist.id !== currentPlaylistId &&
+      (!currentPlaylistId || playlist.id !== currentPlaylistId) &&
       !playlistItems.some(
         (item) => item.playlistId === playlist.id && item.songId === songId
       )
@@ -145,7 +145,7 @@ const AddToPlaylistScreen = () => {
         />
         <XStack width={"70%"} justify="center">
           <Text fontSize="$4" fontWeight="bold" color="white" text="center">
-            Add to this playlist
+            Add to playlist
           </Text>
         </XStack>
       </XStack>

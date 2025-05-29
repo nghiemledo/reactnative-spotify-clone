@@ -156,7 +156,7 @@ const AddSongPlaylistScreen = () => {
 
         <XStack flex={2} justify="center">
           <Text fontSize="$4" fontWeight="bold" color="white" text="center">
-            Add to this playlist
+            Add song to this playlist
           </Text>
         </XStack>
 
