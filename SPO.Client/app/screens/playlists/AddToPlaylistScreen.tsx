@@ -17,7 +17,6 @@ import { UserInfo } from "../../types/user";
 
 const { width } = Dimensions.get("window");
 
-// Define the Liked Songs playlist
 const likedSongs: Playlist = {
   id: "liked-songs",
   title: "Liked Songs",
@@ -38,25 +37,21 @@ const AddToPlaylistScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, "AddToPlaylist">>();
-  const user = useSelector((state: { auth: AuthState }) => state.auth.user); // Get user from Redux
+  const user = useSelector((state: { auth: AuthState }) => state.auth.user); 
 
   const { songId, currentPlaylistId } = route.params || {};
 
-  // Fetch playlists for the user
-  const { data: playlistsData, isLoading: isPlaylistsLoading } =
+  const { data: playlistsData} =
     useGetPlaylistsByUserIdQuery(user?.id || "");
 
-  // Fetch playlist items to check which playlists already contain the song
-  const { data: playlistItemsData, isLoading: isItemsLoading } =
+  const { data: playlistItemsData} =
     useGetPlaylistItemsQuery({});
 
-  // Mutation to add songs to playlists
   const [addPlaylistItem] = useAddPlaylistItemMutation();
 
   const playlists: Playlist[] = playlistsData?.data || [];
   const playlistItems: PlaylistItem[] = playlistItemsData?.data || [];
 
-  // Initialize selected playlists with Liked Songs if the song is already in it
   const initialPlaylists = [likedSongs].filter((p) =>
     playlistItems.some(
       (item) => item.playlistId === p.id && item.songId === songId
@@ -65,7 +60,6 @@ const AddToPlaylistScreen = () => {
   const [selectedPlaylists, setSelectedPlaylists] =
     useState<Playlist[]>(initialPlaylists);
 
-  // Filter out the current playlist and playlists that already contain the song
   const filteredPlaylists = playlists.filter(
     (playlist) =>
       playlist.id !== currentPlaylistId &&
@@ -91,7 +85,6 @@ const AddToPlaylistScreen = () => {
   const handleDone = async () => {
     const toastMessages: string[] = [];
 
-    // Handle Liked Songs
     const wasLikedSongsInitiallySelected = initialPlaylists.some(
       (p) => p.id === likedSongs.id
     );
@@ -100,7 +93,6 @@ const AddToPlaylistScreen = () => {
     );
     if (wasLikedSongsInitiallySelected && !isLikedSongsSelected) {
       toastMessages.push("Removed from Liked Songs");
-      // Note: You may need a delete mutation for Liked Songs if it's a separate entity
     } else if (!wasLikedSongsInitiallySelected && isLikedSongsSelected) {
       try {
         if (!songId) {
@@ -113,7 +105,6 @@ const AddToPlaylistScreen = () => {
       }
     }
 
-    // Handle other playlists
     const newPlaylists = selectedPlaylists.filter(
       (p) => p.id !== likedSongs.id
     );
@@ -131,10 +122,6 @@ const AddToPlaylistScreen = () => {
       }
     }
 
-    console.log(
-      "Done with selection:",
-      selectedPlaylists.map((p) => p.title)
-    );
     navigation.goBack()
   };
 
@@ -145,10 +132,6 @@ const AddToPlaylistScreen = () => {
     playlistItems.some(
       (item) => item.playlistId === playlist.id && item.songId === songId
     );
-
-  if (isPlaylistsLoading || isItemsLoading) {
-    return <Text>Loading...</Text>;
-  }
 
   return (
     <YStack flex={1} bg="#000" pt="$4">
