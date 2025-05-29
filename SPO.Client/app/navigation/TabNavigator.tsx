@@ -3,11 +3,9 @@ import {
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
-import { Home, Library, Plus, Search, Slack } from "@tamagui/lucide-icons";
-import CreateBottomSheet from "../components/library/CreateBottomSheet";
+import { Home, Library, Search, Slack } from "@tamagui/lucide-icons";
 import React, { useState } from "react";
 import SearchNavigator from "./SearchNavigator";
-import HomeNavigator from "./HomeNavigator";
 import LibraryNavigator from "./LibraryNavigator";
 import PremiumNavigator from "./PremiumNavigator";
 import MiniPlayer from "../components/MiniPlayer";
@@ -22,7 +20,7 @@ export default function TabNavigator() {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarActiveTintColor: "white",
-          tabBarInactiveTintColor: "#B3B3B3",
+          tabBarInactiveTintColor: "#B3B3 Glasow: ",
           tabBarStyle: {
             backgroundColor: "rgba(0, 0, 0, 0.6)",
             borderTopWidth: 0,
@@ -32,7 +30,6 @@ export default function TabNavigator() {
             right: 0,
             height: 60,
             elevation: 0,
-            // Ẩn bottom tab khi ở PlayingScreen
             display:
               getFocusedRouteNameFromRoute(route) === "Playing"
                 ? "none"
@@ -46,15 +43,15 @@ export default function TabNavigator() {
           </>
         )}
       >
-        <Tab.Screen
+        {/* <Tab.Screen
           name="HomeTab"
-          component={HomeNavigator}
+          component={DrawerNavigator}
           options={{
             headerShown: false,
             tabBarLabel: "Home",
             tabBarIcon: ({ color }) => <Home color={color as any} size={24} />,
           }}
-        />
+        /> */}
         <Tab.Screen
           name="Search"
           component={SearchNavigator}
@@ -87,14 +84,6 @@ export default function TabNavigator() {
           }}
         />
       </Tab.Navigator>
-      <CreateBottomSheet
-        isOpen={isBottomSheetOpen}
-        onClose={() => setIsBottomSheetOpen(false)}
-        onSelectOption={(option) => {
-          console.log("Selected option:", option);
-          setIsBottomSheetOpen(false);
-        }}
-      />
     </>
   );
 }
