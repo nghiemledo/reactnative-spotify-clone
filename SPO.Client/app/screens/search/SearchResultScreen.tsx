@@ -17,67 +17,35 @@ import { ArtistItem } from "../../components/ArtistItem";
 import { SongItem } from "../../components/song/SongItem";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { useSearchSongsQuery } from "../../services/SongService";
-import {
-  useLazyGetArtistByIdQuery,
-  useSearchArtistsQuery,
-} from "../../services/ArtistService";
-import { useSearchPodcastShowsQuery } from "../../services/PodcastService";
+import { useSearchQuery } from "../../services/AuthService";
 import { Artist } from "../../types/artist";
 import { Song } from "../../types/song";
 import { PodcastShow } from "../../types/podcast";
 import { HomeStackParamList } from "../../navigation/HomeNavigator";
 import { PodcastShowItem } from "../../components/podcast/PodcastShowItem";
 
-const sampleData: Item[] = [
-  {
-    type: "artist",
-    id: "1",
-    name: "HieuThuHai",
-    bio: "A talented Vietnamese rapper known for his unique style.",
-    urlAvatar: "https://i.pravatar.cc/150?img=3",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-02T00:00:00Z",
-  },
-  {
-    type: "song",
-    id: "2",
-    title: "Hà Nội",
-    coverImage: "https://i.pravatar.cc/150?img=4",
-    artistId: "1",
-    artist: "HieuThuHai",
-    duration: 180,
-    audioUrl: "https://example.com/audio/hanoi.mp3",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-02T00:00:00Z",
-  },
-  {
-    type: "podcast",
-    id: "3",
-    title: "Tech Talk Vietnam",
-    description: "A podcast about the latest tech trends in Vietnam.",
-    coverImage: "https://i.pravatar.cc/150?img=5",
-    creator: "hai long",
-    categoryId: "1",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-02T00:00:00Z",
-  },
-];
-
-interface ArtistSearch extends Artist {
-  type: "artist";
+// Define interfaces to match SearchResponse
+interface SearchArtist {
+  id: string;
+  name: string;
+  coverImage: string;
 }
 
-interface SongSearch extends Song {
-  type: "song";
+interface SearchSong {
+  id: string;
+  title: string;
+  artistId: string;
+  artistName: string;
+  coverImage: string;
 }
 
-interface PodcastShowSearch extends PodcastShow {
-  categoryId: string;
-  type: "podcast";
+interface SearchPodcastShow {
+  id: string;
+  title: string;
+  creator: string;
+  coverImage: string;
+  categoryId?: string;
 }
-
-type Item = ArtistSearch | SongSearch | PodcastShowSearch;
 
 const SearchResultScreen = () => {
   const navigation =
@@ -90,132 +58,107 @@ const SearchResultScreen = () => {
   const [searchValue, setSearchValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearch, setIsSearch] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<string | null>(null);
+  const [selectedTab, setSelectedTab] = useState<string | null>(null); // Changed to null
   const [toastQueue, setToastQueue] = useState<string[]>([]);
   const [isSongOptionsOpen, setIsSongOptionsOpen] = useState(false);
-  const [selectedSong, setSelectedSong] = useState<SongSearch | null>(null);
-  const [getArtistById] = useLazyGetArtistByIdQuery();
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
 
-  const { data: songsData, isLoading: isSongsLoading } =
-    useSearchSongsQuery(searchQuery);
-  const { data: artistsData, isLoading: isArtistsLoading } =
-    useSearchArtistsQuery(searchQuery);
-  const { data: podcastsData, isLoading: isPodcastsLoading } =
-    useSearchPodcastShowsQuery(searchQuery);
+  const { data: searchData, isLoading: isSearchLoading } = useSearchQuery(
+    { query: searchQuery, limit: 10 },
+    { skip: !searchQuery }
+  );
 
-  console.log(searchQuery);
-
-  const combinedData: Item[] = [];
-  const [artistCache, setArtistCache] = useState<{
-    [key: string]: { name: string; isLoading: boolean };
-  }>({});
-
+  // Debug log to check search query and data
   useEffect(() => {
-    if (!songsData?.data?.length) return;
+    console.log("Search Query:", searchQuery);
+    console.log("Search Data:", searchData);
+  }, [searchQuery, searchData]);
 
-    const fetchArtists = async () => {
-      const uniqueArtistIds = [
-        ...new Set(
-          songsData.data
-            .map((song) => song.artistId)
-            .filter((id): id is string => !!id)
-        ),
-      ];
+  // Normalize string for Vietnamese text (from first code)
+  const normalize = (s: string) => s?.trim().toLowerCase() || "";
 
-      for (const artistId of uniqueArtistIds) {
-        if (!artistCache[artistId]) {
-          setArtistCache((prev) => ({
-            ...prev,
-            [artistId]: { name: "Loading...", isLoading: true },
-          }));
-
-          try {
-            const result = await getArtistById(artistId);
-            setArtistCache((prev) => ({
-              ...prev,
-              [artistId]: {
-                name: result.data?.data?.name || "Unknown Artist",
-                isLoading: false,
-              },
-            }));
-          } catch {
-            setArtistCache((prev) => ({
-              ...prev,
-              [artistId]: { name: "Unknown Artist", isLoading: false },
-            }));
-          }
-        }
-      }
-    };
-
-    fetchArtists();
-  }, [songsData, getArtistById]);
-
-  if (songsData?.data?.length) {
-    combinedData.push(
-      ...songsData.data.map(
-        (song) =>
-          ({
-            ...song,
-            type: "song",
-            artist: artistCache[song.artistId || ""]?.name || "Unknown Artist",
-          } as SongSearch)
-      )
+  // Filter functions for each category with null-safety (from first code)
+  const filterArtists = (artists: SearchArtist[]) =>
+    artists.filter((artist) =>
+      normalize(artist.name).includes(normalize(searchQuery))
     );
-  }
-  if (artistsData?.data?.length) {
-    combinedData.push(
-      ...artistsData.data.map(
-        (artist) => ({ ...artist, type: "artist" } as ArtistSearch)
-      )
+
+  const filterSongs = (songs: SearchSong[]) =>
+    songs.filter(
+      (song) =>
+        normalize(song.title).includes(normalize(searchQuery)) ||
+        normalize(song.artistName).includes(normalize(searchQuery))
     );
-  }
-  if (podcastsData?.data?.length) {
-    combinedData.push(
-      ...podcastsData.data.map(
-        (podcast: PodcastShow) =>
-          ({ ...podcast, type: "podcast" } as PodcastShowSearch)
-      )
-    );
-  }
 
-  if (
-    combinedData.length &&
-    !isSongsLoading &&
-    !isArtistsLoading &&
-    !isPodcastsLoading &&
-    searchQuery
-  ) {
-    combinedData.push(...sampleData);
-  }
+  const filterShows = (shows: SearchPodcastShow[]) =>
+    shows.filter((show) => normalize(show.title).includes(normalize(searchQuery)));
 
-  const normalize = (s: string) => s.trim().toLowerCase();
-
-  const filteredData =
-    searchQuery.trim() === ""
+  // Map and filter data for each category (from second code)
+  const filteredArtists =
+    !searchQuery.trim() ||
+    (selectedTab && selectedTab !== "All" && selectedTab !== "Artists")
       ? []
-      : combinedData.filter((item) => {
-          const needle = normalize(searchQuery);
+      : filterArtists(searchData?.data?.artists || []).map(
+          (artist) =>
+            ({
+              id: artist.id,
+              name: artist.name,
+              urlAvatar: artist.coverImage, // Map coverImage to urlAvatar
+              bio: "",
+              createdAt: "",
+              updatedAt: "",
+            } as Artist)
+        );
 
-          const matchesSearch =
-            normalize(
-              item.type === "song"
-                ? item.title || ""
-                : item.type === "artist"
-                ? item.name || ""
-                : item.title || ""
-            ).includes(needle) ||
-            (item.type === "song" &&
-              item.artist &&
-              normalize(item.artist).includes(needle));
-          const matchesTab =
-            !selectedTab ||
-            selectedTab === "All" ||
-            (selectedTab === "Songs" && item.type === "song") ||
-            (selectedTab === "Artists" && item.type === "artist") ||
-            (selectedTab === "Podcasts" && item.type === "podcast");
-          return matchesSearch && matchesTab;
-        });
+  const filteredSongs =
+    !searchQuery.trim() ||
+    (selectedTab && selectedTab !== "All" && selectedTab !== "Songs")
+      ? []
+      : filterSongs(searchData?.data?.songs || []).map(
+          (song) =>
+            ({
+              id: song.id,
+              title: song.title,
+              coverImage: song.coverImage,
+              artistId: song.artistId,
+              artist: song.artistName,
+              duration: 0, // Default value since API doesn't provide
+              audioUrl: "", // Default value to bypass SongItem validation
+              createdAt: "",
+              updatedAt: "",
+            } as Song)
+        );
+
+  const filteredShows =
+    !searchQuery.trim() ||
+    (selectedTab && selectedTab !== "All" && selectedTab !== "Podcasts")
+      ? []
+      : filterShows(searchData?.data?.shows || []).map(
+          (show) =>
+            ({
+              id: show.id,
+              title: show.title,
+              creator: show.creator,
+              coverImage: show.coverImage,
+              categoryId: show.categoryId || "",
+              description: "", // Default value since API doesn't provide
+              createdAt: "",
+              updatedAt: "",
+            } as PodcastShow)
+        );
+
+  // Debug filtered results
+  useEffect(() => {
+    console.log("Filtered Artists:", filteredArtists);
+    console.log("Filtered Songs:", filteredSongs);
+    console.log("Filtered Shows:", filteredShows);
+  }, [filteredArtists, filteredSongs, filteredShows]);
+
+  const hasResults =
+    filteredArtists.length > 0 ||
+    filteredSongs.length > 0 ||
+    filteredShows.length > 0;
+
 
   const toastConfig = {
     success: ({ text1, text2 }: BaseToastProps) => (
@@ -258,26 +201,25 @@ const SearchResultScreen = () => {
     ),
   };
 
- 
-
   const handleSearchSubmit = () => {
+    console.log("Submitting Search:", searchValue);
     setSearchQuery(searchValue);
     setIsSearch(true);
-    setSelectedTab(null);
+    setSelectedTab(null); // Changed to null
     Keyboard.dismiss();
   };
 
   const handleInputFocus = () => {
     if (isSearch) {
       setIsSearch(false);
-      setSelectedTab(null);
+      setSelectedTab(null); // Changed to null
       setSearchQuery("");
       setSearchValue("");
     }
   };
 
   const handleOpenSongOptionsBottomSheet = (song: Song) => {
-    setSelectedSong({ ...song, type: "song" });
+    setSelectedSong(song);
     setIsSongOptionsOpen(true);
   };
 
@@ -287,7 +229,7 @@ const SearchResultScreen = () => {
   };
 
   const handleClearTab = () => {
-    setSelectedTab(null);
+    setSelectedTab(null); // Changed to null
   };
 
   useEffect(() => {
@@ -326,7 +268,7 @@ const SearchResultScreen = () => {
         items="center"
         flexDirection="column"
       >
-        <XStack py="$1" items="center" mb="$2" bg="rgba(256, 256, 256, 0.3)">
+        <XStack py="$1" items="center" mb="$2" bg="rgba(255, 255, 255, 0.3)">
           <Input
             size="$3.5"
             borderWidth={0}
@@ -366,7 +308,7 @@ const SearchResultScreen = () => {
                 setSearchValue("");
                 setSearchQuery("");
                 setIsSearch(false);
-                setSelectedTab(null);
+                setSelectedTab(null); // Changed to null
               }}
             >
               <X size="$1" color="white" />
@@ -377,50 +319,119 @@ const SearchResultScreen = () => {
       <Tabs
         isSearch={isSearch}
         selectedTab={selectedTab}
-        setSelectedTab={setSelectedTab}
+        setSelectedTab={(tab) => {
+          console.log("Selected Tab:", tab);
+          setSelectedTab(tab);
+        }}
         handleClearTab={handleClearTab}
       />
       <YStack flex={1} bg="#000" px="$3">
-        {isSongsLoading || isArtistsLoading || isPodcastsLoading ? (
+        {isSearchLoading ? (
           <YStack flex={1} justify="center" items="center">
             <ActivityIndicator size="large" color="#1DB954" />
           </YStack>
         ) : (
           <ScrollView scrollEventThrottle={16}>
-            {filteredData.length > 0 ? (
-              <FlatList
-                data={filteredData}
-                keyExtractor={(item) => item.id ?? ""}
-                renderItem={({ item }) => (
-                  <TouchableOpacity>
-                    {item.type === "song" ? (
-                      <SongItem
-                        song={item as Song}
-                        showImage={true}
-                        showArtistName={true}
-                        getArtistName={() => item.artist || "Unknown Artist"}
-                        onMorePress={handleOpenSongOptionsBottomSheet}
-                        screen="search"
-                        navigation={navigation}
+            {isSearch && hasResults ? (
+              <>
+                {(selectedTab === null || selectedTab === "Artists") && // Changed "All" to null
+                  filteredArtists.length > 0 && (
+                    <YStack mb="$4">
+                      <Text
+                        color="white"
+                        fontSize="$5"
+                        fontWeight="bold"
+                        mb="$2"
+                      >
+                        Artists
+                      </Text>
+                      <FlatList
+                        data={filteredArtists}
+                        keyExtractor={(item) => item.id ?? ""}
+                        renderItem={({ item }) => {
+                          console.log("Rendering Artist:", item);
+                          return (
+                            <TouchableOpacity>
+                              <ArtistItem
+                                artist={item}
+                                onPress={() =>
+                                  navigation.navigate("Artist", { id: item.id })
+                                }
+                              />
+                            </TouchableOpacity>
+                          );
+                        }}
+                        scrollEnabled={false}
                       />
-                    ) : item.type === "artist" ? (
-                      <ArtistItem
-                        artist={item as Artist}
-                        onPress={() =>
-                          navigation.navigate("Artist", { id: item.id })
-                        }
+                    </YStack>
+                  )}
+                {(selectedTab === null || selectedTab === "Songs") && // Changed "All" to null
+                  filteredSongs.length > 0 && (
+                    <YStack mb="$4">
+                      <Text
+                        color="white"
+                        fontSize="$5"
+                        fontWeight="bold"
+                        mb="$2"
+                      >
+                        Songs
+                      </Text>
+                      <FlatList
+                        data={filteredSongs}
+                        keyExtractor={(item) => item.id || ""}
+                        renderItem={({ item }) => {
+                          console.log("Rendering Song:", item);
+                          return (
+                            <TouchableOpacity>
+                              <SongItem
+                                song={item}
+                                showImage={true}
+                                showArtistName={true}
+                                getArtistName={() =>
+                                  item.artist || "Unknown Artist"
+                                }
+                                onMorePress={handleOpenSongOptionsBottomSheet}
+                                screen="search"
+                                navigation={navigation}
+                              />
+                            </TouchableOpacity>
+                          );
+                        }}
+                        scrollEnabled={false}
                       />
-                    ) : item.id ? (
-                      <PodcastShowItem
-                        item={item as PodcastShow}
-                        navigation={homeNavigation}
+                    </YStack>
+                  )}
+                {(selectedTab === null || selectedTab === "Podcasts") && // Changed "All" to null
+                  filteredShows.length > 0 && (
+                    <YStack mb="$4">
+                      <Text
+                        color="white"
+                        fontSize="$5"
+                        fontWeight="bold"
+                        mb="$2"
+                      >
+                        Podcasts
+                      </Text>
+                      <FlatList
+                        data={filteredShows}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({ item }) => {
+                          console.log("Rendering Show:", item);
+                          return (
+                            <TouchableOpacity>
+                              <PodcastShowItem
+                                item={item}
+                                navigation={homeNavigation}
+                              />
+                            </TouchableOpacity>
+                          );
+                        }}
+                        scrollEnabled={false}
                       />
-                    ) : null}
-                  </TouchableOpacity>
-                )}
-                scrollEnabled={false}
-              />
-            ) : searchQuery.trim() !== "" ? (
+                    </YStack>
+                  )}
+              </>
+            ) : isSearch && !hasResults ? (
               <YStack
                 position="absolute"
                 t={height / 2}
