@@ -6,12 +6,11 @@ import {
   RewardedAdEventType,
   AdEventType,
 } from "react-native-google-mobile-ads";
-import { YStack, Text } from "tamagui";
+import { YStack, Text, Button } from "tamagui";
 
-// const adUnitId = __DEV__
-//   ? TestIds.REWARDED
-//   : "ca-app-pub-9256713212021306/3967670711";
-const adUnitId = "ca-app-pub-9256713212021306/3967670711";
+const adUnitId = __DEV__
+  ? TestIds.REWARDED
+  : "ca-app-pub-9256713212021306/9858205924";
 
 interface AdComponentProps {
   onClose: () => void;
@@ -20,30 +19,39 @@ interface AdComponentProps {
 
 const AdComponent: React.FC<AdComponentProps> = ({ onClose, onReward }) => {
   const [loading, setLoading] = useState<boolean>(true);
-  const [rewarded, setRewarded] = useState<RewardedAd | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState<number>(0);
+  const maxRetries = 2; // Số lần thử lại tối đa
 
   useEffect(() => {
     // Tạo rewarded ad instance
     const rewardedAd = RewardedAd.createForAdRequest(adUnitId, {
-      requestNonPersonalizedAdsOnly: true,
+      requestNonPersonalizedAdsOnly: false,
+      keywords: ["game", "entertainment", "reward"], // Tăng tỷ lệ điền quảng cáo
     });
 
-    setRewarded(rewardedAd);
-
-    // Thiết lập timeout 10 giây
+    // Thiết lập timeout 30 giây
     const timeout = setTimeout(() => {
-      console.log("⏰ Hết thời gian sau 10 giây");
+      console.log("⏰ Hết thời gian sau 30 giây");
       setLoading(false);
-      onClose();
-    }, 10000);
+      setErrorMessage("Không thể tải quảng cáo. Vui lòng thử lại sau.");
+      if (retryCount < maxRetries) {
+        console.log(`🔄 Thử lại lần ${retryCount + 1}`);
+        setRetryCount(retryCount + 1);
+        rewardedAd.load(); // Thử tải lại quảng cáo
+      } else {
+        onClose();
+      }
+    }, 30000);
 
-    // Đăng ký các sự kiện quảng cáo với event types đúng
+    // Đăng ký các sự kiện quảng cáo
     const unsubscribeLoaded = rewardedAd.addAdEventListener(
       RewardedAdEventType.LOADED,
       () => {
         console.log("✅ Quảng cáo đã tải");
         clearTimeout(timeout);
         setLoading(false);
+        setErrorMessage(null);
         rewardedAd.show();
       }
     );
@@ -53,6 +61,10 @@ const AdComponent: React.FC<AdComponentProps> = ({ onClose, onReward }) => {
       (reward) => {
         console.log("✅ Người dùng nhận thưởng:", reward);
         if (onReward) onReward();
+        clearTimeout(timeout);
+        setLoading(false);
+        setErrorMessage(null);
+        onClose();
       }
     );
 
@@ -62,6 +74,7 @@ const AdComponent: React.FC<AdComponentProps> = ({ onClose, onReward }) => {
         console.log("✅ Quảng cáo đã đóng");
         clearTimeout(timeout);
         setLoading(false);
+        setErrorMessage(null);
         onClose();
       }
     );
@@ -69,10 +82,17 @@ const AdComponent: React.FC<AdComponentProps> = ({ onClose, onReward }) => {
     const unsubscribeError = rewardedAd.addAdEventListener(
       AdEventType.ERROR,
       (error) => {
-        console.error("❌ Lỗi quảng cáo:", error);
+        console.error("❌ Lỗi quảng cáo:", error.message);
         clearTimeout(timeout);
         setLoading(false);
-        onClose();
+        setErrorMessage(`Lỗi tải quảng cáo: ${error.message}`);
+        if (retryCount < maxRetries) {
+          console.log(`🔄 Thử lại lần ${retryCount + 1}`);
+          setRetryCount(retryCount + 1);
+          rewardedAd.load(); // Thử tải lại quảng cáo
+        } else {
+          onClose();
+        }
       }
     );
 
@@ -88,7 +108,7 @@ const AdComponent: React.FC<AdComponentProps> = ({ onClose, onReward }) => {
       unsubscribeError();
       clearTimeout(timeout);
     };
-  }, [onClose, onReward]);
+  }, [onClose, onReward, retryCount]);
 
   return (
     <YStack
@@ -104,9 +124,25 @@ const AdComponent: React.FC<AdComponentProps> = ({ onClose, onReward }) => {
       z={9999}
     >
       <Text color="white" mb="$2" fontSize={16}>
-        Đang chuẩn bị quảng cáo...
+        {errorMessage || "Đang chuẩn bị quảng cáo..."}
       </Text>
       {loading && <ActivityIndicator size="large" color="white" />}
+      {errorMessage && !loading && (
+        <Button
+          onPress={() => {
+            setErrorMessage(null);
+            setLoading(true);
+            setRetryCount(retryCount + 1);
+            RewardedAd.createForAdRequest(adUnitId, {
+              requestNonPersonalizedAdsOnly: false,
+              keywords: ["game", "entertainment", "reward"],
+            }).load();
+          }}
+          disabled={retryCount >= maxRetries}
+        >
+          Thử lại
+        </Button>
+      )}
     </YStack>
   );
 };
