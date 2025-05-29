@@ -3,7 +3,6 @@ import React, { useRef } from "react";
 import { SearchStackParamList } from "../../navigation/SearchNavigator";
 import {
   Avatar,
-  AvatarFallback,
   AvatarImage,
   Input,
   Text,

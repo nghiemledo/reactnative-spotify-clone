@@ -1,7 +1,7 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useState, useEffect } from "react";
-import Toast, { BaseToastProps } from "react-native-toast-message";
-import { Image, Input, Text, View, XStack, YStack } from "tamagui";
+import Toast from "react-native-toast-message";
+import {  Input, Text, View, XStack, YStack } from "tamagui";
 import { ArrowLeft, X } from "@tamagui/lucide-icons";
 import {
   Dimensions,
@@ -54,7 +54,6 @@ const SearchResultScreen = () => {
     useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, "SearchResult">>();
   const { width, height } = Dimensions.get("window");
-  const [likedItems, setLikedItems] = useState<{ [key: string]: boolean }>({});
   const [searchValue, setSearchValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearch, setIsSearch] = useState(false);
