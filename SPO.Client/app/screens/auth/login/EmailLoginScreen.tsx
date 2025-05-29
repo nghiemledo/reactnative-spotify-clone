@@ -14,8 +14,8 @@ const EmailLoginScreen = () => {
     <YStack flex={1} bg="#111">
       <XStack
         position="absolute"
-        t={0}
-        l={0}
+        t={-20}
+        l={-10}
         r={0}
         height={60}
         items="center"
