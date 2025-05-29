@@ -3,7 +3,7 @@ import { YStack, XStack, Text, Input, Button } from "tamagui";
 import { StatusBar } from "react-native";
 import { useEffect, useState } from "react";
 import { LinearGradient } from "@tamagui/linear-gradient";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import { UserInfo } from "../../types/user";
@@ -18,7 +18,6 @@ interface AuthState {
 const CreatePlaylistScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const dispatch = useDispatch();
   const user = useSelector((state: { auth: AuthState }) => state.auth.user);
   const [createPlaylist, { isLoading, error }] = useCreatePlaylistMutation();
   const [playlistName, setPlaylistName] = useState<string>("");
@@ -44,7 +43,7 @@ const CreatePlaylistScreen = () => {
         userId: user.id,
       }).unwrap();
       setPlaylistName("");
-      navigation.navigate("DetailPlaylist", { id: response.data.id }); // Navigate with id
+      navigation.navigate("DetailPlaylist", { id: response.data.id }); 
     } catch (err) {
       console.error("Failed to create playlist:", err);
     }

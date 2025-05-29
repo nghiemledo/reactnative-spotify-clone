@@ -11,7 +11,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   useGetPlaylistByIdQuery,
   useUpdatePlaylistMutation,
-} from "../../services/playlistServices"; // Added useUpdatePlaylistMutation
+} from "../../services/playlistServices"; 
 import {
   useDeletePlaylistItemMutation,
   useGetPlaylistItemsQuery,
@@ -32,7 +32,7 @@ const updateSongPlaylist = () => {
   const { data: playlistItemsData } = useGetPlaylistItemsQuery({ playlistId });
   const [triggerGetSongById] = useLazyGetSongByIdQuery();
   const [updatePlaylist, { isLoading: isUpdating }] =
-    useUpdatePlaylistMutation(); // Added mutation hook
+    useUpdatePlaylistMutation();
 
   const [playlistName, setPlaylistName] = useState<string>(
     playlistData?.data?.title || "My playlist"
