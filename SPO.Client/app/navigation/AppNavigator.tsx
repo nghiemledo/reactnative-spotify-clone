@@ -1,35 +1,33 @@
+import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import * as React from "react";
 import SplashNavigator from "./SplashNavigator";
-import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
 import PlayingScreen from "../screens/PlayingScreen";
+import AddToPlaylistScreen from "../screens/playlists/AddToPlaylistScreen";
 import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
-import { PlaylistsScreen } from "../screens/playlists/PlaylistsScreen";
-import { EditProfileScreen } from "../screens/profile/EditProfileScreen";
 import AlbumScreen from "../screens/AlbumScreen";
 import ArtistDetailScreen from "../screens/artist/ArtistDetailScreen";
-import { Song } from "../types/song";
-// import ShareSongScreen from "../screens/ShareSongScreen";
+import ShareSongScreen from "../screens/ShareSongScreen";
 import SearchScreen from "../screens/search/SearchScreen";
 import SearchResultScreen from "../screens/search/SearchResultScreen";
 import PodcastSelectionScreen from "../screens/library/PodcastSelectionScreen";
 import ArtistSelectionScreen from "../screens/library/ArtistSelectionScreen";
 import SearchLibraryScreen from "../screens/library/SearchLibraryScreen";
 import AddSongPlaylistScreen from "../screens/playlists/AddSongPlaylistScreen";
-import UpdateSongPlaylistScreen from "../screens/playlists/UpdateSongPlaylistScreen";
-import ShareSongScreen from "../screens/ShareSongScreen";
 import CreatePlaylistScreen from "../screens/playlists/CreatePlaylistScreen";
-// import ScanScreen from "../screens/ScanScreen";
+import ScanScreen from "../screens/ScanScreen";
+import { Song } from "../types/song";
+import { EditProfileScreen } from "../screens/profile/EditProfileScreen";
+import { PlaylistsScreen } from "../screens/playlists/PlaylistsScreen";
 
 const Stack = createStackNavigator();
 
 export type RootStackParamList = {
   SplashNavigator: undefined;
   Playing: undefined;
-  AddSongPlaylists: undefined;
+  AddToPlaylist: { songId?: string; currentPlaylistId?: string };
   EditProfile: undefined;
-  detailPlaylist: undefined;
+  DetailPlaylist: { id: string };
   Playlists: undefined;
   Album: { id: string };
   Artist: { id: string };
@@ -39,14 +37,8 @@ export type RootStackParamList = {
   SearchResult: { toastMessages?: string[] };
   ArtistSelection: { selectedIds: string[] };
   PodcastSelection: { selectedIds: string[] };
-  SearchLibraryScreen: {
-    type: "artist" | "podcast";
-    selectedIds: string[];
-  };
-  DetailPlaylist: { id: string }; 
-  AddToPlaylist: { songId?: string; currentPlaylistId?: string };
-  AddSongPlaylist: {playlistId: string };
-  updateSongPlaylist: {playlistId: string };
+  SearchLibraryScreen: { type: "artist" | "podcast"; selectedIds: string[] };
+  AddSongPlaylist: { playlistId: string };
   CreatePlaylist: undefined;
 };
 
@@ -69,14 +61,13 @@ export default function AppNavigator() {
           component={AddToPlaylistScreen}
           options={{ headerShown: false }}
         />
-
         <Stack.Screen
           name="EditProfile"
           component={EditProfileScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="detailPlaylist"
+          name="DetailPlaylist"
           component={DetailPlaylistScreen}
           options={{ headerShown: false }}
         />
@@ -96,13 +87,18 @@ export default function AppNavigator() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="SearchResult"
-          component={SearchResultScreen}
+          name="shareQrSong"
+          component={ShareSongScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="DetailPlaylist"
-          component={DetailPlaylistScreen}
+          name="search"
+          component={SearchScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SearchResult"
+          component={SearchResultScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -126,25 +122,13 @@ export default function AppNavigator() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="updateSongPlaylist"
-          component={UpdateSongPlaylistScreen}
-          options={{ headerShown: false }}
-        />
-        
-        <Stack.Screen
-          name="shareQrSong"
-          component={ShareSongScreen}
-          options={{ headerShown: false }}
-        />
-
-        <Stack.Screen
-          name="search"
-          component={SearchScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
           name="CreatePlaylist"
           component={CreatePlaylistScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ScanQr"
+          component={ScanScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
