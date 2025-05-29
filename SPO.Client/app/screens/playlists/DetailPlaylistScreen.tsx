@@ -11,7 +11,6 @@ import {
 } from "tamagui";
 import { FlatList, ScrollView, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useDispatch } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
@@ -48,8 +47,19 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { useGetUserByIdQuery } from "../../services/AuthService";
 import {
   useGetArtistByIdQuery,
+  useGetArtistsQuery,
   useLazyGetArtistByIdQuery,
 } from "../../services/ArtistService";
+import { store, useAppSelector } from "../../store";
+import { playSong, setPlayerQueue } from "../../services/playerService";
+import { SongItem } from "../../components/song/SongItem";
+import SongBottomSheet from "../../components/song/SongBottomSheet";
+import { Artist } from "../../types/artist";
+import {
+  setCurrentTrack,
+  setQueue as setReduxQueue,
+} from "../../store/playerSlice";
+import Toast from "react-native-toast-message";
 
 interface SongWithPlaylist extends Song {
   playlistItemId?: string;
@@ -62,22 +72,38 @@ const DetailPlaylistScreen = () => {
   const { id } = route.params;
 
   const { data: playlistData } = useGetPlaylistByIdQuery(id);
-
   const { data: playlistItemsData } = useGetPlaylistItemsQuery({
     playlistId: id,
   });
-
   const { data: userData } = useGetUserByIdQuery(
     playlistData?.data?.userId || ""
   );
+  const {
+    data: artists,
+    isLoading: isArtistsLoading,
+    error: artistsError,
+  } = useGetArtistsQuery();
 
+  const getArtistName = (artistId: string | undefined) => {
+    if (!artistId) return "Unknown Artist";
+    const artist = artists?.data?.find((a: Artist) => a.id === artistId);
+    return artist?.name || "Unknown Artist";
+  };
+
+  const handleMorePress = (song: Song) => {
+    setSelectedSong(song);
+    setIsBottomSheetOpen(true);
+  };
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [songs, setSongs] = useState<SongWithPlaylist[]>([]);
   const scrollY = useRef(new Animated.Value(0)).current;
   const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
   const [selectedSortOption, setSelectedSortOption] = useState("customerOrder");
   const [sortedItems, setSortedItems] = useState<SongWithPlaylist[]>([]);
   const [isSongOptionsOpen, setIsSongOptionsOpen] = useState(false);
-  const [selectedSong, setSelectedSong] = useState<SongWithPlaylist | null>(null);
+  const [selectedSong, setSelectedSong] = useState<SongWithPlaylist | null>(
+    null
+  );
   const [isPlaylistOptionsOpen, setIsPlaylistOptionsOpen] = useState(false);
   dayjs.extend(relativeTime);
 
@@ -86,6 +112,8 @@ const DetailPlaylistScreen = () => {
   const [deletePlaylist] = useDeletePlaylistMutation();
   const [deletePlaylistItem, { isLoading: isDeleting }] =
     useDeletePlaylistItemMutation();
+
+  const player = useAppSelector((store) => store.player);
 
   useEffect(() => {
     if (playlistItemsData?.data?.length) {
@@ -102,7 +130,7 @@ const DetailPlaylistScreen = () => {
                 ...result.data,
                 createdAt: item.createdAt,
                 artist: artist.data?.data.name,
-                playlistItemId: item.id
+                playlistItemId: item.id,
               };
             } catch (error) {
               console.error(
@@ -268,11 +296,76 @@ const DetailPlaylistScreen = () => {
     setIsPlaylistOptionsOpen(false);
   };
 
+  const handleSongPress = async (song: Song) => {
+    try {
+      await playSong(song);
+      navigation.navigate("Playing");
+      console.log("Song pressed and playing:", song.title);
+    } catch (error) {
+      console.error("Error playing song:", error);
+    }
+  };
+
+  // const handleMorePress = (song: Song) => {
+  //   setSelectedSong(song as SongWithPlaylist);
+  //   setIsSongOptionsOpen(true);
+  // };
+
   if (!playlistData?.data) {
     return <Text color="white">Playlist not found</Text>;
   }
 
   const playlist = playlistData.data;
+
+  const handlePlayAll = async () => {
+    if (!sortedItems || sortedItems.length === 0) {
+      Toast.show({
+        type: "error",
+        text1: "No songs available to play",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+      return;
+    }
+
+    try {
+      // Convert sortedItems to the track format expected by the player
+      const tracks = sortedItems.map((song: SongWithPlaylist) => ({
+        id: song.id || `song-${song.title}`,
+        url: song.audioUrl ?? "",
+        title: song.title ?? "Unknown Title",
+        artist: getArtistName(song.artistId) || "Unknown Artist",
+        artwork:
+          song.coverImage || "https://via.placeholder.com/300?text=No+Image",
+        duration: song.duration || 0,
+      }));
+
+      // Update the Redux queue and player queue
+      store.dispatch(setReduxQueue(tracks));
+      await setPlayerQueue(tracks);
+
+      // Play the first song
+      const firstSong = sortedItems[0];
+      await playSong(firstSong);
+
+      // Navigate to the Playing screen
+      navigation.navigate("Playing");
+      Toast.show({
+        type: "success",
+        text1: `Playing playlist: ${playlist.title}`,
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+    } catch (error) {
+      console.error("Error playing playlist:", error);
+      Toast.show({
+        type: "error",
+        text1: "Unable to play playlist",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+    }
+  };
 
   return (
     <LinearGradient
@@ -575,13 +668,14 @@ const DetailPlaylistScreen = () => {
                   }}
                 />
                 <Button
-                  disabled
+                  // disabled
                   bg="#1DB954"
                   m={0}
                   p={0}
                   rounded={100}
                   width="$4"
                   height="$4"
+                  onPress={handlePlayAll}
                   icon={
                     <Play
                       size="$2"
@@ -644,50 +738,19 @@ const DetailPlaylistScreen = () => {
               data={sortedItems}
               keyExtractor={(item, index) => `${item.id || "song"}-${index}`}
               scrollEnabled={false}
-              renderItem={({ item }) => (
-                <TouchableOpacity>
-                  <XStack items="center" justify="space-between" py="$2">
-                    <XStack items="center" gap="$3" flex={1}>
-                      <Image
-                        source={{
-                          uri:
-                            item.coverImage ||
-                            "https://images.unsplash.com/photo-1507838153414-b4b713384a76",
-                        }}
-                        width={50}
-                        height={50}
-                        rounded={8}
-                      />
-                      <YStack flex={1}>
-                        <Text fontSize={15} fontWeight="300" color="white">
-                          {item.title}
-                        </Text>
-                        <Text fontSize={13} color="white" opacity={0.7}>
-                          {item.artist}
-                        </Text>
-                      </YStack>
-                    </XStack>
-                    <Button
-                      bg="transparent"
-                      p={0}
-                      onPress={() => {
-                        setSelectedSong(item);
-                        setIsSongOptionsOpen(true);
-                      }}
-                      icon={
-                        <EllipsisVertical
-                          size="$2"
-                          color="white"
-                          strokeWidth={1}
-                        />
-                      }
-                      pressStyle={{
-                        bg: "transparent",
-                        borderBlockColor: "transparent",
-                      }}
-                    />
-                  </XStack>
-                </TouchableOpacity>
+              renderItem={({ item, index }) => (
+                <SongItem
+                  key={item.id || `song-${item.title}`}
+                  song={item}
+                  index={index}
+                  showIndex={false}
+                  showImage={true}
+                  showArtistName={true}
+                  imageSize={60}
+                  getArtistName={getArtistName}
+                  screen="home"
+                  onMorePress={handleMorePress}
+                />
               )}
             />
           </YStack>
@@ -703,8 +766,18 @@ const DetailPlaylistScreen = () => {
             selectedOption={selectedSortOption}
             context="detailPlaylist"
           />
+          <SongBottomSheet
+            isOpen={isBottomSheetOpen}
+            onClose={() => {
+              setIsBottomSheetOpen(false);
+              setSelectedSong(null);
+            }}
+            selectedSong={selectedSong}
+            navigation={navigation}
+            screenType="playlist"
+          />
 
-          {selectedSong && (
+          {/* {selectedSong && (
             <View
               style={{
                 position: "absolute",
@@ -737,7 +810,7 @@ const DetailPlaylistScreen = () => {
                 context="detailPlaylist"
               />
             </View>
-          )}
+          )} */}
 
           {isPlaylistOptionsOpen && (
             <View
