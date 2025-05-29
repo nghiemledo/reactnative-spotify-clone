@@ -4,7 +4,6 @@ import SplashScreen from "../screens/SplashScreen";
 import EmailLoginScreen from "../screens/auth/login/EmailLoginScreen";
 import RegisterScreen from "../screens/auth/register/RegisterScreen";
 import EmailRegisterScreen from "../screens/auth/register/EmailRegisterScreen";
-import HomeNavigator from "./HomeNavigator";
 import TabNavigator from "./TabNavigator";
 
 const Stack = createStackNavigator();
