@@ -4,6 +4,24 @@ import { FollowArtistRequest, FollowPodcastRequest, UpdateUserProfile, UserCrede
 import { useAppSelector, RootState } from "../store";
 import { ApiResponse } from "../types/apiResponse";
 
+// Định nghĩa response types dựa trên DTO từ backend
+export interface FollowedArtistResponse {
+  errorCode?: number | null;
+  errorMessage?: string | null;
+  id?: string | null;
+  name?: string | null;
+  followedAt?: string | null; // DateTimeOffset được ánh xạ thành string trong TypeScript
+}
+
+export interface FollowedPodcastResponse {
+  errorCode: number;
+  errorMessage?: string | null;
+  id?: string | null;
+  title?: string | null;
+  creator?: string | null;
+  followedAt?: string | null; // DateTimeOffset được ánh xạ thành string
+}
+
 interface AuthResponse {
   token: string;
   refreshToken: string;
@@ -191,20 +209,34 @@ export const authServices = baseRestApi.injectEndpoints({
         }
       },
     }),
-    // getFollowedArtists: builder.query<ApiResponse<FollowedArtistResponse[]>, string>({
-    //   query: (userId) => ({
-    //     url: `${entity}/followed-artists`,
-    //     method: "GET",
-    //     params: { userId },
-    //   }),
-    //   async onQueryStarted(_, { queryFulfilled }) {
-    //     try {
-    //       await queryFulfilled;
-    //     } catch (error) {
-    //       console.error("Get followed artists failed:", error);
-    //     }
-    //   },
-    // }),
+    getFollowedArtists: builder.query<ApiResponse<FollowedArtistResponse[]>, string>({
+      query: (userId) => ({
+        url: `${entity}/followed-artists`,
+        method: "GET",
+        params: { userId },
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error("Get followed artists failed:", error);
+        }
+      },
+    }),
+    getFollowedPodcasts: builder.query<ApiResponse<FollowedPodcastResponse[]>, string>({
+      query: (userId) => ({
+        url: `${entity}/followed-podcasts`,
+        method: "GET",
+        params: { userId },
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error("Get followed podcasts failed:", error);
+        }
+      },
+    }),
   }),
   overrideExisting: true,
 });
@@ -219,4 +251,6 @@ export const {
   useFollowArtistMutation,
   useFollowPodcastMutation,
   useSearchQuery,
+  useGetFollowedArtistsQuery,
+  useGetFollowedPodcastsQuery,
 } = authServices;
