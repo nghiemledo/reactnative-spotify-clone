@@ -8,7 +8,7 @@ import {
   Input,
   Avatar,
 } from "tamagui";
-import { FlatList, ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -28,7 +28,7 @@ import {
 import { LinearGradient } from "@tamagui/linear-gradient";
 import { Song } from "../../types/song";
 import SortBottomSheet from "../../components/library/SortBottomSheet";
-import SongOptionsBottomSheet from "../../components/search/SongOptionsBottomSheet";
+import SongBottomSheet from "../../components/song/SongBottomSheet"; 
 import PlaylistOptionsBottomSheet from "../../components/playlist/PlaylistOptionsBottomSheet";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/AppNavigator";
@@ -58,11 +58,9 @@ const DetailPlaylistScreen = () => {
   const { id } = route.params;
 
   const { data: playlistData } = useGetPlaylistByIdQuery(id);
-
   const { data: playlistItemsData } = useGetPlaylistItemsQuery({
     playlistId: id,
   });
-
   const { data: userData } = useGetUserByIdQuery(
     playlistData?.data?.userId || ""
   );
@@ -206,10 +204,18 @@ const DetailPlaylistScreen = () => {
         }
         break;
       case "goToAlbum":
-        console.log(`Navigate to album for ${selectedSong.title}`);
+        if (selectedSong.albumId) {
+          navigation.navigate("Album", { id: selectedSong.albumId });
+        } else {
+          console.log("No album information available");
+        }
         break;
       case "goToArtist":
-        console.log(`Navigate to artist ${selectedSong.artist}`);
+        if (selectedSong.artistId) {
+          navigation.navigate("Artist", { id: selectedSong.artistId });
+        } else {
+          console.log("No artist information available");
+        }
         break;
       case "share":
         console.log(`Share ${selectedSong.title}`);
@@ -221,7 +227,7 @@ const DetailPlaylistScreen = () => {
         console.log(`View credits for ${selectedSong.title}`);
         break;
       case "showSpotifyCode":
-        console.log(`Show Spotify code for ${selectedSong.title}`);
+        navigation.navigate("shareQrSong", { song: selectedSong });
         break;
       default:
         break;
@@ -635,7 +641,7 @@ const DetailPlaylistScreen = () => {
                 showArtistName={true}
                 imageSize={60}
                 getArtistName={() => item.artist || ""}
-                screen="home"
+                screen="detailPlaylist" // Cập nhật screen type
                 onMorePress={() => {
                   setSelectedSong(item);
                   setIsSongOptionsOpen(true);
@@ -657,38 +663,17 @@ const DetailPlaylistScreen = () => {
           />
 
           {selectedSong && (
-            <View
-              style={{
-                position: "absolute",
-                left: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: 9999,
-                height: "100%",
+            <SongBottomSheet
+              isOpen={isSongOptionsOpen}
+              onClose={() => {
+                setIsSongOptionsOpen(false);
+                setSelectedSong(null);
               }}
-            >
-              <SongOptionsBottomSheet
-                isOpen={isSongOptionsOpen}
-                onClose={() => {
-                  setIsSongOptionsOpen(false);
-                  setSelectedSong(null);
-                }}
-                onSelectOption={handleSelectSongOption}
-                songName={selectedSong.title || ""}
-                urlAvatar={
-                  selectedSong.coverImage ||
-                  "https://images.unsplash.com/photo-1507838153414-b4b713384a76"
-                }
-                type="Song"
-                artists={[
-                  {
-                    id: parseInt(selectedSong.id || "0"),
-                    name: selectedSong.artist || "",
-                  },
-                ]}
-                context="detailPlaylist"
-              />
-            </View>
+              selectedSong={selectedSong}
+              navigation={navigation}
+              screenType="detailPlaylist"
+              onSelectOption={handleSelectSongOption}
+            />
           )}
 
           {isPlaylistOptionsOpen && (
