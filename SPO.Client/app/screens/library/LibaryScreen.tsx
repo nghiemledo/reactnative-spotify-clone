@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import {
   Avatar,
-  AvatarFallback,
   AvatarImage,
   Button,
   ScrollView,

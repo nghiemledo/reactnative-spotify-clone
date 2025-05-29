@@ -6,7 +6,6 @@ import {
   Button,
   H3,
   Input,
-  Image,
   Avatar,
 } from "tamagui";
 import { FlatList, TouchableOpacity } from "react-native";
