@@ -1,80 +1,55 @@
 import { LinearGradient } from "@tamagui/linear-gradient";
-import {
-  ArrowDownCircle,
-  ArrowLeft,
-  EllipsisVertical,
-  MoreVertical,
-  Shuffle,
-} from "@tamagui/lucide-icons";
-import React, { useRef } from "react";
+import { ArrowLeft } from "@tamagui/lucide-icons";
+import React, { useRef, useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import {
-  Animated,
-  FlatList,
-  Image,
-  ScrollView,
-  StatusBar,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Animated, ScrollView, StatusBar, TouchableOpacity, View } from "react-native";
 import { Button, Text, XStack, YStack } from "tamagui";
-import { PlaylistItem } from "../../components/PlaylistItem";
+import DataList from "../../components/library/DataList";
+import { useAppSelector } from "../../store";
+import { useGetPlaylistsByUserIdQuery } from "../../services/playlistServices";
+import { RootStackParamList } from "../../navigation/AppNavigator";
 
-interface user {
+type Data = {
   id: string;
+  type: string;
   name: string;
   image: string;
-  follwers: number;
-  following: number;
-}
-const User = {
-  id: "1",
-  name: "Nguyễn Văn A",
-  image: "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-  follwers: 100,
-  following: 200,
-};
-export interface Playlist {
-  id: string;
-  urlCoverPage: string;
-  name: string;
-}
-const data: Playlist[] = [
-  {
-    id: "1",
-    urlCoverPage:
-      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    name: "Playlist 1",
-  },
-  {
-    id: "2",
-    urlCoverPage:
-      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    name: "Playlist 2",
-  },
-  {
-    id: "3",
-    urlCoverPage:
-      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    name: "Playlist 3",
-  },
-  {
-    id: "4",
-    urlCoverPage:
-      "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
-    name: "Playlist 4",
-  },
-];
-
-type RootStackParamList = {
-  EditProfile: undefined;
+  artists?: { id: number; name: string }[];
+  createdAt?: string;
+  creator?: string;
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 export const ProfileScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const scrollY = useRef(new Animated.Value(0)).current;
+  const user = useAppSelector((state) => state.auth.user);
+  const userId = user?.id;
+  const { data: playlistData, isLoading, error } = useGetPlaylistsByUserIdQuery(userId || "", { skip: !userId });
+  const [sortedData, setSortedData] = useState<Data[]>([]);
+
+  // Map API data to Data format and limit to 3 most recent playlists
+  useEffect(() => {
+    if (playlistData?.data) {
+      const mappedData: Data[] = playlistData.data
+        .map((playlist) => ({
+          id: playlist.id,
+          type: "playlist",
+          name: playlist.title,
+          image:
+            playlist.coverImage ||
+            "https://images.pexels.com/photos/3721941/pexels-photo-3721941.jpeg",
+          createdAt: playlist.createdAt,
+          creator: playlist.userId,
+          artists: [],
+        }))
+        .sort((a, b) => parseInt(b.id) - parseInt(a.id))
+        .slice(0, 3);
+      setSortedData(mappedData);
+    }
+  }, [playlistData]);
 
   const navbarBackground = scrollY.interpolate({
     inputRange: [190, 220],
@@ -87,6 +62,36 @@ export const ProfileScreen = () => {
     outputRange: [0, 1],
     extrapolate: "clamp",
   });
+
+  const handleItems = (type: string, id: string) => {
+    if (type === "playlist") {
+      navigation.navigate("DetailPlaylist", { id });
+    }
+  };
+
+  if (!userId) {
+    return (
+      <YStack flex={1} bg="#121212" justify="center" items="center">
+        <Text color="white">Vui lòng đăng nhập để xem hồ sơ</Text>
+      </YStack>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <YStack flex={1} bg="#121212" justify="center" items="center">
+        <Text color="white">Đang tải...</Text>
+      </YStack>
+    );
+  }
+
+  if (error) {
+    return (
+      <YStack flex={1} bg="#121212" justify="center" items="center">
+        <Text color="white">Lỗi: Không thể tải danh sách phát</Text>
+      </YStack>
+    );
+  }
 
   return (
     <YStack flex={1} bg="#121212">
@@ -136,7 +141,7 @@ export const ProfileScreen = () => {
                   marginLeft: 8,
                 }}
               >
-                {User.name || "Người dùng"}
+                {user?.fullName || "Người dùng"}
               </Text>
             </Animated.View>
           </View>
@@ -163,7 +168,7 @@ export const ProfileScreen = () => {
               <TouchableOpacity>
                 <Animated.Image
                   source={{
-                    uri: User.image || "https://via.placeholder.com/300",
+                    uri: user?.urlAvatar || "https://via.placeholder.com/300",
                   }}
                   style={{
                     width: 130,
@@ -177,28 +182,14 @@ export const ProfileScreen = () => {
               <YStack>
                 <Text
                   fontSize={25}
-                  width="100%"
+                  width="85%"
                   fontWeight="bold"
                   color="white"
                   mb={4}
-                  numberOfLines={1}
+                  numberOfLines={2}
                 >
-                  {User.name || "Đang tải..."}
+                  {user?.fullName || "Đang tải..."}
                 </Text>
-                <XStack>
-                  <Text fontSize={14} color="#fff" mr={3}>
-                    {User.follwers}
-                  </Text>
-                  <Text fontSize={14} color="rgba(255,255,255,0.6)" mr={3}>
-                    followers •
-                  </Text>
-                  <Text fontSize={14} color="#fff" mr={3}>
-                    {User.following}
-                  </Text>
-                  <Text fontSize={14} color="rgba(255,255,255,0.6)" mr={3}>
-                    following
-                  </Text>
-                </XStack>
               </YStack>
             </XStack>
             <XStack mb={30}>
@@ -214,38 +205,31 @@ export const ProfileScreen = () => {
                   Edit
                 </Text>
               </Button>
-              <Button bg="transparent" ml={10} p={0}>
-                <MoreVertical color="white" />
-              </Button>
             </XStack>
             <Text color="#fff" fontWeight="bold" fontSize={20}>
-              Playlists
+              Your Library
             </Text>
           </LinearGradient>
-          <YStack pl={16}>
-            {data
-              .slice(-3)
-              .reverse()
-              .map((item) => (
-                <PlaylistItem key={item.id} playlist={item} />
-              ))}
-          </YStack>
 
-          <Button
-            mt={20}
-            borderWidth={1}
-            rounded={30}
-            width={"auto"}
-            borderColor="#b3b3b3"
-            bg="transparent"
-            px="$4"
-            self="center"
-            // onPress={() => navigation.navigate("Playlists")}
-          >
-            <Text color="white" fontWeight="bold" fontSize={12}>
-              See all playlists
-            </Text>
-          </Button>
+          {/* Playlist Display */}
+          <YStack pl={16} pr={16}>
+            <DataList data={sortedData} onItems={handleItems} />
+            <Button
+              mt={20}
+              borderWidth={1}
+              rounded={30}
+              width={"auto"}
+              borderColor="#b3b3b3"
+              bg="transparent"
+              px="$4"
+              self="center"
+              onPress={() => navigation.navigate("Playlists")}
+            >
+              <Text color="white" fontWeight="bold" fontSize={12}>
+                See all playlists
+              </Text>
+            </Button>
+          </YStack>
         </YStack>
       </ScrollView>
     </YStack>
