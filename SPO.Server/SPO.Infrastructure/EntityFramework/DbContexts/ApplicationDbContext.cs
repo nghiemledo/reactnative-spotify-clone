@@ -32,6 +32,7 @@ namespace SPO.Infrastructure.EntityFramework.DbContexts
         public DbSet<UserFollowPodcastShow> UserFollowPodcastShows { get; set; }
         public DbSet<UserLike> UserLikes { get; set; }
         public DbSet<UserLikePodcastEpisode> UserLikePodcastEpisodes { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

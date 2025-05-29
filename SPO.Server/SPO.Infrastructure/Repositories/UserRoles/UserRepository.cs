@@ -1,4 +1,5 @@
-﻿using SPO.Application.DataTransferObjects.Request.UserRoles.User;
+﻿using SPO.Application.DataTransferObjects.Request.User;
+using SPO.Application.DataTransferObjects.Request.UserRoles.User;
 using SPO.Application.DataTransferObjects.Response.User;
 using SPO.Domain.Entities.UserRoles;
 using SPO.Infrastructure.Dappers.Base;
@@ -19,6 +20,7 @@ namespace SPO.Infrastructure.Repositories.UserRoles
         Task<IEnumerable<GetPlaylistByUserIdResponse>> GetPlaylistsByUserIdAsync(string userId);
         Task<bool> FollowPodcastAsync(string userId, string showId);
         Task<IEnumerable<FollowedPodcastResponse>> GetFollowedPodcastsAsync(string userId);
+        Task<IEnumerable<FullSearchResult>> SearchAsync(string keyword, int limit);
     }
 
     public class UserRepository : IUserRepository
@@ -192,6 +194,27 @@ namespace SPO.Infrastructure.Repositories.UserRoles
             catch (Exception ex)
             {
                 throw new Exception("Error occurred when retrieving followed podcasts", ex);
+            }
+        }
+
+        public async Task<IEnumerable<FullSearchResult>> SearchAsync(string keyword, int limit)
+        {
+            try
+            {
+                var parameters = new
+                {
+                    Keyword = keyword,
+                    Limit = limit
+                };
+                var result = await _db.GetData<FullSearchResult, dynamic>(
+                    "[dbo].[SP_SPO_FullSearch]",
+                    parameters
+                );
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error occurred when searching", ex);
             }
         }
 

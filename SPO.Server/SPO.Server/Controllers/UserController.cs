@@ -14,6 +14,7 @@ using SPO.Infrastructure.Repositories;
 using SPO.Application.DataTransferObjects.Request.UserToken;
 using System.Security.Cryptography;
 using SPO.Application.DataTransferObjects.Response.User;
+using System.DirectoryServices.Protocols;
 
 namespace SPO.Server.Controllers
 {
@@ -399,6 +400,70 @@ namespace SPO.Server.Controllers
             catch (Exception ex)
             {
                 return BadRequest(await Result<List<FollowedPodcastResponse>>.FailAsync($"Error occurred: {ex.Message}"));
+            }
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string q, [FromQuery] int limit = 10)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(q))
+                {
+                    return BadRequest(await Result<SearchResponse>.FailAsync("Keyword is required."));
+                }
+
+                var results = await _userRepository.SearchAsync(q, limit);
+                var groupedResults = results.GroupBy(r => r.Type).ToDictionary(
+                    g => g.Key.ToLower(),
+                    g => g.Select(r => new
+                    {
+                        r.Id,
+                        r.Name,
+                        r.Title,
+                        r.Creator,
+                        r.ArtistId,
+                        r.ArtistName,
+                        r.CoverImage
+                    }).ToList()
+                );
+
+                var response = new FullSearchResponse
+                {
+                    Artists = groupedResults.ContainsKey("artist") ? groupedResults["artist"].Select(r => new ArtistResponse
+                    {
+                        Id = r.Id!,
+                        Name = r.Name!,
+                        CoverImage = r.CoverImage
+                    }).ToList() : new List<ArtistResponse>(),
+                    Songs = groupedResults.ContainsKey("song") ? groupedResults["song"].Select(r => new SongResponse
+                    {
+                        Id = r.Id!,
+                        Title = r.Title!,
+                        ArtistId = r.ArtistId,
+                        ArtistName = r.ArtistName,
+                        CoverImage = r.CoverImage!
+                    }).ToList() : new List<SongResponse>(),
+                    Shows = groupedResults.ContainsKey("show") ? groupedResults["show"].Select(r => new ShowResponse
+                    {
+                        Id = r.Id!,
+                        Title = r.Title!,
+                        Creator = r.Creator!,
+                        CoverImage = r.CoverImage
+                    }).ToList() : new List<ShowResponse>()
+                };
+
+                if (results.Any(r => r.ErrorCode != 0))
+                {
+                    return BadRequest(await Result<FullSearchResponse>.FailAsync(
+                        results.First(r => r.ErrorCode != 0).ErrorMessage ?? "Error during search."));
+                }
+
+                return Ok(await Result<FullSearchResponse>.SuccessAsync(response, "Search completed successfully."));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(await Result<FullSearchResponse>.FailAsync($"Error occurred: {ex.Message}"));
             }
         }
 
