@@ -1,70 +1,56 @@
-import React from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { YStack, View, Image } from "tamagui";
-import { MotiView } from "moti";
-import { RootState, useAppSelector } from "../store";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { SplashStackParamList } from "../navigation/SplashNavigator";
-import { Text } from "tamagui";
-import { HomeStackParamList } from "../navigation/HomeNavigator";
+import React from "react"
+import { YStack, Text, Image } from "tamagui"
+import { MotiView } from "moti"
+import { useAppSelector, RootState } from "../store"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { SplashStackParamList } from "../navigation/SplashNavigator"
 
 const SplashScreen = () => {
-  const navigation = useNavigation<NavigationProp<SplashStackParamList>>();
-  const user = useAppSelector((state: RootState) => state.auth.user);
+  const navigation = useNavigation<NavigationProp<SplashStackParamList>>()
+  const user = useAppSelector((state: RootState) => state.auth.user)
 
   React.useEffect(() => {
-    setTimeout(() => {
-      // if (user) {
-      //   navigation.navigate("Main");
-      // } else {
-      //   navigation.navigate("Login");
-      // }
-        navigation.navigate("Main");
-
-    }, 2000);
-  }, [user, navigation]);
+    const timer = setTimeout(() => {
+      navigation.navigate("Main")
+    }, 2500)
+    return () => clearTimeout(timer)
+  }, [user, navigation])
 
   return (
-    <LinearGradient
-      colors={["#1DB954", "#191414"]}
-      style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-    >
-      <YStack flex={1} justify="center" items="center" space="$4">
-        {/* Spotify Logo with Moti animation */}
-        <MotiView
-          from={{ scale: 1 }}
-          animate={{ scale: 1.1 }}
-          transition={{ type: "timing", duration: 1000, loop: true }}
-        >
-          <Text fontSize={24} mb={20} fontWeight={600} color="white">
-            Spotify Clone
-          </Text>
-        </MotiView>
-        {/* Loading Dots */}
-        <YStack flexDirection="row" space="$2">
-          {[...Array(3)].map((_, index) => (
-            <MotiView
-              key={index}
-              from={{ translateY: 0 }}
-              animate={{ translateY: -10 }}
-              transition={{
-                type: "timing",
-                duration: 500,
-                delay: index * 200,
-                loop: true,
-              }}
-              style={{
-                width: 12,
-                height: 12,
-                borderRadius: 6,
-                backgroundColor: "white",
-              }}
-            />
-          ))}
-        </YStack>
-      </YStack>
-    </LinearGradient>
-  );
-};
+    <YStack flex={1} bg="black" justify="center" items="center">
+      {/* Logo trượt lên và phóng to */}
+      <MotiView
+        from={{ translateY: 0, opacity: 0.5, scale: 0.5 }}
+        animate={{ translateY: -10, opacity: 1, scale: 1 }}
+        transition={{ type: "timing", duration: 1000 }}
+        style={{
+          marginBottom: 16,
+          shadowColor: "#1DB954",
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.9,
+          shadowRadius: 30,
+          elevation: 20,
+        }}
+      >
+        <Image
+          source={require("../assets/LogoSpotify.png")}
+          style={{ width: 130, height: 130 }}
+          resizeMode="contain"
+        />
+      </MotiView>
 
-export default SplashScreen;
+      {/* Chữ Spotify trượt xuống */}
+      <MotiView
+        from={{ translateY: 0, opacity: 0 }}
+        animate={{ translateY: 10, opacity: 1 }}
+        transition={{ delay: 300, duration: 1000, type: "timing" }}
+      >
+        <Text fontSize={30} fontWeight="800" color="#1DB954" text="center">
+          Spotify
+        </Text>
+      </MotiView>
+    </YStack>
+  )
+}
+
+export default SplashScreen
