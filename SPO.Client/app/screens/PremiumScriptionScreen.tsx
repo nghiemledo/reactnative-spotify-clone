@@ -14,6 +14,10 @@ import {
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { LinearGradient } from "@tamagui/linear-gradient";
 import { PremiumStackParamList } from "../navigation/PremiumNavigator";
+import { useCreatePaymentMutation } from "../services/paymentService";
+import { PaymentMethod } from "../types/payment";
+import { useAppSelector, RootState } from "../store";
+import { PaymentRequest } from "../services/paymentService";
 
 type PremiumSubscriptionScreenNavigationProp = NativeStackNavigationProp<
   PremiumStackParamList,
@@ -32,31 +36,50 @@ export default function PremiumSubscriptionScreen({
   const [isProcessingStudent, setIsProcessingStudent] = useState(false);
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [plan, setPlan] = useState<string | null>(null);
+  const [createPayment] = useCreatePaymentMutation();
+  const userId = useAppSelector((state: RootState) => state.auth.user?.id);
 
+  
   useEffect(() => {
     navigation.setOptions({
       headerShown: false,
     });
 
-    // Lắng nghe deep link
     const handleDeepLink = ({ url }: { url: string }) => {
       console.log("Deep Link URL:", url);
-      if (url.includes("myapp://truong1510.com/success") && paymentId && plan) {
-        // Lấy chi tiết thanh toán thực tế từ PayPal
+      if (url.includes("myapp://truong1510.com/success") && paymentId && plan && userId) {
         getPaymentDetails(paymentId)
-          .then((paymentDetails) => {
+          .then(async (paymentDetails) => {
             console.log("trạng thái: " + paymentDetails.state);
 
             if (paymentDetails.state === "created") {
-              const amount = paymentDetails.transactions[0].amount.total;
+              const amount = parseFloat(paymentDetails.transactions[0].amount.total);
               const currency = paymentDetails.transactions[0].amount.currency;
               const createTime = paymentDetails.create_time;
-              navigation.navigate("OrderSuccess", {
-                plan,
-                amount,
-                currency,
-                createTime,
-              });
+
+              const paymentData: PaymentRequest = {
+                paymentMethod: PaymentMethod.PayPal,
+                amount: 59000,
+                status: paymentDetails.state,
+                userId: userId,
+              };
+
+              try {
+                const paymentResponse = await createPayment(paymentData).unwrap();
+                console.log("Payment service response:", paymentResponse);
+                navigation.navigate("OrderSuccess", {
+                  plan,
+                  amount: amount.toString(),
+                  currency,
+                  createTime,
+                });
+              } catch (error) {
+                console.error("Payment service error:", error);
+                Alert.alert(
+                  "Lỗi",
+                  "Không thể lưu thanh toán vào hệ thống. Vui lòng thử lại."
+                );
+              }
             } else {
               Alert.alert(
                 "Lỗi",
@@ -76,24 +99,21 @@ export default function PremiumSubscriptionScreen({
       }
     };
 
-    // Lắng nghe URL khi ứng dụng đang chạy
     Linking.addEventListener("url", handleDeepLink);
 
-    // Kiểm tra URL khi ứng dụng mở lần đầu
     Linking.getInitialURL().then((url) => {
       if (url) handleDeepLink({ url });
     });
 
     return () => {
-      // Dọn dẹp listener
       Linking.removeAllListeners("url");
     };
-  }, [navigation, paymentId, plan]);
+  }, [navigation, paymentId, plan, userId, createPayment]);
 
   const PAYPAL_CLIENT_ID =
     "AfHGNGn0WTw_452kVntETCGTECssOjiom_ziHQo0st4fCufkNY9wVfZ3xAYxD9UN9oc_lwwvtxuqJfgI";
   const PAYPAL_SECRET =
-    "ELXkp3xddZfrVSf3nDVCtKU0TF2vwlrA61-Xswcr7pjSaPRLKAdfCScsbi4aTnlGIZNPGuUtB_kYAX5u"; // Thay bằng Secret thật của bạn
+    "ELXkp3xddZfrVSf3nDVCtKU0TF2vwlrA61-Xswcr7pjSaPRLKAdfCScsbi4aTnlGIZNPGuUtB_kYAX5u";
 
   const getAccessToken = async () => {
     try {
@@ -244,12 +264,12 @@ export default function PremiumSubscriptionScreen({
       const orderData = await createPayPalOrder(
         (29000 / 23000).toFixed(2),
         "Student"
-      ); 
+      );
       if (!orderData) throw new Error("Không thể tạo đơn hàng");
 
       const { approvalUrl, paymentId } = orderData;
-      setPaymentId(paymentId); 
-      setPlan("Student"); 
+      setPaymentId(paymentId);
+      setPlan("Student");
 
       await Linking.openURL(approvalUrl);
     } catch (error) {
