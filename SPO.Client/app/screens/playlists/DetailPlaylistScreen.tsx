@@ -9,7 +9,7 @@ import {
   Image,
   Avatar,
 } from "tamagui";
-import { ScrollView, TouchableOpacity } from "react-native";
+import { FlatList, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -53,14 +53,12 @@ import { playSong, setPlayerQueue } from "../../services/playerService";
 import { SongItem } from "../../components/song/SongItem";
 import SongBottomSheet from "../../components/song/SongBottomSheet";
 import { Artist } from "../../types/artist";
-import {
-  setQueue as setReduxQueue,
-} from "../../store/playerSlice";
+import { setQueue as setReduxQueue } from "../../store/playerSlice";
 import Toast from "react-native-toast-message";
 
 interface SongWithPlaylist extends Song {
   playlistItemId?: string;
-  playlistId?: string; // Added for addToOtherPlaylist
+  playlistId?: string;
 }
 
 const DetailPlaylistScreen = () => {
@@ -76,11 +74,7 @@ const DetailPlaylistScreen = () => {
   const { data: userData } = useGetUserByIdQuery(
     playlistData?.data?.userId || ""
   );
-  const {
-    data: artists,
-    isLoading: isArtistsLoading,
-    error: artistsError,
-  } = useGetArtistsQuery();
+  const { data: artists } = useGetArtistsQuery();
 
   const getArtistName = (artistId: string | undefined) => {
     if (!artistId) return "Unknown Artist";
@@ -89,10 +83,9 @@ const DetailPlaylistScreen = () => {
   };
 
   const [songs, setSongs] = useState<SongWithPlaylist[]>([]);
-  const scrollY = useRef(new Animated.Value(0)).current;
+  const [sortedItems, setSortedItems] = useState<SongWithPlaylist[]>([]);
   const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
   const [selectedSortOption, setSelectedSortOption] = useState("customerOrder");
-  const [sortedItems, setSortedItems] = useState<SongWithPlaylist[]>([]);
   const [isSongOptionsOpen, setIsSongOptionsOpen] = useState(false);
   const [selectedSong, setSelectedSong] = useState<SongWithPlaylist | null>(
     null
@@ -103,45 +96,57 @@ const DetailPlaylistScreen = () => {
   const [triggerGetSongById] = useLazyGetSongByIdQuery();
   const [triggerGetArtistById] = useLazyGetArtistByIdQuery();
   const [deletePlaylist] = useDeletePlaylistMutation();
-  const [deletePlaylistItem, { isLoading: isDeleting }] =
-    useDeletePlaylistItemMutation();
+  const [deletePlaylistItem] = useDeletePlaylistItemMutation();
+
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (playlistItemsData?.data?.length) {
       const fetchSongs = async () => {
-        const songPromises = playlistItemsData.data.map(async (item) => {
-          if (item.playlistId === id) {
-            try {
-              const result = await triggerGetSongById(item.songId).unwrap();
-              if (!result.data.artistId) {
-                throw new Error("artistId is undefined");
+        try {
+          const songPromises = playlistItemsData.data.map(async (item) => {
+            if (item.playlistId === id) {
+              try {
+                const result = await triggerGetSongById(item.songId).unwrap();
+                if (!result.data.artistId) {
+                  console.error(
+                    `artistId is undefined for song ${item.songId}`
+                  );
+                  return null;
+                }
+                const artist = await triggerGetArtistById(
+                  result.data.artistId
+                ).unwrap();
+                return {
+                  ...result.data,
+                  createdAt: item.createdAt,
+                  artist: artist.data?.name || "Unknown Artist",
+                  playlistItemId: item.id,
+                  playlistId: item.playlistId,
+                };
+              } catch (error) {
+                console.error(`Failed to fetch song ${item.songId}:`, error);
+                return null;
               }
-              const artist = await triggerGetArtistById(result.data.artistId);
-              return {
-                ...result.data,
-                createdAt: item.createdAt,
-                artist: artist.data?.data.name,
-                playlistItemId: item.id,
-                playlistId: item.playlistId, // Include playlistId
-              };
-            } catch (error) {
-              console.error(
-                "Failed to fetch song with ID:",
-                item.songId,
-                error
-              );
-              return null;
             }
-          }
-        });
-
-        const fetchedSongs = await Promise.all(songPromises);
-        setSongs(fetchedSongs.filter(Boolean) as SongWithPlaylist[]);
+            return null;
+          });
+          const fetchedSongs = await Promise.all(songPromises);
+          const validSongs = fetchedSongs.filter(Boolean) as SongWithPlaylist[];
+          setSongs(validSongs);
+          setSortedItems(validSongs);
+        } catch (error) {
+          console.error("Error fetching songs:", error);
+          Toast.show({
+            type: "error",
+            text1: "Failed to load songs",
+            position: "bottom",
+          });
+        }
       };
-
       fetchSongs();
     }
-  }, [playlistItemsData]);
+  }, [playlistItemsData, id, triggerGetSongById, triggerGetArtistById]);
 
   // Animation interpolations
   const navbarBackground = scrollY.interpolate({
@@ -184,12 +189,9 @@ const DetailPlaylistScreen = () => {
   });
 
   useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
+    navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
-  // Sort songs
   useEffect(() => {
     if (songs.length > 0) {
       let sorted = [...songs];
@@ -208,8 +210,6 @@ const DetailPlaylistScreen = () => {
         case "artist":
           sorted.sort((a, b) => (a.artist || "").localeCompare(b.artist || ""));
           break;
-        default:
-          break;
       }
       setSortedItems(sorted);
     }
@@ -223,7 +223,6 @@ const DetailPlaylistScreen = () => {
   const handleSelectPlaylistOption = async (option: string) => {
     switch (option) {
       case "addToThisPlaylist":
-        console.log("Navigate to add songs to this playlist");
         navigation.navigate("AddSongPlaylist", { playlistId: id });
         break;
       case "editPlaylist":
@@ -239,8 +238,6 @@ const DetailPlaylistScreen = () => {
       case "showSpotifyCode":
         console.log("Show Spotify code for this playlist");
         break;
-      default:
-        break;
     }
     setIsPlaylistOptionsOpen(false);
   };
@@ -249,17 +246,15 @@ const DetailPlaylistScreen = () => {
     try {
       await playSong(song);
       navigation.navigate("Playing");
-      console.log("Song pressed and playing:", song.title);
     } catch (error) {
       console.error("Error playing song:", error);
+      Toast.show({
+        type: "error",
+        text1: "Failed to play song",
+        position: "bottom",
+      });
     }
   };
-
-  if (!playlistData?.data) {
-    return <Text color="white">Playlist not found</Text>;
-  }
-
-  const playlist = playlistData.data;
 
   const handlePlayAll = async () => {
     if (!sortedItems || sortedItems.length === 0) {
@@ -271,9 +266,7 @@ const DetailPlaylistScreen = () => {
       });
       return;
     }
-
     try {
-      // Convert sortedItems to the track format expected by the player
       const tracks = sortedItems.map((song: SongWithPlaylist) => ({
         id: song.id || `song-${song.title}`,
         url: song.audioUrl ?? "",
@@ -283,20 +276,13 @@ const DetailPlaylistScreen = () => {
           song.coverImage || "https://via.placeholder.com/300?text=No+Image",
         duration: song.duration || 0,
       }));
-
-      // Update the Redux queue and player queue
       store.dispatch(setReduxQueue(tracks));
       await setPlayerQueue(tracks);
-
-      // Play the first song
-      const firstSong = sortedItems[0];
-      await playSong(firstSong);
-
-      // Navigate to the Playing screen
+      await playSong(sortedItems[0]);
       navigation.navigate("Playing");
       Toast.show({
         type: "success",
-        text1: `Playing playlist: ${playlist.title}`,
+        text1: `Playing playlist: ${playlistData?.data?.title}`,
         position: "bottom",
         visibilityTime: 2000,
       });
@@ -310,6 +296,12 @@ const DetailPlaylistScreen = () => {
       });
     }
   };
+
+  if (!playlistData?.data) {
+    return <Text color="white">Playlist not found</Text>;
+  }
+
+  const playlist = playlistData.data;
 
   return (
     <LinearGradient
@@ -325,7 +317,6 @@ const DetailPlaylistScreen = () => {
         backgroundColor="transparent"
         barStyle="light-content"
       />
-
       <Animated.View
         style={{
           position: "absolute",
@@ -378,58 +369,11 @@ const DetailPlaylistScreen = () => {
         </View>
       </Animated.View>
 
-      {songs.length === 0 ? (
-        <YStack flex={1} mt="$0" p="$4" justify="center" items="center">
-          <Animated.Image
-            source={{
-              uri:
-                playlist.coverImage ||
-                "https://images.unsplash.com/photo-1507838153414-b4b713384a76",
-            }}
-            style={{
-              width: imageSize.width,
-              height: imageSize.height,
-              opacity,
-              borderRadius: 8,
-              alignSelf: "center",
-              marginBottom: 16,
-            }}
-            resizeMode="cover"
-            defaultSource={{
-              uri: "https://images.unsplash.com/photo-1507838153414-b4b713384a76",
-            }}
-          />
-          <H3 mb="$3" color="white" fontWeight="bold">
-            {playlist.title}
-          </H3>
-          <Text fontSize={13} fontWeight="bold" color="white" mb="$4">
-            Created by: {userData?.data.fullName}
-          </Text>
-          <Button
-            size="$4"
-            bg="rgba(255, 255, 255, 0.2)"
-            rounded={50}
-            onPress={() =>
-              navigation.navigate("AddSongPlaylist", { playlistId: id })
-            }
-          >
-            <XStack items="center" space="$2">
-              <Plus color="white" size="$2" />
-              <Text color="white" fontWeight="bold" fontSize="$4">
-                Add to this playlist
-              </Text>
-            </XStack>
-          </Button>
-        </YStack>
-      ) : (
-        <ScrollView
-          scrollEventThrottle={16}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: false }
-          )}
-        >
-          <YStack flex={1} mt="$0" p="$4">
+      <FlatList
+        data={sortedItems}
+        keyExtractor={(item) => item.id || `song-${item.title}`}
+        ListHeaderComponent={
+          <YStack mt="$0" p="$4">
             <Animated.View style={{ opacity: searchOpacity }}>
               <XStack mt="$6" mb="$6">
                 <Input
@@ -438,19 +382,15 @@ const DetailPlaylistScreen = () => {
                   rounded="$2"
                   bg="rgba(255, 255, 255, 0.2)"
                   color="white"
-                  placeholder="Search in playlist"
+                  placeholder="Search"
                   placeholderTextColor="rgba(255, 255, 255, 0.6)"
                   flex={1}
-                  m="auto"
-                  style={{
-                    fontSize: 15,
-                    paddingLeft: 40,
-                    fontWeight: "bold",
-                  }}
+                  style={{ fontSize: 15, paddingLeft: 40, fontWeight: "bold" }}
                   focusStyle={{
                     borderWidth: 0,
                     bg: "rgba(255, 255, 255, 0.3)",
                   }}
+                  onFocus={() => navigation.navigate("SearchResult", {})}
                 />
                 <XStack
                   position="absolute"
@@ -463,14 +403,7 @@ const DetailPlaylistScreen = () => {
                 </XStack>
               </XStack>
             </Animated.View>
-            <XStack
-              items="center"
-              flex={1}
-              justify="center"
-              self="center"
-              mb={0}
-              p={0}
-            >
+            <XStack items="center" justify="center" mb={0} p={0}>
               <Animated.Image
                 source={{
                   uri:
@@ -490,11 +423,9 @@ const DetailPlaylistScreen = () => {
                 }}
               />
             </XStack>
-
             <H3 mt={0} mb="$3" color="white" fontWeight="bold">
               {playlist.title}
             </H3>
-
             <YStack>
               <XStack items="center" space="$3" mb="$3">
                 <Avatar circular size="$2">
@@ -507,32 +438,17 @@ const DetailPlaylistScreen = () => {
                   />
                   <Avatar.Fallback backgroundColor="$blue10" />
                 </Avatar>
-                <YStack items="center">
-                  <Text
-                    fontSize={13}
-                    fontWeight="bold"
-                    color="white"
-                    text="center"
-                  >
-                    {userData?.data.fullName}
-                  </Text>
-                </YStack>
+                <Text fontSize={13} fontWeight="bold" color="white">
+                  {userData?.data.fullName}
+                </Text>
               </XStack>
               <XStack items="center" space="$2" mb="$3">
                 <Globe size={18} color="#ffff" />
-                <YStack items="center">
-                  <Text
-                    fontSize={13}
-                    fontWeight="bold"
-                    color="white"
-                    text="center"
-                  >
-                    {dayjs(playlist.createdAt).fromNow()}
-                  </Text>
-                </YStack>
+                <Text fontSize={13} fontWeight="bold" color="white">
+                  {dayjs(playlist.createdAt).fromNow()}
+                </Text>
               </XStack>
             </YStack>
-
             <XStack space="$4" mb="$4" justify="space-between">
               <XStack gap="$4">
                 <Button
@@ -625,7 +541,6 @@ const DetailPlaylistScreen = () => {
                 />
               </XStack>
             </XStack>
-
             <XStack space="$2" mb="$4">
               <Button
                 size="$3"
@@ -671,87 +586,71 @@ const DetailPlaylistScreen = () => {
                 </XStack>
               </Button>
             </XStack>
-            {sortedItems?.map((item: Song, index: number) => (
-              <SongItem
-                key={item.id || `song-${item.title}`}
-                song={item}
-                index={index}
-                showIndex={false}
-                showImage={true}
-                showArtistName={true}
-                imageSize={60}
-                getArtistName={() => item.artist || ""}
-                screen="detailPlaylist"
-                onMorePress={() => {
-                  setSelectedSong(item);
-                  setIsSongOptionsOpen(true);
-                }}
-              />
-            ))}
           </YStack>
-        </ScrollView>
-      )}
-
-      {songs.length > 0 && (
-        <>
-          <SortBottomSheet
-            isOpen={isSortSheetOpen}
-            onClose={() => setIsSortSheetOpen(false)}
-            onSelectOption={handleSelectSortOption}
-            selectedOption={selectedSortOption}
-            context="detailPlaylist"
-          />
-          <View
-            style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 9999,
-              height: "100%",
-            }}
-          >
-            <SongBottomSheet
-              isOpen={isSongOptionsOpen}
-              onClose={() => {
-                setIsSongOptionsOpen(false);
-                setSelectedSong(null);
-              }}
-              selectedSong={selectedSong}
-              navigation={navigation}
-              screenType="detailPlaylist"
-              sortedItems={sortedItems}
-              setSortedItems={setSortedItems}
-              deletePlaylistItem={async (id: string) => {
-                  await deletePlaylistItem(id).unwrap();
+        }
+        renderItem={({ item, index }) => (
+          <View style={{ paddingHorizontal: 16}}>
+            <SongItem
+              key={item.id || `song-${item.title}`}
+              song={item}
+              index={index}
+              showIndex={false}
+              showImage={true}
+              showArtistName={true}
+              imageSize={60}
+              getArtistName={() => item.artist || ""}
+              screen="detailPlaylist"
+              onMorePress={() => {
+                console.log("Opening SongBottomSheet for song:", item.title);
+                setSelectedSong(item);
+                setIsSongOptionsOpen(true);
               }}
             />
           </View>
-          {isPlaylistOptionsOpen && (
-            <View
-              style={{
-                position: "absolute",
-                left: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: 9999,
-                height: "100%",
-              }}
-            >
-              <PlaylistOptionsBottomSheet
-                isOpen={isPlaylistOptionsOpen}
-                onClose={() => setIsPlaylistOptionsOpen(false)}
-                onSelectOption={handleSelectPlaylistOption}
-                playlistName={playlist.title}
-                urlAvatar={
-                  playlist.coverImage ||
-                  "https://images.unsplash.com/photo-1507838153414-b4b713384a76"
-                }
-                creator={userData?.data.fullName || ""}
-              />
-            </View>
-          )}
-        </>
+        )}
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+      />
+
+      <SortBottomSheet
+        isOpen={isSortSheetOpen}
+        onClose={() => setIsSortSheetOpen(false)}
+        onSelectOption={handleSelectSortOption}
+        selectedOption={selectedSortOption}
+        context="detailPlaylist"
+      />
+      <SongBottomSheet
+        isOpen={isSongOptionsOpen}
+        onClose={() => {
+          console.log("Closing SongBottomSheet");
+          setIsSongOptionsOpen(false);
+          setSelectedSong(null);
+        }}
+        selectedSong={selectedSong}
+        navigation={navigation}
+        screenType="detailPlaylist"
+        sortedItems={sortedItems}
+        setSortedItems={setSortedItems}
+        deletePlaylistItem={async (id: string) => {
+          console.log("Deleting playlist item:", id);
+          await deletePlaylistItem(id).unwrap();
+        }}
+      />
+      {isPlaylistOptionsOpen && (
+        <PlaylistOptionsBottomSheet
+          isOpen={isPlaylistOptionsOpen}
+          onClose={() => setIsPlaylistOptionsOpen(false)}
+          onSelectOption={handleSelectPlaylistOption}
+          playlistName={playlist.title}
+          urlAvatar={
+            playlist.coverImage ||
+            "https://images.unsplash.com/photo-1507838153414-b4b713384a76"
+          }
+          creator={userData?.data.fullName || ""}
+        />
       )}
     </LinearGradient>
   );

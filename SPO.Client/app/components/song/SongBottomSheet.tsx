@@ -366,14 +366,14 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
       label: "Go to Song Radio",
       icon: <Radio size="$2" color="white" />,
       action: handleGoToSongRadio,
-      visibleOnScreens: ["detailPlaylist"],
+      visibleOnScreens: [],
     },
     {
       key: "viewSongCredits",
       label: "View Song Credits",
       icon: <FileText size="$2" color="white" />,
       action: handleViewSongCredits,
-      visibleOnScreens: ["detailPlaylist"],
+      visibleOnScreens: [],
     },
     {
       key: "removeFromThisPlaylist",
