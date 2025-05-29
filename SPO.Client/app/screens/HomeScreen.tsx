@@ -9,7 +9,10 @@ import {
   View,
 } from "react-native";
 import { YStack, XStack, Text, Button, Avatar, Spinner } from "tamagui";
-import { useGetSongsQuery, useGetTrendingSongsQuery } from "../services/SongService";
+import {
+  useGetSongsQuery,
+  useGetTrendingSongsQuery,
+} from "../services/SongService";
 import { useGetAlbumsQuery } from "../services/AlbumService";
 import { useGetArtistsQuery } from "../services/ArtistService";
 import { Album } from "../types/album";
