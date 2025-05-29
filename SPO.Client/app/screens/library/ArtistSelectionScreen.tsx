@@ -1,12 +1,11 @@
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { NavigationProp, RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { Selection } from "../../components/library/Selection";
 import { SelectionCard } from "../../components/library/SelectionCard";
 import { useGetArtistsQuery } from "../../services/ArtistService";
 import { Artist } from "../../types/artist";
 import { Text } from "tamagui";
-import { LibraryStackParamList } from "../../navigation/LibraryNavigator";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 
 const ArtistSelectionScreen = () => {
