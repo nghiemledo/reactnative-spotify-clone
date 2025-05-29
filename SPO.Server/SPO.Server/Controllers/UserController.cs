@@ -167,7 +167,7 @@ namespace SPO.Server.Controllers
             return Ok(await Result<User>.SuccessAsync());
         }
 
-        [HttpPatch("")]
+        [HttpPatch("lockout")]
         public async Task<IActionResult> UserLockOutPatch([FromBody] UpdateLockOutUserRequest request)
         {
             var item = await _userRepository.GetByIdAsync(request.Id);

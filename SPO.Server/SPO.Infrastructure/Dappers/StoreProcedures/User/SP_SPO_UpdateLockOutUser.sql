@@ -10,7 +10,7 @@ GO
 
 -- drop procedure [SP_SPO_UpdateLockOutUser]
 create procedure [dbo].[SP_SPO_UpdateLockOutUser]
-    (
+(
     @Id nvarchar(MAX),
     @LockOutEnabled bit
 )

@@ -52,10 +52,15 @@ namespace SPO.Infrastructure.Repositories.UserRoles
                 await _db.SaveData("[SP_SPO_UpdateUser]", new
                 {
                     vm.Id,
-                    vm.Email,
                     vm.FirstName,
                     vm.LastName,
-                    vm.PasswordHash
+                    vm.FullName,
+                    vm.DateofBirth,
+                    vm.Gender,
+                    vm.Address,
+                    vm.UrlAvatar,
+                    vm.Email,
+                    vm.PhoneNumber
                 });
                 return true;
             }
