@@ -323,12 +323,13 @@ const DetailPlaylistScreen = () => {
         style={{
           position: "absolute",
           top: -35,
-          left: 0,
+          left: -10,
           right: 0,
           height: 90,
           zIndex: 1000,
           backgroundColor: navbarBackground,
         }}
+        pointerEvents="box-none"
       >
         <View
           style={{
@@ -341,19 +342,14 @@ const DetailPlaylistScreen = () => {
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Button
-                size="$8"
-                chromeless
-                icon={ArrowLeft}
-                color="white"
-                p={0}
-                bg="transparent"
-                pressStyle={{
-                  bg: "transparent",
-                  borderBlockColor: "transparent",
-                }}
-              />
+            <TouchableOpacity
+              onPress={() => {
+                console.log("Back button pressed");
+                navigation.goBack();
+              }}
+              style={{ padding: 10 }} // Add padding for larger touch area
+            >
+              <ArrowLeft size="$2" color="white" />
             </TouchableOpacity>
             <Animated.Text
               style={{
@@ -591,7 +587,7 @@ const DetailPlaylistScreen = () => {
           </YStack>
         }
         renderItem={({ item, index }) => (
-          <View style={{ paddingHorizontal: 16}}>
+          <View style={{ paddingHorizontal: 16 }}>
             <SongItem
               key={item.id || `song-${item.title}`}
               song={item}
@@ -606,7 +602,6 @@ const DetailPlaylistScreen = () => {
                 console.log("Opening SongBottomSheet for song:", item.title);
                 setSelectedSong(item);
                 setIsSongOptionsOpen(true);
-
               }}
             />
           </View>
