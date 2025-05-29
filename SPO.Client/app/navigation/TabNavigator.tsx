@@ -9,6 +9,8 @@ import SearchNavigator from "./SearchNavigator";
 import LibraryNavigator from "./LibraryNavigator";
 import PremiumNavigator from "./PremiumNavigator";
 import MiniPlayer from "../components/MiniPlayer";
+import HomeScreen from "../screens/HomeScreen";
+import HomeNavigator from "./HomeNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -20,7 +22,7 @@ export default function TabNavigator() {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarActiveTintColor: "white",
-          tabBarInactiveTintColor: "#B3B3 Glasow: ",
+          tabBarInactiveTintColor: "#B3B3B3",
           tabBarStyle: {
             backgroundColor: "rgba(0, 0, 0, 0.6)",
             borderTopWidth: 0,
@@ -43,15 +45,15 @@ export default function TabNavigator() {
           </>
         )}
       >
-        {/* <Tab.Screen
+        <Tab.Screen
           name="HomeTab"
-          component={DrawerNavigator}
+          component={HomeNavigator}
           options={{
             headerShown: false,
             tabBarLabel: "Home",
             tabBarIcon: ({ color }) => <Home color={color as any} size={24} />,
           }}
-        /> */}
+        />
         <Tab.Screen
           name="Search"
           component={SearchNavigator}
