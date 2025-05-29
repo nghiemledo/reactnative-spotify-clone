@@ -8,12 +8,7 @@ import {
   XStack,
   YStack,
 } from "tamagui";
-import {
-  ArrowUpDown,
-  Plus,
-  Search,
-  X,
-} from "@tamagui/lucide-icons";
+import { ArrowUpDown, Plus, Search, X } from "@tamagui/lucide-icons";
 import { Animated, TouchableOpacity, FlatList } from "react-native";
 import DataList from "../../components/library/DataList";
 import CreateBottomSheet from "../../components/library/CreateBottomSheet";
@@ -22,7 +17,12 @@ import { MotiView } from "moti";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import { useGetPlaylistsByUserIdQuery } from "../../services/playlistServices";
-import { FollowedArtistResponse, FollowedPodcastResponse, useGetFollowedArtistsQuery, useGetFollowedPodcastsQuery } from "../../services/AuthService"
+import {
+  FollowedArtistResponse,
+  FollowedPodcastResponse,
+  useGetFollowedArtistsQuery,
+  useGetFollowedPodcastsQuery,
+} from "../../services/AuthService";
 import { UserInfo } from "../../types/user";
 import { useSelector } from "react-redux";
 
@@ -92,8 +92,12 @@ const LibraryScreen = () => {
 
   // Lấy dữ liệu từ API
   const { data: playlistData } = useGetPlaylistsByUserIdQuery(userId || "");
-  const { data: followedArtistsData } = useGetFollowedArtistsQuery(userId || "");
-  const { data: followedPodcastsData } = useGetFollowedPodcastsQuery(userId || "");
+  const { data: followedArtistsData } = useGetFollowedArtistsQuery(
+    userId || ""
+  );
+  const { data: followedPodcastsData } = useGetFollowedPodcastsQuery(
+    userId || ""
+  );
 
   const scrollY = useRef(new Animated.Value(0)).current;
   const headerHeight = 160;
@@ -128,12 +132,12 @@ const LibraryScreen = () => {
     if (selectedTab === null || selectedTab === "Artists") {
       const artistsData = followedArtistsData?.data || mockFollowedArtists;
       const mappedArtists = artistsData
-        .filter((artist) => artist.id && artist.name) 
+        .filter((artist) => artist.id && artist.name)
         .map((artist) => ({
           id: artist.id!,
           type: "artist",
           name: artist.name!,
-          image: "https://i.pravatar.cc/150?img=3", 
+          image: "https://i.pravatar.cc/150?img=3",
           createdAt: artist.followedAt || "",
           creator: "",
           artists: [],
@@ -239,7 +243,7 @@ const LibraryScreen = () => {
   };
 
   return (
-    <YStack flex={1} bg="#000" px="$3" pt="$15">
+    <YStack flex={1} bg="#000" px="$3" pt="$15" pb="$15">
       <Animated.View
         style={{
           position: "absolute",
@@ -264,13 +268,13 @@ const LibraryScreen = () => {
         <XStack items="center" justify="space-between" mt="$5">
           <XStack items="center">
             <Avatar circular size="$3">
-                          <AvatarImage src={user?.urlAvatar} />
-                          <Avatar.Fallback>
-                            <Text fontWeight="bold" color="white" fontSize="$8">
-                              {user?.fullName?.charAt(0).toUpperCase()}
-                            </Text>
-                          </Avatar.Fallback>
-                        </Avatar>
+              <AvatarImage src={user?.urlAvatar} />
+              <Avatar.Fallback>
+                <Text fontWeight="bold" color="white" fontSize="$8">
+                  {user?.fullName?.charAt(0).toUpperCase()}
+                </Text>
+              </Avatar.Fallback>
+            </Avatar>
             <Text fontWeight="bold" px="$4" color="white" fontSize="$8">
               Your Library
             </Text>
@@ -339,10 +343,10 @@ const LibraryScreen = () => {
       </Animated.View>
       <ScrollView
         scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
+        // onScroll={Animated.event(
+        //   [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+        //   { useNativeDriver: true }
+        // )}
       >
         <XStack py="$3" justify="space-between">
           <TouchableOpacity onPress={handleOpenSortBottomSheet}>
