@@ -11,118 +11,210 @@ import {
   Keyboard,
   ActivityIndicator,
 } from "react-native";
-import SongOptionsBottomSheet from "../../components/search/SongOptionsBottomSheet";
+import SongBottomSheet from "../../components/song/SongBottomSheet";
 import Tabs from "../../components/search/Tabs";
-import ArtistCard from "../../components/search/ArtistCard";
-import SongCard from "../../components/search/SongCard";
+import { ArtistItem } from "../../components/ArtistItem";
+import { SongItem } from "../../components/song/SongItem";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { useSearchSongsQuery } from "../../services/SongService";
+import {
+  useLazyGetArtistByIdQuery,
+  useSearchArtistsQuery,
+} from "../../services/ArtistService";
+import { useSearchPodcastShowsQuery } from "../../services/PodcastService";
+import { Artist } from "../../types/artist";
+import { Song } from "../../types/song";
+import { PodcastShow } from "../../types/podcast";
+import { HomeStackParamList } from "../../navigation/HomeNavigator";
+import { PodcastShowItem } from "../../components/podcast/PodcastShowItem";
 
-interface Artist {
-  id: number;
-  type: "artist";
-  name: string;
-  image: string;
-}
-
-interface Song {
-  id: number;
-  type: "song";
-  name: string;
-  artists: { id: number; name: string }[];
-  image: string;
-}
-
-type Item = Artist | Song;
-const data = [
+const sampleData: Item[] = [
   {
-    id: 1,
     type: "artist",
+    id: "1",
     name: "HieuThuHai",
-    image: "https://i.pravatar.cc/150?img=3",
+    bio: "A talented Vietnamese rapper known for his unique style.",
+    urlAvatar: "https://i.pravatar.cc/150?img=3",
+    createdAt: "2023-01-01T00:00:00Z",
+    updatedAt: "2023-01-02T00:00:00Z",
   },
   {
-    id: 2,
     type: "song",
-    name: "HieuThuHai",
-    artists: [
-      {
-        id: 1,
-        name: "MANBO",
-      },
-      {
-        id: 2,
-        name: "obito",
-      },
-    ],
-    image: "https://i.pravatar.cc/150?img=3",
+    id: "2",
+    title: "Hà Nội",
+    coverImage: "https://i.pravatar.cc/150?img=4",
+    artistId: "1",
+    artist: "HieuThuHai",
+    duration: 180,
+    audioUrl: "https://example.com/audio/hanoi.mp3",
+    createdAt: "2023-01-01T00:00:00Z",
+    updatedAt: "2023-01-02T00:00:00Z",
   },
   {
-    id: 3,
-    type: "song",
-    name: "Hà Nội",
-    artists: [
-      {
-        id: 1,
-        name: "MANBO",
-      },
-      {
-        id: 2,
-        name: "obito",
-      },
-      {
-        id: 3,
-        name: "dangrangto",
-      },
-      {
-        id: 4,
-        name: "tlinh",
-      },
-      {
-        id: 5,
-        name: "mck",
-      },
-    ],
-    image: "https://i.pravatar.cc/150?img=3",
+    type: "podcast",
+    id: "3",
+    title: "Tech Talk Vietnam",
+    description: "A podcast about the latest tech trends in Vietnam.",
+    coverImage: "https://i.pravatar.cc/150?img=5",
+    creator: "hai long",
+    categoryId: "1",
+    createdAt: "2023-01-01T00:00:00Z",
+    updatedAt: "2023-01-02T00:00:00Z",
   },
 ];
+
+interface ArtistSearch extends Artist {
+  type: "artist";
+}
+
+interface SongSearch extends Song {
+  type: "song";
+}
+
+interface PodcastShowSearch extends PodcastShow {
+  categoryId: string;
+  type: "podcast";
+}
+
+type Item = ArtistSearch | SongSearch | PodcastShowSearch;
 
 const SearchResultScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const homeNavigation =
+    useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, "SearchResult">>();
   const { width, height } = Dimensions.get("window");
-  const [likedItems, setLikedItems] = useState<{ [key: number]: boolean }>({});
+  const [likedItems, setLikedItems] = useState<{ [key: string]: boolean }>({});
   const [searchValue, setSearchValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [isSearch, setIsSearch] = useState(false);
-  const [artist, setArtist] = useState<Artist | null>(null);
-  const [isSongOptionsOpen, setIsSongOptionsOpen] = useState(false);
-  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [toastQueue, setToastQueue] = useState<string[]>([]);
+  const [isSongOptionsOpen, setIsSongOptionsOpen] = useState(false);
+  const [selectedSong, setSelectedSong] = useState<SongSearch | null>(null);
+  const [getArtistById] = useLazyGetArtistByIdQuery();
+
+  const { data: songsData, isLoading: isSongsLoading } =
+    useSearchSongsQuery(searchQuery);
+  const { data: artistsData, isLoading: isArtistsLoading } =
+    useSearchArtistsQuery(searchQuery);
+  const { data: podcastsData, isLoading: isPodcastsLoading } =
+    useSearchPodcastShowsQuery(searchQuery);
+
+  console.log(searchQuery);
+
+  const combinedData: Item[] = [];
+  const [artistCache, setArtistCache] = useState<{
+    [key: string]: { name: string; isLoading: boolean };
+  }>({});
+
+  useEffect(() => {
+    if (!songsData?.data?.length) return;
+
+    const fetchArtists = async () => {
+      const uniqueArtistIds = [
+        ...new Set(
+          songsData.data
+            .map((song) => song.artistId)
+            .filter((id): id is string => !!id)
+        ),
+      ];
+
+      for (const artistId of uniqueArtistIds) {
+        if (!artistCache[artistId]) {
+          setArtistCache((prev) => ({
+            ...prev,
+            [artistId]: { name: "Loading...", isLoading: true },
+          }));
+
+          try {
+            const result = await getArtistById(artistId);
+            setArtistCache((prev) => ({
+              ...prev,
+              [artistId]: {
+                name: result.data?.data?.name || "Unknown Artist",
+                isLoading: false,
+              },
+            }));
+          } catch {
+            setArtistCache((prev) => ({
+              ...prev,
+              [artistId]: { name: "Unknown Artist", isLoading: false },
+            }));
+          }
+        }
+      }
+    };
+
+    fetchArtists();
+  }, [songsData, getArtistById]);
+
+  if (songsData?.data?.length) {
+    combinedData.push(
+      ...songsData.data.map(
+        (song) =>
+          ({
+            ...song,
+            type: "song",
+            artist: artistCache[song.artistId || ""]?.name || "Unknown Artist",
+          } as SongSearch)
+      )
+    );
+  }
+  if (artistsData?.data?.length) {
+    combinedData.push(
+      ...artistsData.data.map(
+        (artist) => ({ ...artist, type: "artist" } as ArtistSearch)
+      )
+    );
+  }
+  if (podcastsData?.data?.length) {
+    combinedData.push(
+      ...podcastsData.data.map(
+        (podcast: PodcastShow) =>
+          ({ ...podcast, type: "podcast" } as PodcastShowSearch)
+      )
+    );
+  }
+
+  if (
+    combinedData.length &&
+    !isSongsLoading &&
+    !isArtistsLoading &&
+    !isPodcastsLoading &&
+    searchQuery
+  ) {
+    combinedData.push(...sampleData);
+  }
 
   const normalize = (s: string) => s.trim().toLowerCase();
 
   const filteredData =
     searchQuery.trim() === ""
       ? []
-      : data.filter((item) => {
+      : combinedData.filter((item) => {
           const needle = normalize(searchQuery);
+
           const matchesSearch =
-            normalize(item.name).includes(needle) ||
+            normalize(
+              item.type === "song"
+                ? item.title || ""
+                : item.type === "artist"
+                ? item.name || ""
+                : item.title || ""
+            ).includes(needle) ||
             (item.type === "song" &&
-              item.artists?.some((artist) =>
-                normalize(artist.name).includes(needle)
-              ));
+              item.artist &&
+              normalize(item.artist).includes(needle));
           const matchesTab =
             !selectedTab ||
             selectedTab === "All" ||
             (selectedTab === "Songs" && item.type === "song") ||
-            (selectedTab === "Artists" && item.type === "artist");
-          const matchesType = artist ? item.type === "song" : true;
-          return matchesSearch && matchesTab && matchesType;
+            (selectedTab === "Artists" && item.type === "artist") ||
+            (selectedTab === "Podcasts" && item.type === "podcast");
+          return matchesSearch && matchesTab;
         });
 
   const toastConfig = {
@@ -154,7 +246,7 @@ const SearchResultScreen = () => {
               fontWeight="bold"
               onPress={() =>
                 navigation.navigate("AddToPlaylist", {
-                  songId: data.find((item) => item.id === selectedSong?.id)!.id,
+                  songId: selectedSong?.id,
                 })
               }
             >
@@ -166,11 +258,13 @@ const SearchResultScreen = () => {
     ),
   };
 
-  const handlePress = (id: number) => {
+  const handlePress = (id: string) => {
     setLikedItems((prev) => {
       const isLiked = prev[id];
-      const song = data.find((item) => item.id === id) as Song;
-      if (!isLiked) {
+      const song = combinedData.find(
+        (item) => item.id === id && item.type === "song"
+      ) as SongSearch;
+      if (!isLiked && song) {
         setSelectedSong(song);
         Toast.show({
           type: "success",
@@ -187,43 +281,23 @@ const SearchResultScreen = () => {
   };
 
   const handleSearchSubmit = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setSearchQuery(searchValue);
-      const needle = normalize(searchValue);
-
-      const matchedArtist = data.find(
-        (item) =>
-          item.type === "artist" && normalize(item.name).includes(needle)
-      );
-
-      if (matchedArtist) {
-        setArtist(matchedArtist as Artist);
-      } else {
-        setArtist(null);
-      }
-      setIsSearch(true);
-      setSelectedTab(null);
-      setIsLoading(false);
-    }, 1500);
-
+    setSearchQuery(searchValue);
+    setIsSearch(true);
+    setSelectedTab(null);
     Keyboard.dismiss();
   };
 
   const handleInputFocus = () => {
     if (isSearch) {
-      setIsLoading(true);
       setIsSearch(false);
-      setArtist(null);
       setSelectedTab(null);
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 1500);
+      setSearchQuery("");
+      setSearchValue("");
     }
   };
 
   const handleOpenSongOptionsBottomSheet = (song: Song) => {
-    setSelectedSong(song);
+    setSelectedSong({ ...song, type: "song" });
     setIsSongOptionsOpen(true);
   };
 
@@ -233,14 +307,30 @@ const SearchResultScreen = () => {
   };
 
   const handleSongOptionSelect = (option: string) => {
-    if (selectedSong) {
-      Toast.show({
-        type: "success",
-        text1: `${option} - ${selectedSong.name}`,
-        position: "bottom",
-        visibilityTime: 2000,
-        autoHide: true,
-      });
+    if (!selectedSong) return;
+    switch (option) {
+      case "addToLikedSongs":
+        handlePress(selectedSong?.id || "");
+        break;
+      case "addToPlaylist":
+        navigation.navigate("AddToPlaylist", { songId: selectedSong.id || "" });
+        break;
+      case "addToQueue":
+        console.log(`Add ${selectedSong.title} to queue`); // Cập nhật console log
+        break;
+      case "goToArtist":
+        if (selectedSong.artistId) {
+          navigation.navigate("Artist", { id: selectedSong.artistId });
+        } else {
+          console.log(`No artist ID for ${selectedSong.artist}`);
+        }
+        break;
+      case "showSpotifyCode":
+        navigation.navigate("shareQrSong", { song: selectedSong }); // Cập nhật navigation
+        break;
+      default:
+        console.log(`Unhandled option: ${option}`);
+        break;
     }
     handleCloseSongOptionsBottomSheet();
   };
@@ -299,7 +389,6 @@ const SearchResultScreen = () => {
             pl="$7"
             value={searchValue}
             onChangeText={setSearchValue}
-            returnKeyType="search"
             onSubmitEditing={handleSearchSubmit}
             onFocus={handleInputFocus}
           />
@@ -326,7 +415,6 @@ const SearchResultScreen = () => {
                 setSearchValue("");
                 setSearchQuery("");
                 setIsSearch(false);
-                setArtist(null);
                 setSelectedTab(null);
               }}
             >
@@ -342,33 +430,41 @@ const SearchResultScreen = () => {
         handleClearTab={handleClearTab}
       />
       <YStack flex={1} bg="#000" px="$3">
-        {isLoading ? (
+        {isSongsLoading || isArtistsLoading || isPodcastsLoading ? (
           <YStack flex={1} justify="center" items="center">
             <ActivityIndicator size="large" color="#1DB954" />
           </YStack>
         ) : (
           <ScrollView scrollEventThrottle={16}>
-            {artist && selectedTab !== "Songs" && (
-              <ArtistCard artist={artist} />
-            )}
             {filteredData.length > 0 ? (
               <FlatList
                 data={filteredData}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={(item) => item.id ?? ""}
                 renderItem={({ item }) => (
                   <TouchableOpacity>
                     {item.type === "song" ? (
-                      <SongCard
-                        item={item as Song}
-                        likedItems={likedItems}
-                        handlePress={handlePress}
-                        handleOpenSongOptionsBottomSheet={
-                          handleOpenSongOptionsBottomSheet
+                      <SongItem
+                        song={item as Song}
+                        showImage={true}
+                        showArtistName={true}
+                        getArtistName={() => item.artist || "Unknown Artist"}
+                        onMorePress={handleOpenSongOptionsBottomSheet}
+                        screen="search"
+                        navigation={navigation}
+                      />
+                    ) : item.type === "artist" ? (
+                      <ArtistItem
+                        artist={item as Artist}
+                        onPress={() =>
+                          navigation.navigate("Artist", { id: item.id })
                         }
                       />
-                    ) : (
-                      <ArtistCard artist={item as Artist} />
-                    )}
+                    ) : item.id ? (
+                      <PodcastShowItem
+                        item={item as PodcastShow}
+                        navigation={homeNavigation}
+                      />
+                    ) : null}
                   </TouchableOpacity>
                 )}
                 scrollEnabled={false}
@@ -427,14 +523,13 @@ const SearchResultScreen = () => {
             height: "100%",
           }}
         >
-          <SongOptionsBottomSheet
+          <SongBottomSheet
             isOpen={isSongOptionsOpen}
             onClose={handleCloseSongOptionsBottomSheet}
+            selectedSong={selectedSong}
+            navigation={navigation}
+            screenType="search"
             onSelectOption={handleSongOptionSelect}
-            songName={selectedSong?.name || ""}
-            urlAvatar={selectedSong?.image || ""}
-            type={selectedSong?.type || ""}
-            artists={selectedSong?.artists || []}
           />
         </View>
       )}
