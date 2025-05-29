@@ -18,3 +18,19 @@ export interface UserInfo {
   address?: string;
   urlAvatar?: string;
 }
+
+export interface UpdateUserProfile {
+  Id: string;
+  FirstName: string;
+  LastName: string;
+}
+
+export interface FollowArtistRequest {
+  ArtistId: string;
+  UserId: string;
+}
+
+export interface FollowPodcastRequest {
+  ShowId: string;
+  UserId: string;
+}
