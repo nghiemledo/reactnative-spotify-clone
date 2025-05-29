@@ -2,13 +2,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "../screens/HomeScreen";
 import AlbumScreen from "../screens/AlbumScreen";
 import DetailPlaylistScreen from "../screens/playlists/DetailPlaylistScreen";
-import PodcastDetailScreen from "../screens/podcast/PodcastEpisodeScreen";
-import SettingsScreen from "../screens/SettingsScreen";
-import ArtistDetailScreen from "../screens/artist/ArtistDetailScreen";
-import { ProfileScreen } from "../screens/profile/ProfileScreen";
-import PodcastEpisodesScreen from "../screens/podcast/PodcastShowScreen";
-import PodcastShowScreen from "../screens/podcast/PodcastShowScreen";
 import PodcastEpisodeScreen from "../screens/podcast/PodcastEpisodeScreen";
+import ArtistDetailScreen from "../screens/artist/ArtistDetailScreen";
+import PodcastShowScreen from "../screens/podcast/PodcastShowScreen";
 
 const Stack = createStackNavigator();
 
@@ -17,12 +13,8 @@ export type HomeStackParamList = {
   Album: { id: string };
   Playlist: { id: string };
   Artist: { id: string };
-  Podcast: { id: string };
-  AddSongPlaylists: undefined;
-  Settings: undefined;
-  Profile: undefined;
   PodcastShow: { showId: string };
-  PodcastEpisodeScreen: { episodeId: string};
+  PodcastEpisodeScreen: { episodeId: string };
 };
 
 export default function HomeNavigator() {
@@ -46,21 +38,6 @@ export default function HomeNavigator() {
       <Stack.Screen
         name="Artist"
         component={ArtistDetailScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Podcast"
-        component={PodcastDetailScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Profile"
-        component={ProfileScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
