@@ -58,7 +58,7 @@ const SearchResultScreen = () => {
   const [searchValue, setSearchValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearch, setIsSearch] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<string | null>(null); // Changed to null
+  const [selectedTab, setSelectedTab] = useState<string | null>(null); 
   const [toastQueue, setToastQueue] = useState<string[]>([]);
   const [isSongOptionsOpen, setIsSongOptionsOpen] = useState(false);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
@@ -160,46 +160,7 @@ const SearchResultScreen = () => {
     filteredShows.length > 0;
 
 
-  const toastConfig = {
-    success: ({ text1, text2 }: BaseToastProps) => (
-      <View
-        style={{
-          flexDirection: "row",
-          justifyItems: "center",
-          backgroundColor: "white",
-          padding: 12,
-          borderRadius: 10,
-          marginHorizontal: 16,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 2,
-        }}
-      >
-        <Image
-          source={{ uri: "https://i.pravatar.cc/150?img=3" }}
-          style={{ width: 24, height: 24, marginRight: 12 }}
-        />
-        <XStack justify="space-between" grow={1}>
-          <Text fontSize="$3">{text1}</Text>
-          {text1 === "Added to liked songs" && (
-            <Text
-              color="#1DB954"
-              fontWeight="bold"
-              onPress={() =>
-                navigation.navigate("AddToPlaylist", {
-                  songId: selectedSong?.id,
-                })
-              }
-            >
-              Change
-            </Text>
-          )}
-        </XStack>
-      </View>
-    ),
-  };
+
 
   const handleSearchSubmit = () => {
     console.log("Submitting Search:", searchValue);
@@ -473,7 +434,6 @@ const SearchResultScreen = () => {
           </ScrollView>
         )}
       </YStack>
-      <Toast config={toastConfig} />
       {isSongOptionsOpen && (
         <View
           style={{
