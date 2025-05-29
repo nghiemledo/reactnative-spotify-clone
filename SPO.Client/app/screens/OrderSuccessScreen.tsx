@@ -12,15 +12,15 @@ const OrderSuccessScreen = () => {
     useNavigation<NavigationProp<PremiumStackParamList>>();
   const route = useRoute<RouteProp<PremiumStackParamList, "OrderSuccess">>();
   const { plan, amount, currency, createTime } = route.params;
-  const formatVND = (usdAmount: string) => {
-    const exchangeRate = 23000;
-    const vndAmount = parseFloat(usdAmount) * exchangeRate;
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-      minimumFractionDigits: 0,
-    }).format(vndAmount);
-  };
+  // const formatVND = (usdAmount: string) => {
+  //   const exchangeRate = 23000;
+  //   const vndAmount = parseFloat(usdAmount) * exchangeRate;
+  //   return new Intl.NumberFormat("vi-VN", {
+  //     style: "currency",
+  //     currency: "VND",
+  //     minimumFractionDigits: 0,
+  //   }).format(vndAmount);
+  // };
   return (
     <YStack
       flex={1}
@@ -104,7 +104,7 @@ const OrderSuccessScreen = () => {
             Amount:
           </Text>
           <Text color="#fff" fontSize={14} fontWeight="700">
-            {formatVND(amount)}
+            ₫59,000
           </Text>
         </XStack>
         <XStack justify="space-between">
