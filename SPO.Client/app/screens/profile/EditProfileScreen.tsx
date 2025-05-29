@@ -6,29 +6,27 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Toast from "react-native-toast-message";
 import SafeImage from "../../components/SafeImage";
-import { useAppSelector } from "../../store";
+import { useAppDispatch, useAppSelector } from "../../store";
 import {
   useGetUserByIdQuery,
   useUpdateUserProfileMutation,
 } from "../../services/AuthService";
-
-type RootStackParamList = {
-  Profile: undefined;
-};
+import { RootStackParamList } from "../../navigation/AppNavigator";
+import { setUser } from "../../store/authSlice";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const EditProfileScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const user = useAppSelector((state) => state.auth.user);
-  const userId = useAppSelector((state) => state.auth.user?.id);
+  const userId = user?.id;
 
-  // Fetch user data at the top level
+  // Fetch user data với refetch function
   const { data: userData, refetch } = useGetUserByIdQuery(userId || "", {
-    skip: !userId,
+    skip: !userId, // Skip query nếu không có userId
   });
 
-  // Initialize state with user data from Redux or API
+  // Initialize state
   const [firstName, setFirstName] = React.useState(user?.firstName || "");
   const [lastName, setLastName] = React.useState(user?.lastName || "");
   const [urlAvatar, setUrlAvatar] = React.useState(user?.urlAvatar || "");
@@ -38,16 +36,17 @@ export const EditProfileScreen = () => {
 
   const [updateUserProfile, { isLoading: isUpdating }] =
     useUpdateUserProfileMutation();
+  const dispatch = useAppDispatch();
 
-  // Update state when userData changes (e.g., after refetch)
+  // Sync state with fetched user data
   useEffect(() => {
-    if (userData?.data) {
-      setFirstName(userData.data.firstName || "");
-      setLastName(userData.data.lastName || "");
-      setUrlAvatar(userData.data.urlAvatar || "");
-      setTempUrl(userData.data.urlAvatar || "");
+    if (user) {
+      setFirstName(user.firstName || "");
+      setLastName(user.lastName || "");
+      setUrlAvatar(user.urlAvatar || "");
+      setTempUrl(user.urlAvatar || "");
     }
-  }, [userData]);
+  }, [user]);
 
   const handleSave = async () => {
     if (!userId) {
@@ -59,35 +58,54 @@ export const EditProfileScreen = () => {
       return;
     }
 
+    // Validate required fields
+    if (!firstName.trim() || !lastName.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "Lỗi",
+        text2: "Họ và tên không được để trống.",
+      });
+      return;
+    }
+
     try {
+      // Construct fullName
+      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+
       // Update user profile
-      const res = await updateUserProfile({
-        Id: userId,
-        FirstName: firstName || "",
-        LastName: lastName || "",
+      await updateUserProfile({
+        id: userId,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        fullName,
+        urlAvatar: urlAvatar || "",
+        email: user.email || "",
       }).unwrap();
 
-      console.log("res", res);
-
-      // Refetch user data to update the UI
-      await refetch();
+      // Refetch user data để lấy dữ liệu mới
+      const refetchResult = await refetch();
+      
+      if (refetchResult.data?.data) {
+        // Update Redux store với dữ liệu mới
+        dispatch(setUser({ user: refetchResult.data.data }));
+        console.log("Updated user data:", refetchResult.data.data);
+      }
 
       Toast.show({
         type: "success",
         text1: "Thành công",
         text2: "Cập nhật thông tin thành công!",
       });
-      console.log(userData);
-      console.log(userId);
-      console.log(firstName);
-      console.log(lastName);
 
       navigation.goBack();
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage =
+        error?.data?.message ||
+        "Cập nhật thông tin thất bại. Vui lòng thử lại.";
       Toast.show({
         type: "error",
         text1: "Lỗi",
-        text2: "Cập nhật thông tin thất bại. Vui lòng thử lại.",
+        text2: errorMessage,
       });
       console.error("Update profile error:", error);
     }
@@ -102,6 +120,7 @@ export const EditProfileScreen = () => {
   };
 
   const isValidImageUrl = async (url: string) => {
+    if (!url) return false;
     try {
       const response = await fetch(url, { method: "HEAD" });
       const contentType = response.headers.get("content-type");
@@ -112,7 +131,7 @@ export const EditProfileScreen = () => {
   };
 
   const handleSaveImage = async () => {
-    if (tempUrl && (await isValidImageUrl(tempUrl))) {
+    if (await isValidImageUrl(tempUrl)) {
       setUrlAvatar(tempUrl);
       setOpenModal(false);
     } else {
@@ -171,7 +190,7 @@ export const EditProfileScreen = () => {
           </View>
         </YStack>
 
-        {/* Dialog để nhập URL hình ảnh */}
+        {/* Dialog for image URL */}
         <Dialog open={openModal} onOpenChange={setOpenModal}>
           <Dialog.Portal>
             <Dialog.Overlay

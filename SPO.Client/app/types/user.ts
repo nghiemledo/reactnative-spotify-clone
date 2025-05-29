@@ -20,9 +20,12 @@ export interface UserInfo {
 }
 
 export interface UpdateUserProfile {
-  Id: string;
-  FirstName: string;
-  LastName: string;
+  id: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  urlAvatar: string
+  email: string;
 }
 
 export interface FollowArtistRequest {

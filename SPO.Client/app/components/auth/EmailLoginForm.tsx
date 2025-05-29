@@ -27,15 +27,15 @@ const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ navigation }) => {
   const [login] = useLoginMutation();
 
   const validateInputs = useCallback(() => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setLocalError("Please enter a valid email address");
-      return false;
-    }
-    if (password.length < 6) {
-      setLocalError("Password must be at least 6 characters long");
-      return false;
-    }
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // if (!emailRegex.test(email)) {
+    //   setLocalError("Please enter a valid email address");
+    //   return false;
+    // }
+    // if (password.length < 6) {
+    //   setLocalError("Password must be at least 6 characters long");
+    //   return false;
+    // }
     return true;
   }, [email, password]);
 

@@ -10,10 +10,16 @@ const SplashScreen = () => {
   const user = useAppSelector((state: RootState) => state.auth.user)
 
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.navigate("Main")
-    }, 2500)
-    return () => clearTimeout(timer)
+    setTimeout(() => {
+      if (user) {
+        navigation.navigate("Main");
+      } else {
+        navigation.navigate("Login");
+      }
+        // navigation.navigate("Main");
+
+    }, 2000);
+    // return () => clearTimeout(timer)
   }, [user, navigation])
 
   return (
