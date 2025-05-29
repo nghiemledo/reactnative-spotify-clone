@@ -39,7 +39,7 @@ interface SongBottomSheetProps {
   onClose: () => void;
   selectedSong: Song | null;
   navigation?: NativeStackNavigationProp<RootStackParamList>;
-  screenType?: "home" | "artist" | "album" | "playing";
+  screenType?: "home" | "artist" | "album" | "playing" | "playlist";
 }
 
 const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
@@ -183,28 +183,28 @@ const SongBottomSheet: React.FC<SongBottomSheetProps> = ({
       label: "Add to Queue",
       icon: <ListPlus size="$2" color="white" />,
       action: handleAddToQueue,
-      visibleOnScreens: ["home", "artist", "album"],
+      visibleOnScreens: ["home", "artist", "album", "playlist"]
     },
     {
       key: "goToAlbum",
       label: "Go to Album",
       icon: <CircleDot size="$2" color="white" />,
       action: handleGoToAlbum,
-      visibleOnScreens: ["home", "artist"],
+      visibleOnScreens: ["home", "artist", "playlist"],
     },
     {
       key: "goToArtist",
       label: "Go to Artist",
       icon: <User size="$2" color="white" />,
       action: handleGoToArtist,
-      visibleOnScreens: ["home", "album"],
+      visibleOnScreens: ["home", "album", "playlist"],
     },
     {
       key: "showSpotifyCode",
       label: "Show Spotify Code",
       icon: <QrCode size="$2" color="white" />,
       action: handleShowSpotifyCode,
-      visibleOnScreens: ["home", "artist", "album", "playing"],
+      visibleOnScreens: ["home", "artist", "album", "playing", "playlist"],
     },
     {
       key: "setTimer",
