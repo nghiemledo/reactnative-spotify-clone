@@ -6,7 +6,6 @@ const Stack = createStackNavigator();
 
 export type PremiumStackParamList = {
   PremiumScreen: undefined;
-  Premium: undefined;
   OrderSuccess: {
     plan: string;
     amount: string;
@@ -19,12 +18,12 @@ export default function PremiumNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="PremiumScreen" // Đổi tên
+        name="PremiumScreen"
         component={PremiumSubscriptionScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="OrderSuccess" // Đổi tên
+        name="OrderSuccess"
         component={OrderSuccessScreen}
         options={{ headerShown: false }}
       />
