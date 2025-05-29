@@ -143,6 +143,7 @@ export const ProfileScreen = () => {
               >
                 {user?.fullName || "Người dùng"}
               </Text>
+              
             </Animated.View>
           </View>
         </View>

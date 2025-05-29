@@ -48,7 +48,7 @@ import {
   useGetArtistsQuery,
   useLazyGetArtistByIdQuery,
 } from "../../services/ArtistService";
-import { store } from "../../store";
+import { store, useAppSelector } from "../../store";
 import { playSong, setPlayerQueue } from "../../services/playerService";
 import { SongItem } from "../../components/song/SongItem";
 import SongBottomSheet from "../../components/song/SongBottomSheet";
@@ -65,6 +65,8 @@ const DetailPlaylistScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<any>();
+  const user = useAppSelector((state) => state.auth.user);
+
   const { id } = route.params;
 
   const { data: playlistData } = useGetPlaylistByIdQuery(id);
@@ -407,7 +409,7 @@ const DetailPlaylistScreen = () => {
               <Animated.Image
                 source={{
                   uri:
-                    playlist.coverImage ||
+                    user?.urlAvatar ||
                     "https://images.unsplash.com/photo-1507838153414-b4b713384a76",
                 }}
                 style={{
@@ -604,6 +606,7 @@ const DetailPlaylistScreen = () => {
                 console.log("Opening SongBottomSheet for song:", item.title);
                 setSelectedSong(item);
                 setIsSongOptionsOpen(true);
+
               }}
             />
           </View>
