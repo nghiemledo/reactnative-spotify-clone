@@ -74,6 +74,17 @@ export const podcastShowServices = baseRestApi.injectEndpoints({
         { type: PODCAST_SHOW_TAG, id: `category-${categoryId}` }
       ],
     }),
+    searchPodcastShows: builder.query<{ data: PodcastShow[]; message: string }, string>({
+      query: (keyword = "") => ({
+        url: `podcastShow?keyword=${encodeURIComponent(keyword)}`,
+        method: "GET",
+      }),
+      transformResponse: (response: ApiResponse<PodcastShow[]>) => ({
+        data: response.data,
+        message: response.message,
+      }),
+      providesTags: [{ type: PODCAST_SHOW_TAG, id: "SEARCH" }],
+    }),
   }),
 });
 
@@ -138,6 +149,8 @@ export const {
   useLazyGetPodcastShowByIdQuery,
   useGetPodcastShowsByCategoryQuery,
   useLazyGetPodcastShowsByCategoryQuery,
+  useSearchPodcastShowsQuery,
+  useLazySearchPodcastShowsQuery,
   usePrefetch: podcastShowPrefetch,
 } = podcastShowServices;
 

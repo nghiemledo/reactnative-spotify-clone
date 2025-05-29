@@ -40,10 +40,19 @@ export const songServices = baseRestApi.injectEndpoints({
       }),
       providesTags: [{ type: SONG_TAG, id: "TRENDING " }],
     }),
-    
-  }
-),
-overrideExisting: true
+    searchSongs: builder.query<{ data: Song[]; message: string }, string>({
+      query: (keyword = "") => ({
+        url: `${entity}?keyword=${encodeURIComponent(keyword)}`,
+        method: "GET",
+      }),
+      transformResponse: (response: ApiResponse<Song[]>) => ({
+        data: response.data,
+        message: response.message,
+      }),
+      providesTags: [{ type: SONG_TAG, id: "SEARCH" }],
+    }),
+  }),
+  overrideExisting: true
 });
 export const {
   useGetSongsQuery,
@@ -51,5 +60,8 @@ export const {
   useGetSongByIdQuery,
   useLazyGetSongByIdQuery,
   useGetTrendingSongsQuery,
+  useSearchSongsQuery,
+  useLazySearchSongsQuery,
   usePrefetch: songPrefetch,
+
 } = songServices;
