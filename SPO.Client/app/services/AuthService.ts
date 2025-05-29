@@ -12,6 +12,27 @@ interface AuthResponse {
   role: string;
 }
 
+interface SearchResponse {
+  artists: Array<{
+    id: string;
+    name: string;
+    coverImage: string;
+  }>;
+  songs: Array<{
+    id: string;
+    title: string;
+    artistId: string;
+    artistName: string;
+    coverImage: string;
+  }>;
+  shows: Array<{
+    id: string;
+    title: string;
+    creator: string;
+    coverImage: string;
+  }>;
+}
+
 const entity = "user";
 
 export const authServices = baseRestApi.injectEndpoints({
@@ -114,7 +135,6 @@ export const authServices = baseRestApi.injectEndpoints({
         }
       },
     }),
-
     updateUserProfile: builder.mutation<ApiResponse<UserInfo>, UpdateUserProfile>({
       query: (user) => ({
         url: `${entity}`,
@@ -122,7 +142,7 @@ export const authServices = baseRestApi.injectEndpoints({
         body: user,
       }),
       async onQueryStarted(_, { queryFulfilled }) {
-        try {          
+        try {
           await queryFulfilled;
         } catch (error) {
           console.error("Update user profile failed:", error);
@@ -157,6 +177,20 @@ export const authServices = baseRestApi.injectEndpoints({
         }
       },
     }),
+    search: builder.query<ApiResponse<SearchResponse>, { query: string; limit?: number }>({
+      query: ({ query, limit = 10 }) => ({
+        url: `${entity}/search`,
+        method: "GET",
+        params: { q: query, limit },
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error("Search failed:", error);
+        }
+      },
+    }),
     // getFollowedArtists: builder.query<ApiResponse<FollowedArtistResponse[]>, string>({
     //   query: (userId) => ({
     //     url: `${entity}/followed-artists`,
@@ -172,7 +206,7 @@ export const authServices = baseRestApi.injectEndpoints({
     //   },
     // }),
   }),
-  overrideExisting: true, 
+  overrideExisting: true,
 });
 
 export const {
@@ -184,4 +218,5 @@ export const {
   useUpdateUserProfileMutation,
   useFollowArtistMutation,
   useFollowPodcastMutation,
+  useSearchQuery,
 } = authServices;
